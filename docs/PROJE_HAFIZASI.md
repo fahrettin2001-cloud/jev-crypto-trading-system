@@ -41,9 +41,9 @@ Ajan tüm geçmiş yerine önce kısa özeti, ardından ilgili görev ve karar n
 
 ## Yedekleme ve kurtarma planı
 
-Henüz otomatik yedekleme veya Obsidian eşitlemesi kurulmadı. Hedef: kodu ve gizli bilgi içermeyen proje notlarını özel GitHub deposunda sürümlemek; uygulama veritabanı yedeklerini ayrı, şifreli bir depolama alanında saklamak.
+Proje sahibinin Windows bilgisayarında yalnızca `notlar/paylasilan` Markdown notları için saat 23.00'e zamanlanmış bir GitHub yedekleme görevi oluşturuldu. 13 Kasım 2026'da elle başlatılan ilk gönderim doğrulandı; zamanında ve kaçırıldıktan sonra otomatik çalışma henüz test edilmedi. Tam kasa eşitlemesi kurulmuş değildir. SQLite verileri için ayrı şifreli yedek henüz kurulmadı.
 
-Günlük kod/not yedeği ve daha sık veritabanı yedeği seçenekleri, saklama süresi, uyarı yöntemi ve anahtarların güvenli saklanması ekipçe belirlenecek. Günlük yedek son yedekten sonraki değişiklikleri korumayabilir. Yedekler belirli aralıklarla izole bir ortamda geri yüklenerek doğrulanmalı.
+Diğer kod ve notların yedekleme düzeni, veritabanı yedek sıklığı, saklama süresi, uyarı yöntemi ve anahtarların güvenli saklanması ekipçe belirlenecek. Günlük yedek son yedekten sonraki değişiklikleri korumayabilir. Yedekler belirli aralıklarla izole bir ortamda geri yüklenerek doğrulanmalı.
 
 Kurtarma hedefi: (1) depoyu güvenilir kaynaktan geri al, (2) şifreli veritabanı yedeğini izole ortamda geri yükle, (3) gizli anahtarları güvenli yoldan yeniden sağla, (4) kayıtları kontrol et ve ileride gerçek hesap kullanılırsa borsa emir ve varlıklarıyla karşılaştır, (5) canlı işlem öncesi insan değerlendirmesi yap.
 
