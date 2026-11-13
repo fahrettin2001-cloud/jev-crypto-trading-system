@@ -16,6 +16,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik verilerle ayrı bir küçük ağ deneyi ve risk/maliyet duyarlı ödül kaydı planlanıyor; bunlar henüz uygulanmadı. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
 
+## Görev 6 — piyasa araştırma ortamı
+
+`feature/gorev6-piyasa-arastirma` dalında geçmiş fiyatlardan zaman sıralı eğitim/doğrulama/test ayıran, hedefi sınırı aşan örnekleri çıkaran ve lojistik temel modeli basit olasılıklarla karşılaştıran çevrimdışı araştırma taslağı hazırlandı. Sentetik BTCUSDT örneğinde test Brier 0,2566, sabit 0,5 tabanı 0,25; örnek model tabanı geçmedi. 8 özel ve 214 toplam test geçti; mevcut iki CSV ResourceWarning sürüyor. Bu performans kripto piyasası veya kârlılık kanıtı değildir. Ayrıntı `docs/GOREV6-PIYASA-ARASTIRMA.md`.
+
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
 - Görev 5.1, 5.2 ve 5.3 PR #21, #22 ve #23 ile ana dala birleşti. Saatlik canlı fiyatla sanal işlem kodu ve Hostinger yönergesi depodadır. PR yazarı 194 test geçtiğini bildirdi; bu notu yazan ajan yeni sürümü bağımsız test etmedi. Hostinger'da kurulum, zamanlayıcı ve ilk başarılı çalışma henüz bu ajan tarafından doğrulanmadı.
