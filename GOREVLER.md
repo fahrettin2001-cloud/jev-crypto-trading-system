@@ -19,7 +19,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## Görev 1 — Sanal işlem çekirdeği
 
 - Sorumlu: @demirfahrieren-png
-- Durum: İncelemede — çekirdek main'de (PR #2); arayüz notu: docs/gorev1-arayuz.md
+- Durum: Tamamlandı — PR #2 ve #4 ana dala birleşti (13 Kasım 2026). Görev 2'nin `SQLitePortfolio` katmanı çekirdeği değiştirmeden kullanıyor; ana dalda 60 test geçti (13 Kasım akşamı yeniden çalıştırıldı). Arayüz notu: docs/gorev1-arayuz.md
 - Kapsam: Python proje altyapısı, ortak veri modelleri, sanal portföy ve alış/satış.
 - Çıktı: Decimal ile tutarlı tutar ve komisyon hesapları; geçersiz fiyat/miktar, yetersiz para veya varlığın reddi.
 - Sınır: Sadece örnek veri ve sanal bakiye; borsa veya harici servis bağlantısı yok.
@@ -75,9 +75,9 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 - Doğrulama: `python -m unittest discover -s tests -t .` — 52 test geçti.
 - Örnek limitler ekip kararı değildir; borsa ve ajan bağlantısı kurulmadı.
 
-## Terminal arayüzü — incelemeye hazır
+## Terminal arayüzü — ana dalda
 
-- Dal: `feat/portfoy-cli`; henüz ana dala birleşmedi.
+- Dal: `feat/portfoy-cli`; PR #8 ile ana dala birleşti.
 - `python -m jev`: hesap oluşturma, alış, satış, durum ve geçmiş komutları.
 - Mevcut SQLite/risk katmanı kullanılır; her işlemde risk dosyası açıkça seçilir.
 - 60 test geçti (52 mevcut, 8 CLI süreç testi). Kullanım: `docs/CLI.md`.
