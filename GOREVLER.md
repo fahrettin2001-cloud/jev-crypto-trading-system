@@ -13,7 +13,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 1. Güncel main dalını ve açık pull request'leri kontrol et. Çalışmayı konuşmada planlayan biri varsa onunla çakışma.
 2. Almak istediğin görevin sorumlu alanına GitHub kullanıcı adını ekle; ekip aynı anda değiştirirse güncel sürümü kontrol et. Bir görev başka biri tarafından zaten alındıysa tekrar üstlenme.
 3. İlgili işi ayrı bir dalda yap; dosya sahipliğini ve değişiklikleri ekipçe koordine et.
-4. Sonucu, test komutunu, nelerin eksik kaldığını ve varsa sorunları pull request veya görev notunda paylaş. Katılımcılar kendi değişikliklerini birleştirebilir; mümkünse bir ekip arkadaşı incelesin.
+4. Her çalışma sonunda yapılan yenilikleri, test sonuçlarını ve açık işleri `docs/PROJE_HAFIZASI.md` ile ilgili görev notunda güncelle; yetkin ve erişimin varsa ayrı dalda commit/push edip PR aç veya mevcut PR'ı güncelle. Paylaşım ve doğrulama ayrıntıları için proje hafızasındaki 'Her çalışma sonunda GitHub ve hafızayı güncelleme' bölümünü uygula. Katılımcılar kendi değişikliklerini verilen görev talimatlarına uyarak birleştirebilir; mümkünse bir ekip arkadaşı incelesin.
 5. Bu dosyadaki durumu Bekliyor / Çalışılıyor / İncelemede / Tamamlandı olarak güncelle. Bunlar zorunlu otomatik atama değildir.
 
 ## Görev 1 — Sanal işlem çekirdeği
