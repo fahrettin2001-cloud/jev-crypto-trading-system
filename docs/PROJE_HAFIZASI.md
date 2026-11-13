@@ -16,6 +16,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 `feature/gorev6-sinir-agi-deneyi` dalında ayrı bir sentetik XOR sınıflandırma deneyi geliştirildi (Görev #29; tasarım PR #30). 13 Kasım 2026'da eksik Python ortamında elle yürütülen deneyde eğitim öncesi %31, eğitim sonrası %97,75 ve çoğunluk sınıfı tabanı %49,5 elde edildi; otomatik ve tam proje testleri bu ortamda çalıştırılamadı. Bu sonuçlar sentetik sınıflandırmaya aittir, piyasa performansı değildir. Jev, ödülle öğrenme, Hostinger ve işlem entegrasyonu yoktur. Ayrıntı `docs/SINIR-AGI-ILK-DENEY.md`.
 
+## Görev 6 — sentetik ödül hesabı
+
+PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `docs/ODUL-ILK-DENEY.md` eklendi. Net portföy değerindeki değişim ve isteğe bağlı düşüş artışı cezası örneklenir; ücretler net değere zaten dahilse ikinci kez düşülmez. El ile örnek kazanç/zarar, ceza, yanlış girdiler ve JSONL kayıt kontrolü başarılı; unittest ve bütün proje testleri tam Python ortamında bekliyor. Bu bir eğitim algoritması, Jev entegrasyonu veya gerçek/sanal emir sistemi değildir.
+
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
 - Görev 5.1, 5.2 ve 5.3 PR #21, #22 ve #23 ile ana dala birleşti. Saatlik canlı fiyatla sanal işlem kodu ve Hostinger yönergesi depodadır. PR yazarı 194 test geçtiğini bildirdi; bu notu yazan ajan yeni sürümü bağımsız test etmedi. Hostinger'da kurulum, zamanlayıcı ve ilk başarılı çalışma henüz bu ajan tarafından doğrulanmadı.
