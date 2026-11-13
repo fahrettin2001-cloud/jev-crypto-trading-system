@@ -25,7 +25,8 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 - Görev 1 (sanal işlem çekirdeği) Tamamlandı olarak işaretlendi; ana dalda 60 test yeniden çalıştırıldı ve geçti.
 - PR #10 incelendi (yorum, onay değil): dalda 67 test geçiyor, ancak `SQLitePortfolio.risk` property setter'ı sürüm kontrolü olmadan politikayı değiştirebiliyor; limitli hesapta `account.risk = RiskLimits()` sonrası izin listesi dışı ve limit üstü işlem kabul edildi (denemeyle doğrulandı). CLI etkilenmiyor. Ayrıntı ve öneri PR #10 incelemesinde. PR #11 bu dalın üzerine kurulu olduğu için düzeltmeden etkilenebilir.
 - GOREVLER.md'deki terminal arayüzü notu düzeltildi: PR #8 ana dala birleşmiş.
-- Görev 4 (strateji arayüzü, backtest, piyasa/limit emir, zarar durdur/kâr al, Binance Global işlem kuralları, veri indirme aracı) PR #15'te incelemede; ana dala birleşmedi. 148 test geçti. Test verisi sentetik, exchangeInfo örneği doğrulanmadı; çalışma ortamının Binance'e ağ erişimi yok — gerçek veri `python -m jev.binance_data` ile ekip bilgisayarında indirilmeli. Ayrıntı: `docs/gorev4-backtest.md`.
+- Görev 4 ana dala birleşti (PR #15). 13 Kasım akşamı ilk gerçek veri backtest'i: Binance Global BTCUSDT 1s, Ağu–Eki 2026, SHA-256 doğrulamalı; SMA 24/96 +8,83% (düşüş %13,79), al-tut +21,93%. Tek dönem ve tek parametre; strateji hakkında genel sonuç değil. Bulut ve masaüstü çalışma ortamlarında ağ kapalı; veri Claude masaüstü tarayıcısıyla alındı. `data/exchange_info_sample.json` artık gerçek exchangeInfo.
+- PR #14 ve #10 ana dala birleşti (risk politikası sürüm denetimi; ana dalda 156 test). #11 hedefi `main` yapıldı; birleşmeden önce günlük zarar sınırının göç etmiş hesaplarda kalıcı kilit sorunu düzeltilmeli. #11 birleşince Görev 4 backtest motoru `daily_loss` / `market_prices` geçecek şekilde güncellenmeli.
 
 ## Nasıl birlikte çalışılır?
 
