@@ -193,7 +193,9 @@ class _Engine:
                 raise TradeError(
                     f"Likidite: tutar {quantity * fill:.2f}, barın {volume:.2f} hacminin "
                     f"%{c.max_volume_share * 100} sınırını aşıyor")
-        if apply_risk and c.risk is not None:
+        if apply_risk and c.risk is not None and intent.side == BUY:
+            # Risk limitleri yeni risk almayı sınırlar. Satış riski azaltır; işlem başına
+            # tutar sınırı satışa uygulanırsa değeri artmış bir pozisyon hiç satılamaz.
             quantity, fill = c.risk.check(intent.symbol, quantity, fill)
 
         trial = copy.deepcopy(portfolio)

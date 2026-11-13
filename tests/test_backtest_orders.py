@@ -279,3 +279,42 @@ class ExportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RiskOnSellTests(unittest.TestCase):
+    def test_trade_limit_does_not_block_selling_a_grown_position(self):
+        # 40 USDT'lik alış limite (50) uyar; fiyat iki katına çıkınca satış 80 USDT
+        # olur. Satış riski azalttığı için tutar sınırına takılmamalı.
+        risk = RiskLimits(max_trade_notional="50", allowed_symbols=[S])
+        s = Scripted({0: [OrderIntent(S, BUY, quantity="0.4")],
+                      2: [OrderIntent(S, SELL, quantity="ALL")]})
+        rows = [(100,) * 4, (100,) * 4, (200,) * 4, (200,) * 4]
+        r = run_backtest(ohlc(rows), s, cfg(risk=risk))
+        self.assertEqual([t.side for t in r.trades], [BUY, SELL])
+        self.assertEqual(r.trades[1].quantity * r.trades[1].price, Decimal("80"))
+        self.assertEqual(r.rejections, [])
+
+    def test_trade_limit_still_blocks_large_buys(self):
+        risk = RiskLimits(max_trade_notional="50")
+        s = Scripted({0: [OrderIntent(S, BUY, quantity=1)]})
+        r = run_backtest(ohlc([(100,) * 4] * 2), s, cfg(risk=risk))
+        self.assertEqual(r.trades, [])
+        self.assertIn("risk", r.rejections[0].reason)
+
+
+class MaxQuoteTests(unittest.TestCase):
+    def test_sma_buy_capped_by_max_quote(self):
+        from jev.strategy import PortfolioView
+        closes = [100 - i for i in range(8)] + [92 + 3 * i for i in range(8)]
+        strat = SmaCross(S, 2, 4, fraction="0.95", max_quote="50")
+        for i, c in enumerate(closes):
+            out = strat.on_bar(Bar(T0 + timedelta(hours=i), {S: c}),
+                               PortfolioView(Decimal("1000"), equity=Decimal("1000")))
+            if out:
+                self.assertEqual(out[0].quote_amount, Decimal("50"))
+                return
+        self.fail("alış önerisi gelmedi")
+
+    def test_invalid_max_quote(self):
+        with self.assertRaises(ValueError):
+            SmaCross(S, 2, 4, max_quote="0")

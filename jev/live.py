@@ -203,7 +203,8 @@ def build_strategy(settings: dict):
                                           max_fraction=settings["fraction"])
         parts.append(SmaCross(symbol, settings["fast"], settings["slow"], settings["fraction"],
                               stop_loss_pct=settings.get("stop_loss_pct"),
-                              take_profit_pct=settings.get("take_profit_pct"), sizer=sizer))
+                              take_profit_pct=settings.get("take_profit_pct"), sizer=sizer,
+                              max_quote=settings.get("max_trade_notional")))
     return parts[0] if len(parts) == 1 else Combined(parts)
 
 
