@@ -28,10 +28,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 ## İnceleme devri — 13 Kasım 2026
 
-- PR #10 açık: kalıcı risk politikası sürüm kontrolü eksikleri için [PR #14](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/pull/14) bu dala önerildi. Sürüm karşılaştırması eşzamanlı değişikliklerin çakışmasını önler; yetkilendirme mekanizması değildir.
-- PR #11, PR #10'un dalına bağlıdır. [PR #16](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/pull/16) risk sürümüne uyum ve Windows'ta geçici yedek veritabanı bağlantılarının kapatılmasını önerir. Bağımsız inceleme ve testler tamamlanmadan üst PR'ları birleştirmeyin.
+- [PR #14](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/pull/14), PR #10 dalına birleştirildi; PR #10 da ana dala alındı. Kalıcı risk politikası sürüm kontrolü düzeltmesi ana daldadır. Sürüm karşılaştırması eşzamanlı değişikliklerin çakışmasını önler; yetkilendirme mekanizması değildir.
+- PR #11'in hedefi ana daldır; güncel ana dalla çakışma çözümü ve entegrasyon testi gerekir. [PR #16](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/pull/16) risk sürümüne uyum ve Windows'ta geçici yedek veritabanı bağlantılarının kapatılmasını önerir. Bağımsız inceleme ve testler tamamlanmadan üst PR'ları birleştirmeyin.
 - Yerelde PR #14 tek başına 68 testi geçti; PR #14 ile PR #16 bir arada denendiğinde Windows üzerinde 81 test geçti. PR #16'daki ilgili 8 test ayrıca geçti. Bunlar yerel sonuçlardır; GitHub kontrolleri ve PR'ların güncel dallara entegrasyonu ayrıca doğrulanmalı.
-- Sıra: PR #14'ü PR #10 dalında incele; PR #16'yı PR #11 dalında incele; sonra PR #10 ve PR #11'i güncel tabanlarıyla ve testlerle tekrar değerlendir. PR #3'e dokunulmadı.
+- Sıra: PR #16'yı PR #11 dalında incele; PR #11'in güncel ana dalla çakışmasını çöz ve tüm testleri yeniden çalıştır. Demir'in incelemesinde ana dal, PR #10 ve #14 birlikte 156 test geçtiği bildirildi. PR #3'e dokunulmadı.
 - PR #11'in önerdiği yedekte geçici SQLite kopyaları şifresizdir ve silinmeleri güvenli silme garantisi vermez. Windows'ta `0o600` tek başına kullanıcıya özel ACL garantisi değildir; gerçek hassas veriler öncesi ayrıca çözüm ve hata yolu testleri gerekir. Şifreli SQLite yedeği canlı kullanım için kurulmuş veya doğrulanmış sayılmamalı.
 
 ## Nasıl birlikte çalışılır?
