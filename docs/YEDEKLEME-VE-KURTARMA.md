@@ -2,7 +2,7 @@
 
 ## Mevcut durum
 
-GitHub'a gönderilen commit'ler, depoya alınmış proje kodunun ve notların bir kopyasını sağlar. Yerel ve henüz gönderilmemiş değişiklikler GitHub'da bulunmaz. Her gün otomatik yedekleme henüz kurulmuş veya doğrulanmış değildir.
+GitHub'a gönderilen commit'ler, depoya alınmış proje kodunun ve notların bir kopyasını sağlar. Yerel ve henüz gönderilmemiş değişiklikler GitHub'da bulunmaz. Proje sahibinin Windows bilgisayarında yalnızca `notlar/paylasilan` içindeki Markdown dosyaları için her gün 23.00'e bir görev oluşturuldu. İlk manuel denemede GitHub'a gönderim doğrulandı; saatli çalışma ve kaçırılan görevin sonradan çalışması henüz test edilmedi. Diğer dosyalar ve SQLite bu otomasyonun kapsamı dışındadır.
 
 ## Gün sonu: manuel işlem
 
@@ -23,4 +23,8 @@ GitHub'a gönderilen commit'ler, depoya alınmış proje kodunun ve notların bi
 
 SQLite verileri GitHub notlarından ayrı tutulur. İleride veritabanı kullanıldığında tutarlı yedek için SQLite'ın backup API'si gibi uygun bir yöntem kullanılmalı, yedek şifrelenmiş ve erişimi sınırlandırılmış ayrı bir yerde tutulmalıdır. Geri yükleme bir kopya üzerinde düzenli olarak denenmelidir.
 
-Günlük otomatik çalışma kurulmadan önce çalıştırılacak bilgisayarın açık olması, kimlik doğrulama, başarısızlık bildirimi, çatışmalar, gizli bilgilerin dışlanması ve geri yükleme testi kararlaştırılmalıdır. Bu dosya bir otomasyon kurmaz.
+Kurulu görev için Windows oturumu ve GitHub kimlik doğrulaması gerekir. Git çatışmalarında veya bağlantı hatalarında işlem durur; sonuçlar yerel `Jev-Yedekleme/yedekleme.log` dosyasındadır, ayrı bir bildirim kurulmamıştır. Görev, saatli çalışma, kaçırılan çalışma ve geri yükleme yönünden ayrıca test edilmelidir.
+
+## Windows yedekleme betiklerini geri alma
+
+`araclar/windows-yedekleme/` klasöründe proje sahibinin bilgisayarındaki iki betiğin kopyası bulunur. GitHub'daki kopyayı doğrudan çalıştırmak yerine, depoyu klonladıktan sonra iki dosyayı deponun yanındaki `Jev-Yedekleme` klasörüne kopyalayın. Betikler `jev-crypto-trading-system` adlı kardeş klasörü ve Windows için varsayılan Git yolunu kullanır. `yedekle.ps1` içindeki GitHub depo adresi ve commit kimliği proje sahibine özeldir; başka ekip üyeleri kurmadan önce kendi çalışma düzenlerine göre gözden geçirmelidir. `kur.ps1` ilk yedekleme denemesinin ardından Windows görevi oluşturmaya çalışır. Mevcut görevi değiştirmeden önce betikleri inceleyin. Bu kopyaların varlığı başka bir bilgisayarda görevin kurulduğu anlamına gelmez.
