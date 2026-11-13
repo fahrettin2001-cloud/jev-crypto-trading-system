@@ -6,7 +6,7 @@ Durum: İlk taslak — 13 Kasım 2026. Bu dosya Obsidian'da açılabilen düz Ma
 
 Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bir model ve Hermes Agent kullanılması planlanan bir sistemdir. İleride bağımsız risk denetimi sonrasında Binance üzerinde gerçek işlemler hedeflenir. Kârlılık garanti edilmez.
 
-İlk aşama, dış servislerden bağımsız sanal işlemler: Python, Decimal, SQLite ve testler için ekipçe planlama yapılmıştır. Hangi uygulama kodunun tamamlandığı güncel depo ve açık değişikliklerden kontrol edilir. Binance çeşidi ve onaylanmış risk limitleri henüz seçilmedi. Haber keşfi için CryptoPanic, borsaya özel duyurular için Binance Global başlangıç adayıdır; canlı bağlantı kurulmadı. Ayrıntılar: `docs/HABER-KAYNAKLARI.md`.
+İlk aşama, dış servislerden bağımsız sanal işlemler: Python, Decimal, SQLite ve testler için ekipçe planlama yapılmıştır. Hangi uygulama kodunun tamamlandığı güncel depo ve açık değişikliklerden kontrol edilir. Borsa olarak Binance Global seçildi (13 Kasım 2026, `docs/kararlar/2026-11-13-binance-global.md`); onaylanmış risk limitleri henüz seçilmedi. Haber keşfi için CryptoPanic, borsaya özel duyurular için Binance Global başlangıç adayıdır; canlı bağlantı kurulmadı. Ayrıntılar: `docs/HABER-KAYNAKLARI.md`.
 
 ## Son çalışma durumu — 13 Kasım 2026, sabah
 

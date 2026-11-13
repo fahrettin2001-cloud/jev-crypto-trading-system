@@ -4,7 +4,7 @@ Son güncelleme: 13 Kasım 2026
 
 ## Amaç ve mevcut durum
 
-Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Binance Global veya TR seçimi henüz kesinleşmedi. Hostinger bu aşamanın kapsamı dışındadır.
+Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Borsa olarak Binance Global seçildi ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Hostinger bu aşamanın kapsamı dışındadır.
 
 Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki işler öneridir; kimseye onayı olmadan rol atanmadı.
 
@@ -50,7 +50,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 
 ## İleriki aşamalar — Henüz başlanmadı
 
-- [ ] Binance Global / Binance TR seçimi ve yalnızca halka açık piyasa verisi.
+- [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
 - [ ] Haber kaynağı, Jev ve güçlü model bağlantılarının test ortamında değerlendirilmesi. Başlangıç için [haber kaynakları ve ajan kuralları](docs/HABER-KAYNAKLARI.md): önce çevrimdışı örnekler; CryptoPanic ve Binance duyuruları henüz bağlı değil.
 - [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi.
 - [ ] Hostinger üzerinde dağıtım ve yedekleme, ayrı plan ve testlerden sonra.
@@ -62,7 +62,7 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 
 ## Açık kararlar
 
-- Hangi borsa: Binance Global mi Binance TR mi?
+- ~~Hangi borsa: Binance Global mi Binance TR mi?~~ → Binance Global ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Türkiye'den gerçek hesap kullanımının yasal durumu canlı aşamadan önce kontrol edilecek.
 - İlk sanal bütçe, işlem çiftleri ve örnek komisyon oranı?
 - Üç görevden hangisini kim üstlenecek?
 - Strateji, risk sınırları ve haber kaynakları?

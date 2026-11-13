@@ -44,7 +44,7 @@ Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pul
 
 ## Belirlenecek kararlar
 
-- Binance Global mi Binance TR mi?
+- ~~Binance Global mi Binance TR mi?~~ → Binance Global ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md))
 - İlk izlenecek işlem çiftleri ve sanal bütçe.
 - Üç kişinin görev dağılımı.
 - Başlangıç risk limitleri ve haber kaynakları.
