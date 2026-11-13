@@ -28,6 +28,19 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 4. Durum, alınan kararlar ve açık sorular için aşağıdaki şablonları kullanın.
 5. Birleştirme yetkisi olan ekip üyeleri kendi değişikliklerini birleştirebilir; özellikle riskli hesaplamalarda ekip incelemesi önerilir.
 
+## Her çalışma sonunda GitHub ve hafızayı güncelleme
+
+Bu projede çalışan her ajan, yetkisi ve kullandığı ortamın araçları izin verdiğinde aşağıdaki adımları uygular:
+
+1. Güncel ana dalı, kendi dalını ve devam eden işleri kontrol edin; başkalarının değişikliklerini koruyun.
+2. Yapılan işle ilgili gerekli kodu, testleri ve kısa açıklamayı güncelleyin. Anlamlı proje yenilikleri için bu dosyanın güncel durumunu ve ilgili görevleri `GOREVLER.md` içinde güncelleyin; tarih, neyin değiştiği, test sonucu, açık işler ve ilgili dal/PR/commit bağlantısını belirtin.
+3. Gerçekleşmiş, test edilmiş, taslak ve sadece önerilmiş işleri birbirinden ayırın; henüz birleşmemiş işi ana dalda tamamlanmış göstermeyin.
+4. Değişiklikleri gözden geçirip görev için ayrı dalda commit ve GitHub'a push edin; ekip incelemesi için PR açın veya mevcut PR'ı güncelleyin. Birleştirme için görevde verilen talimatları ve depo kurallarını izleyin; açıkça yasaklanan birleştirme veya kapatma işlemi yapmayın.
+5. GitHub'da commit veya PR'ın görünür olduğunu doğrulayın ve sonucu ekip üyesine aktarın. Erişim, kimlik doğrulama, test veya çatışma engel olursa bunu açıklayın; gönderilmemiş değişiklikleri gönderilmiş gibi raporlamayın. Zorla push yapmayın.
+6. GitHub deposunun güncel görünürlüğünü kontrol edin: şu anda herkese açıktır. Anahtar, parola, kişisel/hassas veri, ham veritabanı ve özel sohbetleri yayımlamayın. İlgili dosyaları seçerek ekleyin; tüm klasörü körlemesine commit etmeyin.
+
+Bu kurallar bir zamanlayıcı veya otomatik senkronizasyon oluşturmaz. Her ajan yalnızca yetkilendirildiği ve erişebildiği ortamda işlem yapabilir; yerel değişiklikler GitHub'a gönderilene kadar diğer ajanlar tarafından görülemez.
+
 ## Obsidian ve token kullanımı
 
 Bu dosya ve depodaki diğer Markdown dosyaları bir proje klasörü olarak Obsidian'da açılabilecek şekilde tutulur. Herkesin dosyaları Git aracılığıyla nasıl güncelleyeceği ayrıca kurulmalı; bu not kendiliğinden senkronizasyon sağlamaz. Mevcut kişisel kasayı otomatik olarak paylaşmayın.
