@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from contextlib import closing
 import sqlite3
 import subprocess
 import sys
@@ -87,7 +88,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(json.loads(self.run_cli('history').stdout), [])
 
     def test_incompatible_database_not_modified(self):
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute('CREATE TABLE unrelated (value TEXT)')
         before = self.path.read_bytes()
         self.run_cli('status', ok=False)

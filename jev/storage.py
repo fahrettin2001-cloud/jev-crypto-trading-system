@@ -111,16 +111,14 @@ class SQLitePortfolio:
     def risk(self):
         return self._read_policy()[1]
 
-    @risk.setter
-    def risk(self, value):
-        self.set_risk(value)
-
-    def set_risk(self, risk, *, expected_version=None):
+    def set_risk(self, risk, *, expected_version):
         """Bilinçli politika değişikliği; sürüm geçmişini korur."""
+        if type(expected_version) is not int or expected_version < 0:
+            raise ValueError("Beklenen risk sürümü negatif olmayan tam sayı olmalı")
         self._db.execute("BEGIN IMMEDIATE")
         try:
             current = self._db.execute("SELECT COALESCE(MAX(version),0) FROM risk_policies").fetchone()[0]
-            if expected_version is not None and current != expected_version:
+            if current != expected_version:
                 raise RiskError("Risk sürümü değişti; güncel politikayı yeniden okuyun")
             version = self._insert_policy(risk)
             self._db.commit()
