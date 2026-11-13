@@ -51,7 +51,7 @@ Alıştan sonra komisyon dahil asgari nakit (`min_cash_reserve`) ve işlem fiyat
 isteğe bağlıdır. Bu iki kontrol satışlara uygulanmaz; işlem tutarı ve sembol
 kontrolleri alış ve satışta sürer. Risk reddi hiçbir kayıt yazmadan rollback yapar.
 Sayısal limit varsayılanı yoktur. Yetersiz nakit ve fazla satış çekirdekte reddedilir.
-Risk ayarları dosyaya kaydedilmez; her açılışta açıkça verilmelidir.
+Risk politikası artık sürümlü olarak SQLite’ta tutulur; yeniden açma kayıtlı politikayı kullanır. Eski hesaplar için [göç yönergesini](RISK-KALICILIK-INCELEMESI.md) okuyun.
 Doğrudan `Portfolio` kullanımı bu ek risk katmanını çalıştırmaz.
 
 Bu ilk taslakta günlük zarar, tüm sembolleri kapsayan toplam pozisyon riski ve canlı emir
@@ -87,7 +87,7 @@ Bu tutarlar yalnızca örnektir. Nakit rezerve eşitse ve pozisyon değeri üst
 limite eşitse alış kabul edilir. Tek sembol limiti, o semboldeki eski ve yeni
 miktarın toplamını son işlem fiyatıyla değerler; ortalama maliyeti kullanmaz.
 Piyasa hareketlerini sürekli izlemez ve farklı sembolleri birlikte sınırlamaz.
-Politika, `SQLitePortfolio(..., risk=limits)` ile her açılışta sağlanır.
+Politika yeni hesapta risk=limits ile kaydedilir; yeniden açılırken kayıtlı sürüm kullanılır.
 
 Genişletme sonrası 39 test geçti: önceki 30 teste ek olarak rezerv sınırı,
 komisyonun rezerve etkisi, birikimli pozisyon sınırı, yeni fiyatla değerleme,
@@ -125,7 +125,7 @@ harici fiyat içeriği kontrol saatini belirlememelidir. Tarihsel simülasyonda 
 ilgili simülasyon anını döndürmelidir; güncellik kontrolü için işlem `timestamp`ini
 eskiletmek yeterli değildir.
 
-Politika her yeniden açılışta `risk=limits` ile verilir. Bu katman bir veri kaynağına
+Politika yeniden açılışta SQLite’tan yüklenir. Bu katman bir veri kaynağına
 bağlanmaz; gözlem zamanının kaynaktaki doğruluğunu veya fiyatın gerçek piyasa fiyatı
 olduğunu doğrulamaz. Gözlem zamanı bu sürümde veritabanına ayrıca kaydedilmez.
 Fiyat hatasında satış için de geçerli bir fiyat gerekir; nakit/pozisyon üst limitleri
