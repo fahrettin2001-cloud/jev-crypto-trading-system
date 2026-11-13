@@ -46,11 +46,15 @@ ortalama maliyet ile zamanlı işlem geçmişi yeniden yüklenir.
 `RiskLimits` kayıt katmanının her alış ve satışında çekirdekten önce çalışır:
 boş sembol, sonlu/pozitif olmayan fiyat veya miktar reddedilir. İsteğe bağlı
 sembol izin listesi ve komisyon hariç işlem tutarı üst limiti uygulanır.
+Alıştan sonra komisyon dahil asgari nakit (`min_cash_reserve`) ve işlem fiyatıyla
+ölçülen tek sembol pozisyon değeri (`max_position_notional`) sınırları da
+isteğe bağlıdır. Bu iki kontrol satışlara uygulanmaz; işlem tutarı ve sembol
+kontrolleri alış ve satışta sürer. Risk reddi hiçbir kayıt yazmadan rollback yapar.
 Sayısal limit varsayılanı yoktur. Yetersiz nakit ve fazla satış çekirdekte reddedilir.
 Risk ayarları dosyaya kaydedilmez; her açılışta açıkça verilmelidir.
 Doğrudan `Portfolio` kullanımı bu ek risk katmanını çalıştırmaz.
 
-Bu ilk taslakta günlük zarar, fiyat güncelliği, toplam pozisyon riski ve canlı emir
+Bu ilk taslakta günlük zarar, fiyat güncelliği, tüm sembolleri kapsayan toplam pozisyon riski ve canlı emir
 kontrolleri yoktur. Şifreleme, yedekleme, şema göçü ve birden fazla hesap desteği
 bu değişikliğin kapsamı dışındadır. SQLite dosyaları yereldir, Git'e eklenmez.
 
@@ -67,3 +71,25 @@ geçersiz girdileri, risk reddini ve iki bağlantının güncel hesapla çalış
 kapsar. SQLite trigger ile bakiye güncellemesinden sonraki işlem kaydı yazımı
 bilerek bozulur; bakiye, pozisyonlar ve geçmişin tamamen geri alındığı, yeniden
 açıldığında da değişmediği ve sonraki işlemin çalıştığı doğrulanır.
+
+## Genişletilmiş limit örneği
+
+```python
+limits = RiskLimits(
+    max_trade_notional="1000",
+    allowed_symbols={"BTCUSDT", "ETHUSDT"},
+    min_cash_reserve="2000",
+    max_position_notional="3000",
+)
+```
+
+Bu tutarlar yalnızca örnektir. Nakit rezerve eşitse ve pozisyon değeri üst
+limite eşitse alış kabul edilir. Tek sembol limiti, o semboldeki eski ve yeni
+miktarın toplamını son işlem fiyatıyla değerler; ortalama maliyeti kullanmaz.
+Piyasa hareketlerini sürekli izlemez ve farklı sembolleri birlikte sınırlamaz.
+Politika, `SQLitePortfolio(..., risk=limits)` ile her açılışta sağlanır.
+
+Genişletme sonrası 39 test geçti: önceki 30 teste ek olarak rezerv sınırı,
+komisyonun rezerve etkisi, birikimli pozisyon sınırı, yeni fiyatla değerleme,
+sembol bazında uygulama, limit dışındayken pozisyon azaltan satış, yeniden açma,
+geçersiz limitler ve sayısal taşma senaryoları doğrulandı.
