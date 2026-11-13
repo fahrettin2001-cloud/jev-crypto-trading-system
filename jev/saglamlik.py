@@ -159,7 +159,9 @@ def analyse(bars: Sequence[Bar], symbols: Sequence[str], rules: str | None = Non
                       f"{f}/{s} sabit") for f in fasts for s in slows if f < s]
     live = run(bars, live_settings(symbols, rules=rules), "canlı ayar 24/96")
     costs = [run(bars, signal_settings(symbols, 24, 96, rules=rules, **kw), label)
-             for label, kw in (("komisyon %0,075 (BNB)", {"taker_rate": "0.00075"}),
+             for label, kw in (("masrafsız (yalnızca sinyalin kendisi)",
+                                {"taker_rate": "0", "slippage_bps": "0"}),
+                               ("komisyon %0,075 (BNB)", {"taker_rate": "0.00075"}),
                                ("komisyon %0,1 (varsayılan)", {}),
                                ("kayma 10 bps", {"slippage_bps": "10"}),
                                ("kayma 20 bps", {"slippage_bps": "20"}))]
