@@ -100,7 +100,7 @@ class PriceFreshnessTests(unittest.TestCase):
                 account.buy('BTCUSDT', 1, 100, price_observed_at=observed_at-timedelta(days=2))
 
     def test_opt_in_preserves_existing_offline_workflow(self):
-        self.account.risk = RiskLimits()
+        self.account.set_risk(RiskLimits(), expected_version=1)
         self.account.buy('BTCUSDT', 1, 100)
         self.assertEqual(len(self.account.portfolio.trades), 1)
 
