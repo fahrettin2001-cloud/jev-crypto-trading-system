@@ -61,7 +61,9 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## Görev 5 — Botu geliştirme: ölçüm, risk ve yeni sinyaller
 
 - Sorumlu: @demirfahrieren-png
-- Durum: Devam ediyor — 5.1 (PR #21), 5.2 (PR #22) ve 5.3 (PR #23) ana dala birleşti. Hostinger üzerinde kurulum ve saatlik çalışma bu notu yazan ajan tarafından doğrulanmadı (`docs/CANLI-SANAL-ISLEM.md`).
+- Durum: Devam ediyor — 5.1 (PR #21), 5.2 (PR #22) ve 5.3 (PR #23, #24, #26) ana dala birleşti. 5.4 (haber duygu analizi) sırada.
+- Canlı sanal işlem (13 Kasım 2026): Hostinger sunucusuna kuruldu ve doğrulandı. 500 USDT sanal bakiye, BTCUSDT + ETHUSDT, saatlik çalışma (`jev-live.timer`, her saat :01). Kurulum: `docs/CANLI-SANAL-ISLEM.md`.
+- Sonuçlar: Her sabah 08:20'de (TR) herkese açık [`demirfahrieren-png/jev-canli-sonuclar`](https://github.com/demirfahrieren-png/jev-canli-sonuclar) deposuna yayınlanıyor (`jev-sonuc.timer`, yalnızca o depoya yazabilen deploy key). `son/durum.txt` güncel durumu, `son/islemler.csv` işlemleri gösterir.
 - Kapsam: 5.1 oynaklığa göre pozisyon büyüklüğü, 5.2 karar günlüğü ve güven kalibrasyonu, 5.3 canlı sanal işlem, 5.4 haber duygu analizi. Jev bağlantısı (@fahrettin2001-cloud) bu görevin dışında.
 - Sınır: Gerçek emir, hesap veya API anahtarı yok. 5.3 ve 5.4'ün canlı kısımları ağ erişimi olan bir ekip bilgisayarında çalıştırılacak.
 - Ayrıntı: `docs/gorev5-gelistirmeler.md`.
@@ -71,7 +73,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
 - [ ] Haber kaynağı, Jev ve güçlü model bağlantılarının test ortamında değerlendirilmesi. Başlangıç için [haber kaynakları ve ajan kuralları](docs/HABER-KAYNAKLARI.md): önce çevrimdışı örnekler; CryptoPanic ve Binance duyuruları henüz bağlı değil.
 - [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi. Görev 4'te başlandı (backtest ve ölçümler); gerçek veriyle çalıştırma bekliyor.
-- [ ] Hostinger üzerinde dağıtım ve yedekleme, ayrı plan ve testlerden sonra.
+- [ ] Hostinger üzerinde yedekleme. Sanal işlem dağıtımı Görev 5.3 kapsamında yapıldı.
 - [ ] Gerçek emir bağlantısı, ancak sanal testler ve ekip değerlendirmesinden sonra ayrı aşama.
 
 ## Güvenlik ve veri
