@@ -8,7 +8,8 @@ Jev bağlantısı @fahrettin2001-cloud'da; bu görev onunla çakışmayan, Jev g
 |---|---|---|---|
 | 5.1 | Oynaklığa göre pozisyon büyüklüğü | Az emekle riski azaltır | Tamamlandı (PR #21) |
 | 5.2 | Karar günlüğü ve güven kalibrasyonu | "Jev %70 emin dediğinde %70 haklı mı?" sorusunu cevaplar | İncelemede (PR #22) |
-| 5.3 | Canlı sanal işlem | Büyük modellerin geçmişi "bilmesi" sorununu ve gerçek koşulları ancak bu sınar; Hostinger'da saatlik çalışır | İncelemede — kurulum: `docs/CANLI-SANAL-ISLEM.md` |
+| 5.3 | Canlı sanal işlem | Büyük modellerin geçmişi "bilmesi" sorununu ve gerçek koşulları ancak bu sınar; Hostinger'da saatlik çalışır | Çalışıyor (13 Kasım 2026, 500 USDT) — kurulum: `docs/CANLI-SANAL-ISLEM.md` |
+| 5.5 | Strateji sağlamlık testi | Ayar ızgarası, çeyrekler, ileriye dönük seçim; SMA 24/96 masraflar sonrası 2 yılda zararda | Yapıldı — `docs/saglamlik-2026-11.md` |
 | 5.4 | Haber duygu analizi | Projenin asıl fikri; Jev'e ek girdi. Haberler talimat değil veridir | Bekliyor |
 
 ## 5.3 Canlı sanal işlem
