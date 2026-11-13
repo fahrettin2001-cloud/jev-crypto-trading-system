@@ -1,74 +1,89 @@
-import sqlite3
-import tempfile
 import unittest
 from decimal import Decimal
-from pathlib import Path
 
-from trading import Portfolio, TradeError
+from jev import FeeSchedule, Portfolio, TradeError
 
 
 class PortfolioTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
-        self.path = Path(self.temp.name) / "portfolio.sqlite3"
-        self.portfolio = Portfolio(self.path)
-        self.portfolio.initialize("1000")
+        self.p = Portfolio(cash=10000, fees=FeeSchedule(taker_rate="0.001"))
 
-    def tearDown(self):
-        self.portfolio.close()
-        self.temp.cleanup()
+    def test_buy_deducts_cost_and_fee(self):
+        t = self.p.buy("BTCUSDT", "0.1", 50000)  # 5000 + 5 komisyon
+        self.assertEqual(t.fee, Decimal("5"))
+        self.assertEqual(self.p.cash, Decimal("4995"))
+        pos = self.p.positions["BTCUSDT"]
+        self.assertEqual(pos.quantity, Decimal("0.1"))
+        self.assertEqual(pos.avg_cost, Decimal("50050"))  # komisyon dahil
 
-    def test_buy_sell_fees_and_history(self):
-        self.portfolio.trade("buy", "btc", "0.1", "1000", "0.01")
-        self.portfolio.trade("sell", "BTC", "0.04", "1200", "0.01")
-        self.assertEqual(self.portfolio.balances(), {"BTC": Decimal("0.06"), "USDT": Decimal("946.52")})
-        history = self.portfolio.history()
-        self.assertEqual(len(history), 2)
-        self.assertEqual((history[0]["side"], Decimal(history[0]["fee"]), Decimal(history[0]["total"])), ("buy", Decimal("1"), Decimal("101")))
-        self.assertEqual((history[1]["side"], Decimal(history[1]["fee"]), Decimal(history[1]["total"])), ("sell", Decimal("0.48"), Decimal("47.52")))
+    def test_average_cost_over_two_buys(self):
+        fees = FeeSchedule(taker_rate="0")
+        p = Portfolio(cash=10000, fees=fees)
+        p.buy("ETHUSDT", 1, 2000)
+        p.buy("ETHUSDT", 1, 3000)
+        self.assertEqual(p.positions["ETHUSDT"].avg_cost, Decimal("2500"))
 
-    def test_reopen_restores_balances_and_history(self):
-        self.portfolio.trade("buy", "ETH", "0.25", "100", "0.002")
-        expected = self.portfolio.balances(), self.portfolio.history()
-        self.portfolio.close()
-        self.portfolio = Portfolio(self.path)
-        self.assertEqual((self.portfolio.balances(), self.portfolio.history()), expected)
-        self.portfolio.trade("sell", "ETH", "0.1", "120")
-        self.assertEqual(self.portfolio.balances()["ETH"], Decimal("0.15"))
+    def test_round_trip_at_same_price_loses_exactly_fees(self):
+        self.p.buy("BTCUSDT", "0.1", 50000)
+        t = self.p.sell("BTCUSDT", "0.1", 50000)
+        self.assertEqual(self.p.total_fees, Decimal("10"))
+        self.assertEqual(self.p.cash, Decimal("9990"))
+        self.assertEqual(t.realized_pnl, Decimal("-10"))
+        self.assertNotIn("BTCUSDT", self.p.positions)
 
-    def test_rejections_leave_balances_and_history_unchanged(self):
-        cases = [("buy", "BTC", "2", "1000", "0"), ("sell", "BTC", "1", "1", "0"),
-                 ("buy", "BTC", "0", "1", "0"), ("buy", "BTC", "1", "-1", "0"),
-                 ("buy", "BTC", "1", "NaN", "0"), ("buy", "BTC", "1", "1", "1.1"),
-                 ("buy", "USDT", "1", "1", "0"), ("buy", "BTC", 0.1, "1", "0")]
-        before = self.portfolio.balances(), self.portfolio.history()
-        for args in cases:
-            with self.subTest(args=args), self.assertRaises(TradeError):
-                self.portfolio.trade(*args)
-            self.assertEqual((self.portfolio.balances(), self.portfolio.history()), before)
+    def test_profitable_sell(self):
+        self.p.buy("BTCUSDT", "0.1", 50000)          # maliyet 5005
+        t = self.p.sell("BTCUSDT", "0.1", 60000)     # gelir 6000 - 6
+        self.assertEqual(t.realized_pnl, Decimal("989"))
+        self.assertEqual(self.p.realized_pnl, Decimal("989"))
+        self.assertEqual(self.p.cash, Decimal("10989"))
 
-    def test_database_failure_after_balance_updates_rolls_back_everything(self):
-        self.portfolio.db.execute("CREATE TRIGGER fail_trade BEFORE INSERT ON trades BEGIN SELECT RAISE(ABORT, 'simulated failure'); END")
-        with self.assertRaises(sqlite3.IntegrityError):
-            self.portfolio.trade("buy", "BTC", "1", "100")
-        self.assertEqual(self.portfolio.balances(), {"USDT": Decimal("1000")})
-        self.assertEqual(self.portfolio.history(), [])
-        with Portfolio(self.path) as reopened:
-            self.assertEqual(reopened.balances(), {"USDT": Decimal("1000")})
-            self.assertEqual(reopened.history(), [])
+    def test_partial_sell_keeps_avg_cost(self):
+        self.p.buy("BTCUSDT", "0.1", 50000)
+        self.p.sell("BTCUSDT", "0.04", 55000)
+        pos = self.p.positions["BTCUSDT"]
+        self.assertEqual(pos.quantity, Decimal("0.06"))
+        self.assertEqual(pos.avg_cost, Decimal("50050"))
 
-    def test_reinitialization_does_not_reset_portfolio(self):
+    def test_equity_and_unrealized_pnl(self):
+        self.p.buy("BTCUSDT", "0.1", 50000)
+        prices = {"BTCUSDT": Decimal("52000")}
+        self.assertEqual(self.p.market_value(prices), Decimal("5200"))
+        self.assertEqual(self.p.equity(prices), Decimal("10195"))
+        self.assertEqual(self.p.unrealized_pnl(prices), Decimal("195"))
+
+    def test_insufficient_cash_rejected_without_side_effects(self):
         with self.assertRaises(TradeError):
-            self.portfolio.initialize("5000")
-        self.assertEqual(self.portfolio.balances(), {"USDT": Decimal("1000")})
+            self.p.buy("BTCUSDT", 1, 10000)  # 10000 + 10 komisyon > 10000
+        self.assertEqual(self.p.cash, Decimal("10000"))
+        self.assertEqual(self.p.positions, {})
+        self.assertEqual(self.p.trades, [])
 
-    def test_concurrent_connections_use_latest_balance(self):
-        with Portfolio(self.path) as other:
-            self.portfolio.trade("buy", "BTC", "1", "600")
+    def test_oversell_and_short_rejected(self):
+        with self.assertRaises(TradeError):
+            self.p.sell("ETHUSDT", 1, 3000)
+        self.p.buy("ETHUSDT", 1, 3000)
+        with self.assertRaises(TradeError):
+            self.p.sell("ETHUSDT", 2, 3000)
+
+    def test_invalid_quantity_or_price(self):
+        for qty, price in ((0, 100), (-1, 100), (1, 0), (1, -5)):
             with self.assertRaises(TradeError):
-                other.trade("buy", "BTC", "1", "600")
-            self.assertEqual(len(other.history()), 1)
-            self.assertEqual(other.balances()["USDT"], Decimal("400"))
+                self.p.buy("BTCUSDT", qty, price)
+
+    def test_missing_price_raises(self):
+        self.p.buy("BTCUSDT", "0.01", 50000)
+        with self.assertRaises(KeyError):
+            self.p.equity({})
+
+    def test_negative_initial_cash_rejected(self):
+        with self.assertRaises(ValueError):
+            Portfolio(cash=-1)
+
+    def test_trade_history_recorded(self):
+        self.p.buy("BTCUSDT", "0.1", 50000)
+        self.p.sell("BTCUSDT", "0.05", 51000)
+        self.assertEqual([t.side for t in self.p.trades], ["BUY", "SELL"])
 
 
 if __name__ == "__main__":
