@@ -38,6 +38,16 @@ Dış bağımlılık gerekmez. Kullanım, risk taslağı ve sınırlar: [Görev 
 bakiye ve geçmiş için [CLI kullanım rehberi](docs/CLI.md). Her işlem mevcut
 SQLite ve risk katmanını kullanır; dış servis bağlantısı yoktur.
 
+## Strateji ve backtest (görev 4)
+
+Bir stratejiyi geçmiş fiyatlarla komisyon, kayma, Binance işlem kuralları ve risk limitleriyle çalıştırıp al-tut ile kıyaslar. Ağ bağlantısı kurmaz.
+
+```bash
+python -m jev.backtest --prices data/synthetic_prices.csv --rules data/exchange_info_sample.json --fast 24 --slow 96
+```
+
+`data/synthetic_prices.csv` sentetiktir, `data/exchange_info_sample.json` doğrulanmamış örnektir. Ayrıntılar ve gerçek Binance verisiyle kullanım: `docs/gorev4-backtest.md`.
+
 ## Ekipçe çalışma
 
 Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pull request ile incelemeye sunun. API anahtarlarını, şifreleri, gerçek hesap bilgilerini ve gizli yapılandırmaları repoya koymayın.

@@ -48,11 +48,21 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Bitti ölçütü: Yeni bir ekip üyesi README ve notları okuyup ilk aşamayı, testleri ve açık kararları anlayabilmeli.
 - Sınır: Otomatik yedekleme kurulduğunu iddia etme. Hostinger'da veya gerçek hesaplarda işlem yapma.
 
+## Görev 4 — Strateji arayüzü, backtest ve Binance işlem kuralları
+
+- Sorumlu: @demirfahrieren-png
+- Durum: İncelemede — dal `feat/backtest-strateji`, ana dala birleşmedi.
+- Kapsam: Strateji/öneri arayüzü (ileride Jev'in bağlanacağı yer), geçmiş fiyatlarla backtest, kayma modeli, performans ölçümü ve Binance Global `exchangeInfo` işlem kuralları.
+- Çıktı: `python -m jev.backtest`; getiri, en büyük düşüş, kazanan satış oranı, komisyon payı ve al-tut kıyası. Reddedilen öneriler nedeniyle kaydedilir.
+- Sınır: Ağ bağlantısı yok; örnek exchangeInfo doğrulanmadı, test verisi sentetik. Gerçek emir yok.
+- Bitti ölçütü: Geleceği görmeme, komisyon/kayma, işlem kuralları, risk reddi ve geri alma senaryolarını doğrulayan testler; gerçek Binance verisiyle bir backtest çalıştırılması.
+- Ayrıntı: `docs/gorev4-backtest.md`. Test: `python -m unittest discover -s tests -t .` → 113 test geçti.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
 - [ ] Haber kaynağı, Jev ve güçlü model bağlantılarının test ortamında değerlendirilmesi. Başlangıç için [haber kaynakları ve ajan kuralları](docs/HABER-KAYNAKLARI.md): önce çevrimdışı örnekler; CryptoPanic ve Binance duyuruları henüz bağlı değil.
-- [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi.
+- [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi. Görev 4'te başlandı (backtest ve ölçümler); gerçek veriyle çalıştırma bekliyor.
 - [ ] Hostinger üzerinde dağıtım ve yedekleme, ayrı plan ve testlerden sonra.
 - [ ] Gerçek emir bağlantısı, ancak sanal testler ve ekip değerlendirmesinden sonra ayrı aşama.
 

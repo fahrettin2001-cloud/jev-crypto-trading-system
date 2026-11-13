@@ -1,0 +1,30 @@
+{
+  "_not": "ORNEK VERI - dogrulanmadi. Binance Global GET /api/v3/exchangeInfo cevabiyla ayni bicimde elle yazildi; degerler gercek sembol kurallarina yakin tutuldu ama ag erisimi olmadigi icin kontrol edilemedi. Gercek cevap indirildiginde bu dosya onunla degistirilmeli: curl -g 'https://api.binance.com/api/v3/exchangeInfo?symbols=[\"BTCUSDT\",\"ETHUSDT\"]' > data/exchange_info.json",
+  "timezone": "UTC",
+  "symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "status": "TRADING",
+      "baseAsset": "BTC",
+      "quoteAsset": "USDT",
+      "filters": [
+        {"filterType": "PRICE_FILTER", "minPrice": "0.01000000", "maxPrice": "1000000.00000000", "tickSize": "0.01000000"},
+        {"filterType": "LOT_SIZE", "minQty": "0.00001000", "maxQty": "9000.00000000", "stepSize": "0.00001000"},
+        {"filterType": "MARKET_LOT_SIZE", "minQty": "0.00000000", "maxQty": "50.00000000", "stepSize": "0.00000000"},
+        {"filterType": "NOTIONAL", "minNotional": "5.00000000", "applyMinToMarket": true, "maxNotional": "9000000.00000000", "applyMaxToMarket": false, "avgPriceMins": 5}
+      ]
+    },
+    {
+      "symbol": "ETHUSDT",
+      "status": "TRADING",
+      "baseAsset": "ETH",
+      "quoteAsset": "USDT",
+      "filters": [
+        {"filterType": "PRICE_FILTER", "minPrice": "0.01000000", "maxPrice": "1000000.00000000", "tickSize": "0.01000000"},
+        {"filterType": "LOT_SIZE", "minQty": "0.00010000", "maxQty": "9000.00000000", "stepSize": "0.00010000"},
+        {"filterType": "MARKET_LOT_SIZE", "minQty": "0.00000000", "maxQty": "1000.00000000", "stepSize": "0.00000000"},
+        {"filterType": "NOTIONAL", "minNotional": "5.00000000", "applyMinToMarket": true, "maxNotional": "9000000.00000000", "applyMaxToMarket": false, "avgPriceMins": 5}
+      ]
+    }
+  ]
+}
