@@ -18,21 +18,63 @@ from typing import Iterable, Mapping, Protocol
 from .fees import D
 
 BUY, SELL = "BUY", "SELL"
+MARKET, LIMIT = "MARKET", "LIMIT"
 
 
 @dataclass(frozen=True)
 class Bar:
-    """Bir zaman adımındaki kapanış fiyatları."""
+    """Bir zaman adımı. `timestamp` barın KAPANIŞ zamanıdır.
+
+    `prices` kapanış fiyatlarıdır (zorunlu). `opens`, `highs`, `lows` ve
+    `quote_volumes` (karşı para cinsinden işlem hacmi) isteğe bağlıdır; yoksa
+    açılış/yüksek/düşük kapanışa eşit kabul edilir, hacim bilinmiyor sayılır.
+    """
 
     timestamp: datetime
     prices: Mapping[str, Decimal]
+    opens: Mapping[str, Decimal] | None = None
+    highs: Mapping[str, Decimal] | None = None
+    lows: Mapping[str, Decimal] | None = None
+    quote_volumes: Mapping[str, Decimal] | None = None
 
     def __post_init__(self) -> None:
-        prices = {s: D(p) for s, p in self.prices.items()}
-        for s, p in prices.items():
-            if not p.is_finite() or p <= 0:
-                raise ValueError(f"{s} için geçersiz fiyat: {p}")
-        object.__setattr__(self, "prices", MappingProxyType(prices))
+        closes = _positive_prices(self.prices, "kapanış")
+        object.__setattr__(self, "prices", MappingProxyType(closes))
+        for name in ("opens", "highs", "lows"):
+            raw = getattr(self, name)
+            values = _positive_prices(raw or {}, name)
+            if values.keys() - closes.keys():
+                raise ValueError(f"{name}: kapanış fiyatı olmayan sembol")
+            object.__setattr__(self, name, MappingProxyType(values))
+        volumes = {s: D(v) for s, v in (self.quote_volumes or {}).items()}
+        for s, v in volumes.items():
+            if not v.is_finite() or v < 0:
+                raise ValueError(f"{s} için geçersiz hacim: {v}")
+        object.__setattr__(self, "quote_volumes", MappingProxyType(volumes))
+        for s in closes:
+            o, h, l, c = self.open(s), self.high(s), self.low(s), closes[s]
+            if not (l <= min(o, c) and max(o, c) <= h):
+                raise ValueError(f"{s}: tutarsız OHLC (açılış {o}, yüksek {h}, düşük {l}, kapanış {c})")
+
+    def open(self, symbol: str) -> Decimal:
+        return self.opens.get(symbol, self.prices[symbol])
+
+    def high(self, symbol: str) -> Decimal:
+        return self.highs.get(symbol, max(self.open(symbol), self.prices[symbol]))
+
+    def low(self, symbol: str) -> Decimal:
+        return self.lows.get(symbol, min(self.open(symbol), self.prices[symbol]))
+
+    def quote_volume(self, symbol: str) -> Decimal | None:
+        return self.quote_volumes.get(symbol)
+
+
+def _positive_prices(raw: Mapping, label: str) -> dict[str, Decimal]:
+    out = {s: D(p) for s, p in raw.items()}
+    for s, p in out.items():
+        if not p.is_finite() or p <= 0:
+            raise ValueError(f"{s} için geçersiz {label} fiyatı: {p}")
+    return out
 
 
 @dataclass(frozen=True)
@@ -41,6 +83,10 @@ class OrderIntent:
 
     Alışta `quote_amount` (harcanacak USDT, komisyon dahil) ya da `quantity`;
     satışta `quantity` verilir. `quantity="ALL"` eldekinin tamamını satar.
+
+    Emir türü: `MARKET` (varsayılan) ya da `LIMIT` (`limit_price` ve
+    `good_for_bars` ile). Alışta isteğe bağlı `stop_loss` / `take_profit`
+    mutlak fiyatları verilirse alış gerçekleştiğinde koruyucu çıkış kurulur.
     """
 
     symbol: str
@@ -49,6 +95,11 @@ class OrderIntent:
     quote_amount: Decimal | None = None
     reason: str = ""
     confidence: Decimal | None = None  # 0..1, yalnızca kayıt için
+    order_type: str = MARKET
+    limit_price: Decimal | None = None
+    good_for_bars: int = 1
+    stop_loss: Decimal | None = None
+    take_profit: Decimal | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.symbol, str) or not self.symbol.strip():
@@ -77,6 +128,28 @@ class OrderIntent:
             if not c.is_finite() or not 0 <= c <= 1:
                 raise ValueError("confidence 0 ile 1 arasında olmalı")
             object.__setattr__(self, "confidence", c)
+        if self.order_type not in (MARKET, LIMIT):
+            raise ValueError("order_type MARKET ya da LIMIT olmalı")
+        if self.order_type == LIMIT:
+            if self.limit_price is None:
+                raise ValueError("Limit emirde limit_price zorunlu")
+            if not isinstance(self.good_for_bars, int) or self.good_for_bars < 1:
+                raise ValueError("good_for_bars en az 1 olan tam sayı olmalı")
+        elif self.limit_price is not None:
+            raise ValueError("limit_price yalnızca LIMIT emirde kullanılabilir")
+        for name in ("limit_price", "stop_loss", "take_profit"):
+            value = getattr(self, name)
+            if value is None:
+                continue
+            v = D(value)
+            if not v.is_finite() or v <= 0:
+                raise ValueError(f"{name} pozitif olmalı")
+            object.__setattr__(self, name, v)
+        if (self.stop_loss is not None or self.take_profit is not None) and self.side != BUY:
+            raise ValueError("stop_loss / take_profit yalnızca alışta verilebilir")
+        if (self.stop_loss is not None and self.take_profit is not None
+                and self.stop_loss >= self.take_profit):
+            raise ValueError("stop_loss take_profit'ten küçük olmalı")
 
 
 @dataclass(frozen=True)
@@ -86,9 +159,13 @@ class PortfolioView:
     cash: Decimal
     positions: Mapping[str, Decimal] = field(default_factory=dict)
     equity: Decimal = Decimal("0")
+    # Henüz gerçekleşmemiş emirler (bekleyen limit emirler). Strateji aynı
+    # emri tekrar vermemek için bunlara bakmalı.
+    open_orders: tuple["OrderIntent", ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "positions", MappingProxyType(dict(self.positions)))
+        object.__setattr__(self, "open_orders", tuple(self.open_orders))
 
     def quantity(self, symbol: str) -> Decimal:
         return self.positions.get(symbol, Decimal("0"))
@@ -126,12 +203,21 @@ class SmaCross:
     """Hareketli ortalama kesişimi: hızlı ortalama yavaşı yukarı keserse al,
     aşağı keserse tamamını sat. Basit, bilinen bir örnek; kârlılık iddiası yoktur."""
 
-    def __init__(self, symbol: str, fast: int = 10, slow: int = 30, fraction="0.95"):
+    def __init__(self, symbol: str, fast: int = 10, slow: int = 30, fraction="0.95",
+                 stop_loss_pct=None, take_profit_pct=None):
         if not (isinstance(fast, int) and isinstance(slow, int)) or not 0 < fast < slow:
             raise ValueError("0 < fast < slow tam sayılar olmalı")
         self.symbol, self.fast, self.slow = symbol, fast, slow
         self.fraction = _fraction(fraction)
-        self.name = f"sma-kesisim({symbol},{fast}/{slow})"
+        # Alış anındaki kapanışa göre yüzde: 0.05 = %5 aşağıda zarar durdur
+        self.stop_loss_pct = _fraction(stop_loss_pct) if stop_loss_pct is not None else None
+        self.take_profit_pct = D(take_profit_pct) if take_profit_pct is not None else None
+        if self.take_profit_pct is not None and (not self.take_profit_pct.is_finite()
+                                                 or self.take_profit_pct <= 0):
+            raise ValueError("take_profit_pct pozitif olmalı")
+        extras = "".join(f",{k}{v * 100}%" for k, v in (("sl", self.stop_loss_pct),
+                                                         ("tp", self.take_profit_pct)) if v)
+        self.name = f"sma-kesisim({symbol},{fast}/{slow}{extras})"
         self._prices: deque[Decimal] = deque(maxlen=slow)
         self._prev_diff: Decimal | None = None
 
@@ -151,8 +237,11 @@ class SmaCross:
             return []
         held = view.quantity(self.symbol)
         if prev <= 0 < diff and held == 0:
-            return [OrderIntent(self.symbol, BUY, quote_amount=view.cash * self.fraction,
-                                reason=f"SMA{self.fast} SMA{self.slow}'u yukarı kesti")]
+            return [OrderIntent(
+                self.symbol, BUY, quote_amount=view.cash * self.fraction,
+                reason=f"SMA{self.fast} SMA{self.slow}'u yukarı kesti",
+                stop_loss=price * (1 - self.stop_loss_pct) if self.stop_loss_pct else None,
+                take_profit=price * (1 + self.take_profit_pct) if self.take_profit_pct else None)]
         if prev >= 0 > diff and held > 0:
             return [OrderIntent(self.symbol, SELL, quantity="ALL",
                                 reason=f"SMA{self.fast} SMA{self.slow}'u aşağı kesti")]

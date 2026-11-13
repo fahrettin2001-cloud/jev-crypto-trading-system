@@ -25,7 +25,7 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 - Görev 1 (sanal işlem çekirdeği) Tamamlandı olarak işaretlendi; ana dalda 60 test yeniden çalıştırıldı ve geçti.
 - PR #10 incelendi (yorum, onay değil): dalda 67 test geçiyor, ancak `SQLitePortfolio.risk` property setter'ı sürüm kontrolü olmadan politikayı değiştirebiliyor; limitli hesapta `account.risk = RiskLimits()` sonrası izin listesi dışı ve limit üstü işlem kabul edildi (denemeyle doğrulandı). CLI etkilenmiyor. Ayrıntı ve öneri PR #10 incelemesinde. PR #11 bu dalın üzerine kurulu olduğu için düzeltmeden etkilenebilir.
 - GOREVLER.md'deki terminal arayüzü notu düzeltildi: PR #8 ana dala birleşmiş.
-- Görev 4 (strateji arayüzü, backtest, Binance Global işlem kuralları) `feat/backtest-strateji` dalında incelemeye açıldı; ana dala birleşmedi. 113 test geçti. Test verisi sentetik, exchangeInfo örneği doğrulanmadı; çalışma ortamının Binance'e ağ erişimi yok. Ayrıntı: `docs/gorev4-backtest.md`.
+- Görev 4 (strateji arayüzü, backtest, piyasa/limit emir, zarar durdur/kâr al, Binance Global işlem kuralları, veri indirme aracı) PR #15'te incelemede; ana dala birleşmedi. 148 test geçti. Test verisi sentetik, exchangeInfo örneği doğrulanmadı; çalışma ortamının Binance'e ağ erişimi yok — gerçek veri `python -m jev.binance_data` ile ekip bilgisayarında indirilmeli. Ayrıntı: `docs/gorev4-backtest.md`.
 
 ## Nasıl birlikte çalışılır?
 

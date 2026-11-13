@@ -117,12 +117,7 @@ class SymbolRules:
             raise ExchangeRuleError("Miktar ve fiyat pozitif olmalı")
 
         if check_price_filter if check_price_filter is not None else not market:
-            if self.min_price and price < self.min_price:
-                raise ExchangeRuleError(f"PRICE_FILTER: fiyat {price} < asgari {self.min_price}")
-            if self.max_price and price > self.max_price:
-                raise ExchangeRuleError(f"PRICE_FILTER: fiyat {price} > azami {self.max_price}")
-            if not _is_multiple(price, self.min_price, self.tick_size):
-                raise ExchangeRuleError(f"PRICE_FILTER: fiyat {price} tick {self.tick_size} katı değil")
+            self.check_price(price)
 
         lots = [("LOT_SIZE", self.min_qty, self.max_qty, self.step_size)]
         if market and (self.market_min_qty or self.market_max_qty or self.market_step_size):
@@ -143,6 +138,16 @@ class SymbolRules:
         if self.max_notional and (self.apply_max_to_market or not market) \
                 and notional > self.max_notional:
             raise ExchangeRuleError(f"NOTIONAL: tutar {notional} > azami {self.max_notional}")
+
+    def check_price(self, price) -> None:
+        """Limit fiyatını PRICE_FILTER'a göre doğrular."""
+        price = D(price)
+        if self.min_price and price < self.min_price:
+            raise ExchangeRuleError(f"PRICE_FILTER: fiyat {price} < asgari {self.min_price}")
+        if self.max_price and price > self.max_price:
+            raise ExchangeRuleError(f"PRICE_FILTER: fiyat {price} > azami {self.max_price}")
+        if not _is_multiple(price, self.min_price, self.tick_size):
+            raise ExchangeRuleError(f"PRICE_FILTER: fiyat {price} tick {self.tick_size} katı değil")
 
     # --- exchangeInfo ayrıştırma ------------------------------------------
 

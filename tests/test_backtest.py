@@ -209,15 +209,15 @@ class KlineLoaderTests(unittest.TestCase):
 
     def test_millisecond_and_microsecond_timestamps(self):
         # 2026-01-01 00:00 UTC = 1767225600000 ms
-        ms = self.write("1767225600000,1,2,0.5,100.5,10,1767229199999,0,0,0,0,0\n")
-        us = self.write("1767225600000000,1,2,0.5,100.5,10,1767229199999999,0,0,0,0,0\n")
+        ms = self.write("1767225600000,100,101,99,100.5,10,1767229199999,1005,0,0,0,0\n")
+        us = self.write("1767225600000000,100,101,99,100.5,10,1767229199999999,1005,0,0,0,0\n")
         expected = {datetime(2026, 1, 1, 1, tzinfo=timezone.utc): Decimal("100.5")}
         self.assertEqual(load_binance_kline_csv(ms, "BTCUSDT"), expected)
         self.assertEqual(load_binance_kline_csv(us, "BTCUSDT"), expected)
 
     def test_header_skipped_and_bad_rows_rejected(self):
         p = self.write("open_time,open,high,low,close,volume,close_time\n"
-                       "1767225600000,1,2,0.5,100,10,1767229199999,0,0,0,0,0\n")
+                       "1767225600000,99,101,98,100,10,1767229199999,0,0,0,0,0\n")
         self.assertEqual(len(load_binance_kline_csv(p, "X")), 1)
         with self.assertRaises(ValueError):
             load_binance_kline_csv(self.write("1767225600000,1,2\n"), "X")
@@ -225,8 +225,8 @@ class KlineLoaderTests(unittest.TestCase):
             load_binance_kline_csv(self.write("1767225600000,1,2,0.5,0,10,1767229199999\n"), "X")
 
     def test_load_bars_multi_file(self):
-        a = self.write("1767225600000,1,2,0.5,100,10,1767229199999,0,0,0,0,0\n")
-        b = self.write("1767225600000,1,2,0.5,50,10,1767229199999,0,0,0,0,0\n")
+        a = self.write("1767225600000,99,101,98,100,10,1767229199999,1000,0,0,0,0\n")
+        b = self.write("1767225600000,49,51,48,50,10,1767229199999,500,0,0,0,0\n")
         result = load_bars([a, b], kline_symbols=["BTCUSDT", "ETHUSDT"])
         self.assertEqual(dict(result[0].prices), {"BTCUSDT": Decimal("100"), "ETHUSDT": Decimal("50")})
         with self.assertRaises(ValueError):

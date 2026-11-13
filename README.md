@@ -40,13 +40,17 @@ SQLite ve risk katmanını kullanır; dış servis bağlantısı yoktur.
 
 ## Strateji ve backtest (görev 4)
 
-Bir stratejiyi geçmiş fiyatlarla komisyon, kayma, Binance işlem kuralları ve risk limitleriyle çalıştırıp al-tut ile kıyaslar. Ağ bağlantısı kurmaz.
+Bir stratejiyi geçmiş fiyatlarla komisyon, kayma, Binance işlem kuralları, zarar durdur / kâr al, limit emir ve risk limitleriyle çalıştırıp al-tut ile kıyaslar. Backtest ağ bağlantısı kurmaz.
 
 ```bash
-python -m jev.backtest --prices data/synthetic_prices.csv --rules data/exchange_info_sample.json --fast 24 --slow 96
+# Gerçek Binance verisini indir (anahtarsız, SHA-256 doğrulamalı)
+python -m jev.binance_data --symbols BTCUSDT --interval 1h --start 2026-08 --end 2026-10
+# Sentetik veriyle hemen dene
+python -m jev.backtest --prices data/synthetic_klines/BTCUSDT-1h-sentetik.csv --kline-symbols BTCUSDT \
+    --rules data/exchange_info_sample.json --fast 24 --slow 96 --stop-loss-pct 0.04
 ```
 
-`data/synthetic_prices.csv` sentetiktir, `data/exchange_info_sample.json` doğrulanmamış örnektir. Ayrıntılar ve gerçek Binance verisiyle kullanım: `docs/gorev4-backtest.md`.
+`data/synthetic_*` sentetiktir, `data/exchange_info_sample.json` doğrulanmamış örnektir. Ayrıntılar: `docs/gorev4-backtest.md`.
 
 ## Ekipçe çalışma
 
