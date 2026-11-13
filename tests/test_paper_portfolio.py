@@ -62,6 +62,22 @@ class PersistentPortfolioTests(unittest.TestCase):
                 self.assertEqual(opened.cash, Decimal("394"))
                 self.assertEqual(len(opened.trades), 1)
 
+    def test_closed_persistent_portfolio_rejects_buy_and_sell(self):
+        self.p.buy("BTCUSDT", "0.1", "1000")
+        before = (self.p.cash, self.p.positions.copy(), self.p.trades.copy())
+        self.p.close()
+        for side in ("buy", "sell"):
+            with self.subTest(side=side), self.assertRaisesRegex(TradeError, "kapatılmış"):
+                getattr(self.p, side)("BTCUSDT", "0.01", "1000")
+        with Portfolio.open(self.path) as reopened:
+            self.assertEqual((reopened.cash, reopened.positions, reopened.trades), before)
+
+    def test_memory_portfolio_trading_remains_available(self):
+        p = Portfolio(cash="1000")
+        p.close()
+        p.buy("BTCUSDT", "0.1", "1000")
+        self.assertEqual(p.trades[-1].side, "BUY")
+
     def test_missing_database_not_created(self):
         path = Path(self.temp.name) / "missing.sqlite3"
         with self.assertRaises(TradeError):

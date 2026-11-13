@@ -54,6 +54,7 @@ class Portfolio:
 
     def buy(self, symbol: str, quantity, price, *, taker: bool = True,
             timestamp: datetime | None = None) -> Trade:
+        self._ensure_open()
         if self._db is not None:
             return self._persistent_trade("buy", symbol, quantity, price, taker=taker, timestamp=timestamp)
         quantity, price = self._validate(quantity, price)
@@ -74,6 +75,7 @@ class Portfolio:
 
     def sell(self, symbol: str, quantity, price, *, taker: bool = True,
              timestamp: datetime | None = None) -> Trade:
+        self._ensure_open()
         if self._db is not None:
             return self._persistent_trade("sell", symbol, quantity, price, taker=taker, timestamp=timestamp)
         quantity, price = self._validate(quantity, price)
@@ -112,6 +114,7 @@ class Portfolio:
             db.close()
             raise
         portfolio._db = db
+        portfolio._persistent = True
         return portfolio
 
     @classmethod
@@ -130,6 +133,7 @@ class Portfolio:
             db.close()
             raise
         portfolio._db = db
+        portfolio._persistent = True
         return portfolio
 
     @classmethod
@@ -143,6 +147,10 @@ class Portfolio:
         portfolio.positions = {symbol: Position(Decimal(qty), Decimal(cost)) for symbol, qty, cost in db.execute("SELECT symbol, quantity, avg_cost FROM positions")}
         portfolio.trades = [Trade(datetime.fromisoformat(t), symbol, side, Decimal(qty), Decimal(price), Decimal(fee), Decimal(pnl)) for t, symbol, side, qty, price, fee, pnl in db.execute("SELECT timestamp, symbol, side, quantity, price, fee, realized_pnl FROM trades ORDER BY id")]
         return portfolio
+
+    def _ensure_open(self):
+        if getattr(self, "_persistent", False) and self._db is None:
+            raise TradeError("Kalıcı portföy kapatılmış; işlem için yeniden açın")
 
     def close(self):
         if self._db is not None:
