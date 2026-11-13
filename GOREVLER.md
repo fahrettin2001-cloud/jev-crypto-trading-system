@@ -51,11 +51,11 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## Görev 4 — Strateji arayüzü, backtest ve Binance işlem kuralları
 
 - Sorumlu: @demirfahrieren-png
-- Durum: İncelemede — PR #15 (`feat/backtest-strateji`), ana dala birleşmedi.
+- Durum: Tamamlandı — PR #15 ana dala birleşti; ilk gerçek Binance verisiyle backtest 13 Kasım 2026'da çalıştırıldı (sonuçlar `docs/gorev4-backtest.md`).
 - Kapsam: Strateji/öneri arayüzü (ileride Jev'in bağlanacağı yer), geçmiş fiyatlarla backtest, piyasa/limit emir, zarar durdur / kâr al, kayma ve likidite sınırı, performans ölçümü, Binance Global `exchangeInfo` işlem kuralları ve halka açık veri indirme aracı.
 - Çıktı: `python -m jev.backtest` (rapor + `--out` ile CSV/JSON), `python -m jev.binance_data` (SHA-256 doğrulamalı indirme).
-- Sınır: Bu ortamda ağ yok; örnek exchangeInfo doğrulanmadı, test verisi sentetik. Gerçek emir, hesap veya API anahtarı yok.
-- Bitti ölçütü: Testler (geleceği görmeme, komisyon/kayma, emir türleri, kurallar, risk reddi, indirme doğrulaması) ve gerçek Binance verisiyle bir backtest çalıştırılması (bekliyor).
+- Sınır: Gerçek emir, hesap veya API anahtarı yok. Testler sentetik veriyle çalışır; gerçek veri `python -m jev.binance_data` ile indirilir.
+- Bitti ölçütü: Testler (geleceği görmeme, komisyon/kayma, emir türleri, kurallar, risk reddi, indirme doğrulaması) ve gerçek Binance verisiyle bir backtest çalıştırılması (tamamlandı).
 - Ayrıntı: `docs/gorev4-backtest.md`. Test: `python -m unittest discover -s tests -t .` → 148 test geçti.
 
 ## İleriki aşamalar — Henüz başlanmadı

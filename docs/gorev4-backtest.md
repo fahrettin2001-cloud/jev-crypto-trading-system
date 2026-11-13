@@ -1,6 +1,6 @@
 # Görev 4 — Strateji arayüzü, backtest ve Binance işlem kuralları
 
-Durum: İncelemede — 13 Kasım 2026 (@demirfahrieren-png, Claude ile). PR #15, ana dala birleşmedi.
+Durum: Tamamlandı — PR #15 ana dala birleşti; ilk gerçek veri backtest'i 13 Kasım 2026'da çalıştırıldı (@demirfahrieren-png, Claude ile).
 
 ## Neden?
 
@@ -16,7 +16,7 @@ Ana dalda işlemleri doğru kaydeden ve risk kurallarını uygulayan bir sanal p
 | `jev/exchange_rules.py` | Binance Global `exchangeInfo` filtreleri: LOT_SIZE, MARKET_LOT_SIZE, PRICE_FILTER, NOTIONAL/MIN_NOTIONAL |
 | `jev/klines.py` | Basit CSV ve data.binance.vision kline CSV'lerinden OHLCV bar okuma (ms ve µs zaman damgası) |
 | `jev/binance_data.py` | Halka açık veriyi indirme aracı: exchangeInfo ve aylık kline arşivleri, SHA-256 doğrulamalı (`python -m jev.binance_data`) |
-| `data/exchange_info_sample.json` | **Örnek, doğrulanmamış** exchangeInfo (BTCUSDT, ETHUSDT) |
+| `data/exchange_info_sample.json` | Binance Global'den 13 Kasım 2026'da alınan gerçek exchangeInfo (BTCUSDT, ETHUSDT; izin listeleri çıkarıldı) |
 | `data/synthetic_prices.csv`, `data/synthetic_klines/`, `examples/sentetik_veri.py` | **Sentetik** 90 günlük saatlik fiyat (basit CSV ve Binance kline biçiminde OHLCV); sabit tohumla üretilir |
 | `data/binance/` | İndirilen gerçek verinin yeri; içeriği git'e eklenmez |
 | `tests/test_strategy.py`, `test_backtest.py`, `test_backtest_orders.py`, `test_exchange_rules.py`, `test_binance_data.py` | 88 yeni test |
@@ -106,9 +106,24 @@ Jev bağlandığında aynı arayüzü uygulayan bir adaptör yazılacak; modelin
 
 Sentetik veride örnek (BTCUSDT, SMA 24/96, kayma 5 bps, örnek kurallar): zarar durdur/kâr al olmadan +29,00% (düşüş %30,36); %4 zarar durdur + %8 kâr al + %1 likidite sınırıyla +3,91% (düşüş %24,19); aynı dönemde al-tut −21,44% (düşüş %61,03). **Veri sentetik olduğu için strateji hakkında bir şey göstermez**, yalnızca motorun çalıştığını gösterir.
 
+## İlk gerçek veri sonucu (13 Kasım 2026)
+
+Veri: Binance Global BTCUSDT 1 saatlik mumlar, 1 Ağustos – 31 Ekim 2026 (2.208 bar), data.binance.vision aylık arşivleri. Üç arşivin SHA-256 özeti `.CHECKSUM` dosyalarıyla `jev.binance_data` koduyla doğrulandı. İşlem kuralları: data-api.binance.vision exchangeInfo. Çalışma ortamlarının ağ erişimi olmadığından dosyalar Claude masaüstü uygulamasının tarayıcısıyla alındı.
+
+Ayarlar: 10.000 USDT, komisyon %0,1, kayma 5 bps, gerçek işlem kuralları, likidite sınırı %1, sonraki bar açılışında yürütme.
+
+| Strateji | Getiri | En büyük düşüş | İşlem | Kazanan satış | Komisyon |
+|---|---|---|---|---|---|
+| SMA 24/96 | +8,83% | %13,79 | 22 | %18,18 | 241,80 USDT |
+| SMA 24/96 + %4 zarar durdur + %8 kâr al | −1,97% | %9,95 | 22 | %18,18 | 217,51 USDT |
+| Al-tut (kıyas, nakdin %95'i) | +21,93% | %11,61 | 1 | — | — |
+
+Yorum: Yükselen bu üç ayda basit SMA kesişimi al-tutun gerisinde kaldı; komisyon başlangıç sermayesinin yaklaşık %2,4'ünü yedi. Tek bir dönem ve tek parametre setidir; strateji hakkında genel sonuç çıkarılamaz. Al-tut kontrolü: BTC 62.887,88'den (1 Ağu açılış) 77.582,02'ye (31 Eki kapanış) %23,4 yükseldi; %95 yatırım ve komisyonla +21,93% tutarlı.
+
 ## Bilinen sınırlar
 
-- Gerçek veriyle henüz çalıştırılmadı; `data/exchange_info_sample.json` elle yazıldı ve doğrulanmadı.
+- Gerçek veriyle yalnızca BTCUSDT, Ağustos–Ekim 2026 ve iki parametre setiyle çalıştırıldı.
+- Çalışma ortamlarının (bulut ve masaüstü) ağ erişimi kapalı; `jev.binance_data` ağ üzerinden doğrudan çalıştırılamadı, yalnızca indirilen dosyaların doğrulama kısmı gerçek veriyle çalıştı.
 - Bar içi fiyat sırası bilinmez; aynı barda zarar durdur ve kâr al birlikte değerse zarar durdur varsayılır. Daha ince çözünürlük için daha küçük aralıklı (ör. 1m) veri kullanılabilir.
 - Kayma sabit bps; likidite yalnızca "barın hacminin belirli payından büyük emir reddedilir" kuralıyla modelleniyor, fiyat etkisi yok.
 - Binance piyasa emrinde NOTIONAL'ı son birkaç dakikanın ortalama fiyatıyla kontrol eder; burada işlem fiyatı kullanılıyor.

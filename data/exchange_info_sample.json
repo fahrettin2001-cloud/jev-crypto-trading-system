@@ -1,30 +1,107 @@
 {
-  "_not": "ORNEK VERI - dogrulanmadi. Binance Global GET /api/v3/exchangeInfo cevabiyla ayni bicimde elle yazildi; degerler gercek sembol kurallarina yakin tutuldu ama ag erisimi olmadigi icin kontrol edilemedi. Gercek cevap indirildiginde bu dosya onunla degistirilmeli: curl -g 'https://api.binance.com/api/v3/exchangeInfo?symbols=[\"BTCUSDT\",\"ETHUSDT\"]' > data/exchange_info.json",
-  "timezone": "UTC",
-  "symbols": [
+ "_not": "Binance Global GET /api/v3/exchangeInfo?symbols=[\"BTCUSDT\",\"ETHUSDT\"] cevabından (data-api.binance.vision, 13 Kasım 2026). Yalnızca sembol bilgisi ve filtreler tutuldu; izin listeleri çıkarıldı. Kurallar zamanla değişebilir: güncel dosya için python -m jev.binance_data.",
+ "timezone": "UTC",
+ "serverTime": 1794586819644,
+ "symbols": [
+  {
+   "symbol": "BTCUSDT",
+   "status": "TRADING",
+   "baseAsset": "BTC",
+   "quoteAsset": "USDT",
+   "filters": [
     {
-      "symbol": "BTCUSDT",
-      "status": "TRADING",
-      "baseAsset": "BTC",
-      "quoteAsset": "USDT",
-      "filters": [
-        {"filterType": "PRICE_FILTER", "minPrice": "0.01000000", "maxPrice": "1000000.00000000", "tickSize": "0.01000000"},
-        {"filterType": "LOT_SIZE", "minQty": "0.00001000", "maxQty": "9000.00000000", "stepSize": "0.00001000"},
-        {"filterType": "MARKET_LOT_SIZE", "minQty": "0.00000000", "maxQty": "50.00000000", "stepSize": "0.00000000"},
-        {"filterType": "NOTIONAL", "minNotional": "5.00000000", "applyMinToMarket": true, "maxNotional": "9000000.00000000", "applyMaxToMarket": false, "avgPriceMins": 5}
-      ]
+     "filterType": "PRICE_FILTER",
+     "minPrice": "0.01000000",
+     "maxPrice": "1000000.00000000",
+     "tickSize": "0.01000000"
     },
     {
-      "symbol": "ETHUSDT",
-      "status": "TRADING",
-      "baseAsset": "ETH",
-      "quoteAsset": "USDT",
-      "filters": [
-        {"filterType": "PRICE_FILTER", "minPrice": "0.01000000", "maxPrice": "1000000.00000000", "tickSize": "0.01000000"},
-        {"filterType": "LOT_SIZE", "minQty": "0.00010000", "maxQty": "9000.00000000", "stepSize": "0.00010000"},
-        {"filterType": "MARKET_LOT_SIZE", "minQty": "0.00000000", "maxQty": "1000.00000000", "stepSize": "0.00000000"},
-        {"filterType": "NOTIONAL", "minNotional": "5.00000000", "applyMinToMarket": true, "maxNotional": "9000000.00000000", "applyMaxToMarket": false, "avgPriceMins": 5}
-      ]
+     "filterType": "LOT_SIZE",
+     "minQty": "0.00001000",
+     "maxQty": "9000.00000000",
+     "stepSize": "0.00001000"
+    },
+    {
+     "filterType": "ICEBERG_PARTS",
+     "limit": 100
+    },
+    {
+     "filterType": "MARKET_LOT_SIZE",
+     "minQty": "0.00000000",
+     "maxQty": "146.26395679",
+     "stepSize": "0.00000000"
+    },
+    {
+     "filterType": "PERCENT_PRICE_BY_SIDE",
+     "bidMultiplierUp": "1.2",
+     "bidMultiplierDown": "0.5",
+     "askMultiplierUp": "2",
+     "askMultiplierDown": "0.8",
+     "avgPriceMins": 5
+    },
+    {
+     "filterType": "NOTIONAL",
+     "minNotional": "5.00000000",
+     "applyMinToMarket": true,
+     "maxNotional": "9000000.00000000",
+     "applyMaxToMarket": false,
+     "avgPriceMins": 5
+    },
+    {
+     "filterType": "MAX_NUM_ORDERS",
+     "maxNumOrders": 200
     }
-  ]
+   ]
+  },
+  {
+   "symbol": "ETHUSDT",
+   "status": "TRADING",
+   "baseAsset": "ETH",
+   "quoteAsset": "USDT",
+   "filters": [
+    {
+     "filterType": "PRICE_FILTER",
+     "minPrice": "0.01000000",
+     "maxPrice": "1000000.00000000",
+     "tickSize": "0.01000000"
+    },
+    {
+     "filterType": "LOT_SIZE",
+     "minQty": "0.00010000",
+     "maxQty": "9000.00000000",
+     "stepSize": "0.00010000"
+    },
+    {
+     "filterType": "ICEBERG_PARTS",
+     "limit": 100
+    },
+    {
+     "filterType": "MARKET_LOT_SIZE",
+     "minQty": "0.00000000",
+     "maxQty": "3792.71752008",
+     "stepSize": "0.00000000"
+    },
+    {
+     "filterType": "PERCENT_PRICE_BY_SIDE",
+     "bidMultiplierUp": "1.2",
+     "bidMultiplierDown": "0.5",
+     "askMultiplierUp": "2",
+     "askMultiplierDown": "0.8",
+     "avgPriceMins": 5
+    },
+    {
+     "filterType": "NOTIONAL",
+     "minNotional": "5.00000000",
+     "applyMinToMarket": true,
+     "maxNotional": "9000000.00000000",
+     "applyMaxToMarket": false,
+     "avgPriceMins": 5
+    },
+    {
+     "filterType": "MAX_NUM_ORDERS",
+     "maxNumOrders": 200
+    }
+   ]
+  }
+ ]
 }
