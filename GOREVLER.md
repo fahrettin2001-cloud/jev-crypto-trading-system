@@ -58,6 +58,14 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Bitti ölçütü: Testler (geleceği görmeme, komisyon/kayma, emir türleri, kurallar, risk reddi, indirme doğrulaması) ve gerçek Binance verisiyle bir backtest çalıştırılması (tamamlandı).
 - Ayrıntı: `docs/gorev4-backtest.md`. Test: `python -m unittest discover -s tests -t .` → 148 test geçti.
 
+## Görev 5 — Botu geliştirme: ölçüm, risk ve yeni sinyaller
+
+- Sorumlu: @demirfahrieren-png
+- Durum: Devam ediyor — 5.1 incelemede.
+- Kapsam: 5.1 oynaklığa göre pozisyon büyüklüğü, 5.2 karar günlüğü ve güven kalibrasyonu, 5.3 canlı sanal işlem, 5.4 haber duygu analizi. Jev bağlantısı (@fahrettin2001-cloud) bu görevin dışında.
+- Sınır: Gerçek emir, hesap veya API anahtarı yok. 5.3 ve 5.4'ün canlı kısımları ağ erişimi olan bir ekip bilgisayarında çalıştırılacak.
+- Ayrıntı: `docs/gorev5-gelistirmeler.md`.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
