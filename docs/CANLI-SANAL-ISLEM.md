@@ -47,11 +47,12 @@ sudo -u jev python3 -m jev.live check
 #   "Bağlantı tamam ..." görmelisiniz. Hata alırsanız dur ve ekibe yaz.
 
 # 6. Sanal hesabı başlat (ekip kararı: BTCUSDT + ETHUSDT, "temkinli" risk paketi)
-#    Örnek 10.000 USDT bütçeyle: işlem başına %10 = 1000, tek coinde %30 = 3000,
-#    nakitte en az %40 = 4000. Bütçe farklı seçilirse tutarları ona göre değiştirin.
+#    500 USDT bütçeyle: işlem başına %10 = 50, tek coinde %30 = 150,
+#    nakitte en az %40 = 200. Bütçe farklı seçilirse tutarları ona göre değiştirin.
+#    --max-trade-notional hem risk sınırı hem de stratejinin alış tutarı üst sınırıdır.
 sudo -u jev python3 -m jev.live init --dir /var/lib/jev/canli \
-    --symbols BTCUSDT ETHUSDT --cash 10000 \
-    --max-trade-notional 1000 --max-position-notional 3000 --min-cash-reserve 4000
+    --symbols BTCUSDT ETHUSDT --cash 500 \
+    --max-trade-notional 50 --max-position-notional 150 --min-cash-reserve 200
 
 # 7. Saatlik çalışmayı aç
 cp deploy/jev-live.service deploy/jev-live.timer /etc/systemd/system/
@@ -64,7 +65,7 @@ systemctl start jev-live.service              # hemen bir kez çalıştır (iste
 journalctl -u jev-live -n 20 --no-pager       # son çalışmaların çıktısı
 ```
 
-Varsayılan strateji: her coin için SMA 24/96 kesişimi, oynaklığa göre pozisyon (günlük %1 hedef), komisyon %0,1, kayma 5 bps, Binance Global işlem kuralları, bar hacminin en fazla %1'i. Başka ayarlar: `python3 -m jev.live init -h`. Günlük zarar sınırı PR #11 birleşince eklenecek.
+Varsayılan strateji: her coin için SMA 24/96 kesişimi, oynaklığa göre pozisyon (günlük %1 hedef; alış tutarı `--max-trade-notional` ile sınırlı), komisyon %0,1, kayma 5 bps, Binance Global işlem kuralları, bar hacminin en fazla %1'i. Başka ayarlar: `python3 -m jev.live init -h`. Günlük zarar sınırı PR #11 birleşince eklenecek.
 
 ## Günlük kullanım
 
@@ -85,6 +86,8 @@ systemctl disable --now jev-live.timer           # zamanlayıcıyı tamamen kapa
 **Sonuçları paylaşmak:** kendi bilgisayarınızdan `scp -r root@SUNUCU_IP:/var/lib/jev/canli ./canli-sonuc` ile indirip ekiple paylaşın (içinde gizli bilgi yoktur).
 
 **Kodu güncellemek:** `cd /opt/jev/app && sudo -u jev git pull`. Strateji veya motor kodu değiştiyse eski `durum.pkl` yüklenemeyebilir; o durumda eski klasörü saklayıp yeni bir klasörle (`--dir /var/lib/jev/canli-2`) yeniden `init` edin ve `deploy/jev-live.service` içindeki yolu güncelleyin.
+
+Gerçek BTCUSDT verisinde (Ağu–Eki 2026) bu ayarlarla: 22 işlem, red yok, +1,12% getiri, en büyük düşüş %1,53, komisyon 1,10 USDT. İşlemler küçük (≈50 USDT) olduğu için getiri ve düşüş de küçüktür.
 
 ## Sınırlar ve riskler
 

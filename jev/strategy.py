@@ -224,7 +224,7 @@ class SmaCross:
     aşağı keserse tamamını sat. Basit, bilinen bir örnek; kârlılık iddiası yoktur."""
 
     def __init__(self, symbol: str, fast: int = 10, slow: int = 30, fraction="0.95",
-                 stop_loss_pct=None, take_profit_pct=None, sizer=None):
+                 stop_loss_pct=None, take_profit_pct=None, sizer=None, max_quote=None):
         if not (isinstance(fast, int) and isinstance(slow, int)) or not 0 < fast < slow:
             raise ValueError("0 < fast < slow tam sayılar olmalı")
         self.symbol, self.fast, self.slow = symbol, fast, slow
@@ -240,6 +240,11 @@ class SmaCross:
         # sizer verilirse alış büyüklüğü sabit oran yerine oynaklığa göre belirlenir
         # (jev.sizing.VolatilityTargetSizer); `fraction` o durumda kullanılmaz.
         self.sizer = sizer
+        # Alış tutarı için üst sınır (USDT). Risk limitindeki "işlem başına azami tutar"
+        # ile aynı verilirse öneriler o limitte reddedilmek yerine limite göre küçültülür.
+        self.max_quote = D(max_quote) if max_quote is not None else None
+        if self.max_quote is not None and (not self.max_quote.is_finite() or self.max_quote <= 0):
+            raise ValueError("max_quote pozitif olmalı")
         if sizer is not None:
             extras += f",{sizer.describe()}"
         self.name = f"sma-kesisim({symbol},{fast}/{slow}{extras})"
@@ -275,6 +280,8 @@ class SmaCross:
                 sizing = f"; oynaklığa göre varlığın %{frac * 100}"
                 if amount <= 0:
                     return []
+            if self.max_quote is not None:
+                amount = min(amount, self.max_quote)
             return [OrderIntent(
                 self.symbol, BUY, quote_amount=amount,
                 reason=f"SMA{self.fast} SMA{self.slow}'u yukarı kesti{sizing}",
