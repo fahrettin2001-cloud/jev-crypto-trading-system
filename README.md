@@ -10,6 +10,22 @@ Bu proje, kripto piyasasını ve haberleri izleyen, Jev ve güçlü bir modelle 
 4. Haber, Jev ve güçlü model entegrasyonlarının test edilmesi.
 5. Obsidian proje notları ve güvenli yedekleme planı.
 
+## Sanal portföy (görev 1)
+
+Python 3.10+ gerekir, dış bağımlılık yoktur. Tutarlar `Decimal` ile hesaplanır.
+
+- `jev/fees.py`: maker/taker komisyon oranları (varsayılan %0,1)
+- `jev/portfolio.py`: nakit, pozisyonlar, alım-satım, ortalama maliyet, gerçekleşen/gerçekleşmemiş kâr-zarar
+- `jev/prices.py`: `data/sample_prices.csv` dosyasından çevrimdışı fiyat okuma
+- `data/sample_prices.csv`: uydurma örnek fiyatlar (gerçek piyasa verisi değildir)
+
+Varsayımlar: komisyon karşı para biriminden (USDT) alınır ve ortalama maliyete eklenir. Açığa satış ve kaldıraç yoktur. Yetersiz nakit veya miktar varsa işlem reddedilir.
+
+```bash
+python -m unittest discover -s tests -t .   # testler
+python -m examples.demo                     # örnek senaryo
+```
+
 ## Ekipçe çalışma
 
 Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pull request ile incelemeye sunun. API anahtarlarını, şifreleri, gerçek hesap bilgilerini ve gizli yapılandırmaları repoya koymayın.
