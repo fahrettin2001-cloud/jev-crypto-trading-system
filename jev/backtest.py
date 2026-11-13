@@ -40,8 +40,9 @@ from .fees import D, FeeSchedule
 from .metrics import Metrics, compute_metrics
 from .portfolio import Portfolio, Trade, TradeError
 from .risk import RiskLimits
-from .strategy import (BUY, LIMIT, SELL, Bar, BuyAndHold, OrderIntent, PortfolioView, SmaCross,
-                       Strategy)
+from .journal import Decision, DecisionJournal
+from .strategy import (BUY, LIMIT, SELL, Bar, BuyAndHold, Hold, OrderIntent, PortfolioView,
+                       SmaCross, Strategy)
 
 BPS = Decimal("10000")
 # Kural dosyası yoksa Binance'in 8 ondalık hassasiyeti varsayılır.
@@ -111,6 +112,7 @@ class BacktestResult:
     rejections: list[Rejection]
     metrics: Metrics
     notes: list[FillNote] = field(default_factory=list)
+    decisions: list[Decision] = field(default_factory=list)  # stratejinin tüm kararları
 
     @property
     def trades(self) -> list[Trade]:
@@ -125,6 +127,7 @@ class _Engine:
         self.notes: list[FillNote] = []
         self.exits: dict[str, ProtectiveExit] = {}
         self.working: list[list] = []  # [intent, kalan_bar]
+        self.filled: set[int] = set()  # gerçekleşen strateji önerilerinin id()'si
 
     # --- tek bir gerçekleşme --------------------------------------------------
 
@@ -137,6 +140,7 @@ class _Engine:
             self.rejections.append(Rejection(bar.timestamp, intent, str(exc), kind))
             return False
         self.notes.append(FillNote(kind, intent.reason))
+        self.filled.add(id(intent))
         if intent.side == BUY and (intent.stop_loss or intent.take_profit):
             sl, tp = intent.stop_loss, intent.take_profit
             if self.c.rules is not None:
@@ -254,8 +258,8 @@ class _Engine:
         self.working.append([intent, intent.good_for_bars])
 
 
-def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig | None = None
-                 ) -> BacktestResult:
+def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig | None = None,
+                 journal: DecisionJournal | None = None) -> BacktestResult:
     config = config or BacktestConfig()
     if not bars:
         raise ValueError("Backtest için en az bir bar gerekli")
@@ -266,6 +270,8 @@ def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig
     last_prices: dict[str, Decimal] = {}
     equity_curve: list[tuple[datetime, Decimal]] = []
     pending: list[OrderIntent] = []
+    issued: list[tuple[OrderIntent | Hold, Decision]] = []
+    source = getattr(strategy, "name", type(strategy).__name__)
 
     for bar in bars:
         last_prices.update(bar.prices)
@@ -286,10 +292,15 @@ def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig
             equity=e.portfolio.equity(last_prices),
             open_orders=tuple(intent for intent, _ in e.working),
         )
-        intents = list(strategy.on_bar(bar, view) or [])
-        for intent in intents:
-            if not isinstance(intent, OrderIntent):
-                raise TypeError(f"Strateji OrderIntent dışında değer döndürdü: {intent!r}")
+        outputs = list(strategy.on_bar(bar, view) or [])
+        for item in outputs:
+            if not isinstance(item, (OrderIntent, Hold)):
+                raise TypeError(f"Strateji OrderIntent / Hold dışında değer döndürdü: {item!r}")
+            if item.symbol in bar.prices:
+                issued.append((item, Decision(
+                    bar.timestamp, item.symbol, "HOLD" if isinstance(item, Hold) else item.side,
+                    bar.prices[item.symbol], item.confidence, source, item.reason)))
+        intents = [i for i in outputs if isinstance(i, OrderIntent)]
         for intent in intents:
             if intent.order_type == LIMIT:
                 e.place_limit(intent, bar)  # sonraki bardan itibaren geçerli
@@ -311,8 +322,21 @@ def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig
     for intent, _ in e.working:
         e.rejections.append(Rejection(end, intent, "Veri bitti; limit emir açık kaldı", K_LIMIT))
 
+    reasons = {id(r.intent): r.reason for r in e.rejections}
+    decisions = []
+    for item, d in issued:
+        status = ("bekle" if isinstance(item, Hold)
+                  else "gerçekleşti" if id(item) in e.filled
+                  else f"reddedildi: {reasons[id(item)]}" if id(item) in reasons else "bilinmiyor")
+        decisions.append(Decision(d.timestamp, d.symbol, d.action, d.price, d.confidence,
+                                  d.source, d.reason, status))
+    if journal is not None:
+        for d in decisions:
+            journal.record(d)
+
     return BacktestResult(
-        strategy=getattr(strategy, "name", type(strategy).__name__),
+        decisions=decisions,
+        strategy=source,
         config=config,
         portfolio=e.portfolio,
         equity_curve=equity_curve,
@@ -456,6 +480,14 @@ def main(argv=None) -> None:
     parser.add_argument("--same-bar", action="store_true",
                         help="Aynı bar fiyatıyla işlem (geleceği görme hatası; yalnızca kıyas için)")
     parser.add_argument("--out", type=Path, help="Sonuç dosyalarının yazılacağı klasör")
+    parser.add_argument("--calibration", action="store_true",
+                        help="Karar isabeti ve güven kalibrasyonu raporunu da yazdır")
+    parser.add_argument("--decision-horizon", type=int, default=24,
+                        help="Kararın haklı olup olmadığına kaç bar sonra bakılsın (varsayılan 24)")
+    parser.add_argument("--decision-threshold",
+                        help="Haklı sayılma eşiği; varsayılan bir al-sat turunun maliyeti "
+                             "(2 × komisyon + 2 × kayma)")
+    parser.add_argument("--journal", type=Path, help="Kararları bu JSONL dosyasına ekle")
     args = parser.parse_args(argv)
 
     try:
@@ -479,14 +511,31 @@ def main(argv=None) -> None:
                              stop_loss_pct=args.stop_loss_pct, take_profit_pct=args.take_profit_pct,
                              sizer=sizer)
                     if args.strategy == "sma" else BuyAndHold(args.symbol, args.fraction))
-        result = run_backtest(bars, strategy, config)
+        journal = DecisionJournal(args.journal) if args.journal else None
+        result = run_backtest(bars, strategy, config, journal=journal)
         benchmark = None
         if args.strategy != "al-tut":
             benchmark = run_backtest(bars, BuyAndHold(args.symbol, args.fraction), config)
         written = write_results(result, args.out) if args.out else []
+        calib_text = None
+        if args.calibration or args.out:
+            from .journal import calibration, closes_from_bars, evaluate, format_calibration, \
+                write_outcomes_csv
+            threshold = (D(args.decision_threshold) if args.decision_threshold is not None
+                         else 2 * config.fees.taker_rate + 2 * config.slippage_bps / BPS)
+            outcomes = evaluate(result.decisions, closes_from_bars(bars), args.decision_horizon,
+                                threshold)
+            if args.out:
+                written.append(write_outcomes_csv(outcomes, args.out / "kararlar.csv"))
+            if args.calibration:
+                calib_text = format_calibration(calibration(outcomes), args.decision_horizon,
+                                                threshold)
     except (ValueError, OSError, TradeError) as exc:
         parser.exit(1, f"Hata: {exc}\n")
     print(format_report(result, benchmark))
+    if calib_text:
+        print()
+        print(calib_text)
     for path in written:
         print(f"Yazıldı: {path}")
 
