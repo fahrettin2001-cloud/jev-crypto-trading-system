@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 import json
 import sqlite3
+from pathlib import Path
 
 from .fees import D, FeeSchedule
 from .portfolio import Portfolio, Position, Trade
@@ -47,6 +48,21 @@ class SQLitePortfolio:
             self._db.rollback()
             self._db.close()
             raise
+
+    @classmethod
+    def open(cls, path, *, risk=None, clock=None):
+        """Var olan hesabı aç; eksik dosya veya şema oluşturma."""
+        account = cls.__new__(cls)
+        account.risk = risk if risk is not None else RiskLimits()
+        account._clock = clock if clock is not None else lambda: datetime.now(timezone.utc)
+        uri = Path(path).resolve().as_uri() + "?mode=rw"
+        account._db = sqlite3.connect(uri, uri=True, isolation_level=None)
+        try:
+            account.portfolio  # Şemayı ve kayıtlı hesabı doğrula.
+        except BaseException:
+            account.close()
+            raise
+        return account
 
     def _load(self):
         cash, initial, quote, maker, taker, positions = self._db.execute(

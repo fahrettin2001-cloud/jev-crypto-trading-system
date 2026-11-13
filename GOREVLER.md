@@ -70,8 +70,15 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 ## Ek risk geliştirmeleri — 13 Kasım 2026
 
 - Asgari nakit ve sembol pozisyon sınırları PR #6 ile ana dala birleşti.
-- Fiyat güncelliği: `feat/fiyat-guncellik` dalında incelemeye hazır; henüz ana dala
-  birleşmedi. İsteğe bağlı yaş limiti, ayrı gözlem zamanı ve güvenilir kontrol
+- Fiyat güncelliği: PR #7 ile ana dala birleşti. İsteğe bağlı yaş limiti, ayrı gözlem zamanı ve güvenilir kontrol
   saati eklendi. Alış/satışta eski, eksik veya gelecekteki fiyat zamanı reddedilir.
 - Doğrulama: `python -m unittest discover -s tests -t .` — 52 test geçti.
 - Örnek limitler ekip kararı değildir; borsa ve ajan bağlantısı kurulmadı.
+
+## Terminal arayüzü — incelemeye hazır
+
+- Dal: `feat/portfoy-cli`; henüz ana dala birleşmedi.
+- `python -m jev`: hesap oluşturma, alış, satış, durum ve geçmiş komutları.
+- Mevcut SQLite/risk katmanı kullanılır; her işlemde risk dosyası açıkça seçilir.
+- 60 test geçti (52 mevcut, 8 CLI süreç testi). Kullanım: `docs/CLI.md`.
+- Açık PR #3'teki farklı kalıcılık yaklaşımı birleştirilmedi veya kapatılmadı.
