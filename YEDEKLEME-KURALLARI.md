@@ -6,7 +6,7 @@ Bu belge, üç kişilik ekibin ve ajanlarının proje hafızasını güvenli ve 
 
 13 Kasım 2026: Proje sahibi, saatlik/günlük otomatik Obsidian yedekleme yerine isteğe bağlı manuel güncelleme istedi. Ekip ve ajanlar kod/not değişikliklerini gözden geçirip GitHub'a commit ve push eder; inceleme gerektiren işler PR ile paylaşılır. Proje sahibi istediğinde yerel değişiklikleri koruyarak güncel GitHub içeriğini Obsidian'daki depo kopyasına alır. Git pull otomatik değildir ve yerel değişiklikler varsa çakışmalar incelenir.
 
-Önceden oluşturulan Windows 23.00 görevinin devre dışı bırakıldığı henüz doğrulanmadı; Görev Zamanlayıcı'da ayrıca kapatılmalıdır. GitHub herkese açıksa yalnızca herkese açık olmaya uygun içerik gönderilir. GitHub kod ve notları, SQLite verilerinin şifreli yedeği değildir; bu yedek ayrıca planlanır.
+Proje sahibi Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız doğrulama yapamadı. GitHub herkese açıksa yalnızca herkese açık olmaya uygun içerik gönderilir. GitHub kod ve notları, SQLite verilerinin şifreli yedeği değildir; bu yedek ayrıca planlanır.
 
 ## Ne paylaşılır?
 
