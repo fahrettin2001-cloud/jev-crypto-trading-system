@@ -68,6 +68,14 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Sınır: Gerçek emir, hesap veya API anahtarı yok. 5.3 ve 5.4'ün canlı kısımları ağ erişimi olan bir ekip bilgisayarında çalıştırılacak.
 - Ayrıntı: `docs/gorev5-gelistirmeler.md`.
 
+## Görev 6 — Yapay sinir ağı ve ödül sistemi araştırması
+
+- Sorumlu: @fahrettin2001-cloud ve bu sohbetteki ajan.
+- Durum: Planlandı; takip [#29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29).
+- Kapsam: Sentetik veriyle küçük sinir ağı deneyi; daha sonra geçmiş verilerde ayrı değerlendirme; sanal sonuçlardan maliyet ve riski gözeten ödül kaydı tasarımı.
+- Sınır: Jev'in modeli yeniden eğitilmez; çalışan Hostinger botuna bağlanmaz ve emir verilmez. Bağımsız risk sistemi korunur.
+- Bitti ölçütü ve iş sırası: [Görev 6 tasarımı](docs/GOREV6-SINIR-AGI-ODUL.md). PR #27 ayrı bir gölge ölçüm taslağıdır; sinir ağı değildir.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
