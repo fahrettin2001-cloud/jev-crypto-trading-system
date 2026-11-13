@@ -41,4 +41,3 @@ yoktur. API anahtarları, kişisel veya gerçek işlem verileri depoya eklenmez.
 Gelecekte sinir ağına ödülden öğrenme bağlanacaksa eğitim süreci, örnek
 bağlantıları, veri bölmeleri, masraf ve kısıtlar ayrı tasarlanıp sınanmalıdır.
 Bu hesaplayıcının varlığı Jev'i veya sinir ağını kendiliğinden eğitmez.
-
