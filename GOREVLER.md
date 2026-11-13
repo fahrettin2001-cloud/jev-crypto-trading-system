@@ -51,7 +51,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global / Binance TR seçimi ve yalnızca halka açık piyasa verisi.
-- [ ] Haber kaynağı, Jev ve güçlü model bağlantılarının test ortamında değerlendirilmesi.
+- [ ] Haber kaynağı, Jev ve güçlü model bağlantılarının test ortamında değerlendirilmesi. Başlangıç için [haber kaynakları ve ajan kuralları](docs/HABER-KAYNAKLARI.md): önce çevrimdışı örnekler; CryptoPanic ve Binance duyuruları henüz bağlı değil.
 - [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi.
 - [ ] Hostinger üzerinde dağıtım ve yedekleme, ayrı plan ve testlerden sonra.
 - [ ] Gerçek emir bağlantısı, ancak sanal testler ve ekip değerlendirmesinden sonra ayrı aşama.
