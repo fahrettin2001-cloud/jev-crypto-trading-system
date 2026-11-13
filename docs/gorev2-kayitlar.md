@@ -54,7 +54,7 @@ Sayısal limit varsayılanı yoktur. Yetersiz nakit ve fazla satış çekirdekte
 Risk ayarları dosyaya kaydedilmez; her açılışta açıkça verilmelidir.
 Doğrudan `Portfolio` kullanımı bu ek risk katmanını çalıştırmaz.
 
-Bu ilk taslakta günlük zarar, fiyat güncelliği, tüm sembolleri kapsayan toplam pozisyon riski ve canlı emir
+Bu ilk taslakta günlük zarar, tüm sembolleri kapsayan toplam pozisyon riski ve canlı emir
 kontrolleri yoktur. Şifreleme, yedekleme, şema göçü ve birden fazla hesap desteği
 bu değişikliğin kapsamı dışındadır. SQLite dosyaları yereldir, Git'e eklenmez.
 
@@ -93,3 +93,45 @@ Genişletme sonrası 39 test geçti: önceki 30 teste ek olarak rezerv sınırı
 komisyonun rezerve etkisi, birikimli pozisyon sınırı, yeni fiyatla değerleme,
 sembol bazında uygulama, limit dışındayken pozisyon azaltan satış, yeniden açma,
 geçersiz limitler ve sayısal taşma senaryoları doğrulandı.
+
+## Fiyat güncelliği
+
+İsteğe bağlı `max_price_age`, alış ve satış için fiyatın gözlem zamanını zorunlu
+kılar. Limit verilmedikçe mevcut çevrimdışı kullanım değişmez. Aşağıdaki 30 saniye
+sadece örnektir; ekibin kabul ettiği bir politika değildir:
+
+```python
+from datetime import datetime, timedelta, timezone
+from jev import SQLitePortfolio, RiskLimits
+
+limits = RiskLimits(max_price_age=timedelta(seconds=30))
+with SQLitePortfolio("paper.db", initial_cash="10000", risk=limits) as account:
+    # Gerçek veri entegrasyonunda bu zaman fiyat kaynağından gelmelidir.
+    observed_at = datetime.now(timezone.utc)  # yalnızca çevrimdışı örnek
+    account.buy("BTCUSDT", "0.01", "50000", price_observed_at=observed_at)
+```
+
+Kontrol `BEGIN IMMEDIATE` kilidi alınıp hesap yüklendikten sonra yapılır;
+kilit beklerken eskiyen fiyat da reddedilir. Eksik, saat dilimsiz, gelecekteki
+ve limitten daha eski gözlem zamanları `RiskError` üretir. Tam yaş sınırındaki
+fiyat kabul edilir. Eksik/geçersiz fiyat tutarı mevcut sayısal kontrollerle reddedilir.
+`timestamp` işlem kaydı zamanıdır; fiyat gözlem zamanı yerine kullanılamaz ve
+kontrol saatini değiştirmez. Saat dilimleri UTC'ye çevrilerek karşılaştırılır.
+
+Varsayılan kontrol saati UTC sistem saatidir. Deterministik test veya çevrimdışı
+geçmiş veri simülasyonunda `SQLitePortfolio(..., clock=...)` ile saat sağlayıcı
+verilebilir; bu sağlayıcı güvenilir uygulama yapılandırması olmalıdır. Ajan veya
+harici fiyat içeriği kontrol saatini belirlememelidir. Tarihsel simülasyonda saat
+ilgili simülasyon anını döndürmelidir; güncellik kontrolü için işlem `timestamp`ini
+eskiletmek yeterli değildir.
+
+Politika her yeniden açılışta `risk=limits` ile verilir. Bu katman bir veri kaynağına
+bağlanmaz; gözlem zamanının kaynaktaki doğruluğunu veya fiyatın gerçek piyasa fiyatı
+olduğunu doğrulamaz. Gözlem zamanı bu sürümde veritabanına ayrıca kaydedilmez.
+Fiyat hatasında satış için de geçerli bir fiyat gerekir; nakit/pozisyon üst limitleri
+nedeniyle satışa tanınan istisna güncellik kontrolünü kaldırmaz.
+
+Güncellik geliştirmesi sonrası 52 test geçti (39 mevcut, 13 yeni): güncel ve tam
+sınırdaki fiyat, eski/gelecek/eksik zaman, saat dilimi, işlem tarihiyle aşma denemesi,
+satış, yeniden açma, kilit sonrasında eskime, hatalı saat, varsayılan saat, önceki
+çevrimdışı kullanım ve geçersiz yaş limitleri kapsanır.

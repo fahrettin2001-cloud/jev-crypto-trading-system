@@ -1,5 +1,6 @@
 """Çevrimdışı sanal işlem için bağımsız risk kontrolü taslağı."""
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal, DecimalException
 
 from .fees import D
@@ -18,8 +19,12 @@ class RiskLimits:
 
     min_cash_reserve: Decimal | None = None
     max_position_notional: Decimal | None = None
+    max_price_age: timedelta | None = None
 
     def __post_init__(self):
+        if self.max_price_age is not None:
+            if not isinstance(self.max_price_age, timedelta) or self.max_price_age <= timedelta(0):
+                raise ValueError("Fiyat yaşı limiti pozitif timedelta olmalı")
         for name in ("max_trade_notional", "min_cash_reserve", "max_position_notional"):
             value = getattr(self, name)
             if value is None:
@@ -70,3 +75,16 @@ class RiskLimits:
                     raise RiskError("Pozisyon değeri örnek risk limitini aşıyor")
             except DecimalException as exc:
                 raise RiskError("Pozisyon değeri hesaplanamadı") from exc
+
+    def check_price_time(self, observed_at, *, now):
+        """İşlem zamanından bağımsız, karar anındaki saate göre kontrol eder."""
+        if self.max_price_age is None:
+            return
+        for name, value in (("Fiyat gözlem zamanı", observed_at), ("Kontrol zamanı", now)):
+            if not isinstance(value, datetime) or value.utcoffset() is None:
+                raise RiskError(f"{name} saat dilimi içermeli")
+        age = now.astimezone(timezone.utc) - observed_at.astimezone(timezone.utc)
+        if age < timedelta(0):
+            raise RiskError("Fiyat gözlem zamanı gelecekte olamaz")
+        if age > self.max_price_age:
+            raise RiskError("Fiyat izin verilen yaştan eski")

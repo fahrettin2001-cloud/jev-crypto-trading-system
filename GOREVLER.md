@@ -66,3 +66,12 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 - İlk sanal bütçe, işlem çiftleri ve örnek komisyon oranı?
 - Üç görevden hangisini kim üstlenecek?
 - Strateji, risk sınırları ve haber kaynakları?
+
+## Ek risk geliştirmeleri — 13 Kasım 2026
+
+- Asgari nakit ve sembol pozisyon sınırları PR #6 ile ana dala birleşti.
+- Fiyat güncelliği: `feat/fiyat-guncellik` dalında incelemeye hazır; henüz ana dala
+  birleşmedi. İsteğe bağlı yaş limiti, ayrı gözlem zamanı ve güvenilir kontrol
+  saati eklendi. Alış/satışta eski, eksik veya gelecekteki fiyat zamanı reddedilir.
+- Doğrulama: `python -m unittest discover -s tests -t .` — 52 test geçti.
+- Örnek limitler ekip kararı değildir; borsa ve ajan bağlantısı kurulmadı.

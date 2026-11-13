@@ -16,8 +16,9 @@ class SQLitePortfolio:
     işlemleri eski bellek durumuyla ezilmez. Bağlantı aynı iş parçacığında kullanılır.
     """
 
-    def __init__(self, path, *, initial_cash=0, fees=None, quote="USDT", risk=None):
+    def __init__(self, path, *, initial_cash=0, fees=None, quote="USDT", risk=None, clock=None):
         self.risk = risk if risk is not None else RiskLimits()
+        self._clock = clock if clock is not None else lambda: datetime.now(timezone.utc)
         self._db = sqlite3.connect(path, isolation_level=None)
         try:
             self._db.execute("BEGIN IMMEDIATE")
@@ -72,7 +73,8 @@ class SQLitePortfolio:
             self._db.rollback()
             raise
 
-    def _trade(self, side, symbol, quantity, price, *, taker=True, timestamp=None):
+    def _trade(self, side, symbol, quantity, price, *, taker=True, timestamp=None,
+               price_observed_at=None):
         quantity, price = self.risk.check(symbol, quantity, price)
         if timestamp is not None:
             if not isinstance(timestamp, datetime) or timestamp.utcoffset() is None:
@@ -81,6 +83,8 @@ class SQLitePortfolio:
         self._db.execute("BEGIN IMMEDIATE")
         try:
             p = self._load()
+            # Kilit beklerken fiyat eskimiş olabilir; kontrolü kilitten sonra yap.
+            self.risk.check_price_time(price_observed_at, now=self._clock())
             trade = getattr(p, side)(symbol, quantity, price, taker=taker, timestamp=timestamp)
             if side == "buy":
                 self.risk.check_after_buy(p, symbol, price)
@@ -98,11 +102,15 @@ class SQLitePortfolio:
             self._db.rollback()
             raise
 
-    def buy(self, symbol, quantity, price, *, taker=True, timestamp=None):
-        return self._trade("buy", symbol, quantity, price, taker=taker, timestamp=timestamp)
+    def buy(self, symbol, quantity, price, *, taker=True, timestamp=None,
+            price_observed_at=None):
+        return self._trade("buy", symbol, quantity, price, taker=taker, timestamp=timestamp,
+                           price_observed_at=price_observed_at)
 
-    def sell(self, symbol, quantity, price, *, taker=True, timestamp=None):
-        return self._trade("sell", symbol, quantity, price, taker=taker, timestamp=timestamp)
+    def sell(self, symbol, quantity, price, *, taker=True, timestamp=None,
+             price_observed_at=None):
+        return self._trade("sell", symbol, quantity, price, taker=taker, timestamp=timestamp,
+                           price_observed_at=price_observed_at)
 
     def close(self):
         self._db.close()
