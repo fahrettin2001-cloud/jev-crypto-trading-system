@@ -4,7 +4,7 @@ Son güncelleme: 13 Kasım 2026
 
 ## Amaç ve mevcut durum
 
-Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda uygulama kodu henüz yoktur. Binance Global veya TR seçimi henüz kesinleşmedi. Hostinger bu aşamanın kapsamı dışındadır.
+Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; kayıt ve kalıcılık henüz yoktur. Binance Global veya TR seçimi henüz kesinleşmedi. Hostinger bu aşamanın kapsamı dışındadır.
 
 Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki işler öneridir; kimseye onayı olmadan rol atanmadı.
 
@@ -18,8 +18,8 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 
 ## Görev 1 — Sanal işlem çekirdeği
 
-- Sorumlu: Seçilmedi
-- Durum: Bekliyor
+- Sorumlu: @demirfahrieren-png
+- Durum: İncelemede — çekirdek main'de (PR #2); arayüz notu: docs/gorev1-arayuz.md
 - Kapsam: Python proje altyapısı, ortak veri modelleri, sanal portföy ve alış/satış.
 - Çıktı: Decimal ile tutarlı tutar ve komisyon hesapları; geçersiz fiyat/miktar, yetersiz para veya varlığın reddi.
 - Sınır: Sadece örnek veri ve sanal bakiye; borsa veya harici servis bağlantısı yok.
