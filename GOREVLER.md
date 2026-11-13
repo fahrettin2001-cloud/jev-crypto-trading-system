@@ -29,12 +29,14 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## Görev 2 — Kayıtlar ve güvenlik testleri
 
 - Sorumlu: @babakok-prog
-- Durum: Çalışılıyor
+- Durum: İncelemede (dal: `feat/sqlite-kayit-risk`)
 - Kapsam: SQLite işlem kayıtları, bakiye kalıcılığı ve bağımsız risk kontrolü taslağı.
 - Çıktı: İşlem ile bakiye değişikliği tek veritabanı işlemiyle kaydedilir; hata durumunda tamamı geri alınır. Yeniden başlatma sonrası hesap doğru yüklenir.
 - Bitti ölçütü: Başarılı kayıt, yeniden açma, yetersiz bakiye ve hata/geri alma senaryolarını doğrulayan testler.
 - Bağımlılık: Görev 1 ile önceden anlaşılan arayüz. Entegrasyon için diğer dalın hazır olması gerekebilir.
 - Not: Sayısal risk limitleri ekipçe seçilene kadar örnek ve değiştirilebilir olarak işaretlenir.
+
+- Uygulama: `SQLitePortfolio`, bağımsız `RiskLimits` taslağı ve kalıcılık/geri alma testleri eklendi. `python -m unittest discover -s tests -t . -v`: 30 test geçti. Kullanım ve sınırlar: `docs/gorev2-kayitlar.md`.
 
 ## Görev 3 — Proje hafızası ve entegrasyon tasarımı
 

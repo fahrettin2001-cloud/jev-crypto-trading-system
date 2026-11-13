@@ -26,6 +26,12 @@ python -m unittest discover -s tests -t .   # testler
 python -m examples.demo                     # örnek senaryo
 ```
 
+## Kalıcı kayıtlar (görev 2)
+
+`SQLitePortfolio` bakiye, pozisyonlar ve işlem geçmişini aynı SQLite işlemiyle saklar.
+Program yeniden açıldığında hesap yüklenir; başarısız yazım tamamen geri alınır.
+Dış bağımlılık gerekmez. Kullanım, risk taslağı ve sınırlar: [Görev 2](docs/gorev2-kayitlar.md).
+
 ## Ekipçe çalışma
 
 Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pull request ile incelemeye sunun. API anahtarlarını, şifreleri, gerçek hesap bilgilerini ve gizli yapılandırmaları repoya koymayın.

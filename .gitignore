@@ -6,7 +6,15 @@ __pycache__/
 .env.*
 !.env.example
 .obsidian/
+
+# Yerel SQLite hesapları ve günlükleri
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
 *.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
 *.sqlite3
 *.sqlite3-*
-*.db
