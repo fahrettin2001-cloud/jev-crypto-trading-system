@@ -160,12 +160,22 @@ def _save(directory: Path, state: LiveState) -> None:
     os.replace(tmp, directory / STATE)
 
 
+class _StateUnpickler(pickle.Unpickler):
+    """`python -m jev.live` ile yazılmış eski durum dosyalarında sınıf `__main__.LiveState`
+    olarak kayıtlıdır; bunu her zaman `jev.live.LiveState`'e yönlendirir."""
+
+    def find_class(self, module, name):
+        if module == "__main__" and name == "LiveState":
+            return LiveState
+        return super().find_class(module, name)
+
+
 def _load(directory: Path) -> LiveState:
     path = directory / STATE
     if not path.exists():
         raise LiveError(f"{path} yok; önce `init` çalıştırın")
     with open(path, "rb") as f:
-        state = pickle.load(f)  # yalnızca bu programın yazdığı dosya
+        state = _StateUnpickler(f).load()  # yalnızca bu programın yazdığı dosya
     if not isinstance(state, LiveState):
         raise LiveError("Durum dosyası tanınmadı")
     return state
@@ -420,4 +430,7 @@ def main(argv=None) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    # `python -m jev.live` bu dosyayı `__main__` olarak çalıştırır. Kaydedilen nesnelerin
+    # sınıfı her zaman `jev.live` adıyla saklansın diye asıl modül üzerinden çalıştır.
+    from jev.live import main as _main
+    _main()

@@ -175,6 +175,26 @@ class LiveRunTests(unittest.TestCase):
         out = run_once(self.dir, fetch=self.fake, clock=self.at(41))
         self.assertEqual(out["islenen"], 1)
 
+    def test_state_written_as_main_module_still_loads(self):
+        # Sunucuda `python -m jev.live init` ile yazılan dosyada sınıf adı
+        # `__main__.LiveState` olarak geçer; başka bir yerden okunabilmeli.
+        init(self.dir, settings(), fetch=self.fake, clock=self.at(40))
+        path = self.dir / "durum.pkl"
+        data = path.read_bytes()
+        self.assertIn(b"jev.live", data)
+        path.write_bytes(data.replace(b"jev.live", b"__main__", 1))   # aynı uzunluk
+        self.assertIn("Son işlenen bar", status(self.dir))
+        out = run_once(self.dir, fetch=self.fake, clock=self.at(41))
+        self.assertEqual(out["islenen"], 1)
+        self.assertIn(b"jev.live", path.read_bytes())                 # yeniden doğru adla kaydedildi
+
+    def test_status_cli_reads_state_created_by_import(self):
+        init(self.dir, settings(), fetch=self.fake, clock=self.at(40))
+        out = subprocess.run([sys.executable, "-m", "jev.live", "status", "--dir", str(self.dir)],
+                             cwd=ROOT, capture_output=True, text=True, timeout=60)
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertIn("Son işlenen bar", out.stdout)
+
     def test_cli_help_and_error(self):
         out = subprocess.run([sys.executable, "-m", "jev.live", "status", "--dir",
                               str(Path(tempfile.mkdtemp()) / "yok")], cwd=ROOT,

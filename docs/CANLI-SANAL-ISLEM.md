@@ -89,6 +89,26 @@ systemctl disable --now jev-live.timer           # zamanlayıcıyı tamamen kapa
 
 Gerçek BTCUSDT verisinde (Ağu–Eki 2026) bu ayarlarla: 22 işlem, red yok, +1,12% getiri, en büyük düşüş %1,53, komisyon 1,10 USDT. İşlemler küçük (≈50 USDT) olduğu için getiri ve düşüş de küçüktür.
 
+## Sonuçları GitHub'a otomatik yayınlama (isteğe bağlı)
+
+Sunucu her gün 05:20 UTC'de (08:20 TR) `son/` klasörünü (durum raporu, işlemler, kararlar, varlık eğrisi, son günlük satırları, sunucu bilgisi) **ayrı bir sonuç deposuna** yükler. Böylece sunucuya girmeden takip edilebilir; Claude'un günlük özet görevi de buradan okur.
+
+Güvenlik: Sunucu yalnızca bu sonuç deposuna yazabilen bir **deploy key** kullanır; ana kod deposuna yazma yetkisi yoktur. Anahtar sunucuda `jev` kullanıcısına aittir ve dışarı çıkmaz. GitHub'ın sunucu anahtarı betikte sabitlidir (parmak izi `SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU`, GitHub dokümanıyla aynı). Sonuçlarda şifre veya anahtar yoktur; depo herkese açıksa sanal işlem sonuçları da herkese açık olur.
+
+1. GitHub'da boş bir depo oluşturun, ör. `jev-canli-sonuclar` (README eklemeden).
+2. Sunucuda (root): `bash /opt/jev/app/deploy/sonuc-anahtar.sh anahtar` — çıkan `ssh-ed25519 ...` satırını kopyalayın.
+3. GitHub'da sonuç deposu → **Settings → Deploy keys → Add deploy key**: satırı yapıştırın, **Allow write access** işaretleyin.
+4. Sunucuda (root): `bash /opt/jev/app/deploy/sonuc-anahtar.sh bagla git@github.com:KULLANICI/jev-canli-sonuclar.git` — ilk yayını yapar.
+5. Günlük yayını açın:
+
+```bash
+cp /opt/jev/app/deploy/jev-sonuc.service /opt/jev/app/deploy/jev-sonuc.timer /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now jev-sonuc.timer
+systemctl list-timers jev-sonuc.timer --no-pager
+```
+
+Elle yayın: `systemctl start jev-sonuc.service`. Erişimi kaldırmak: GitHub'da deploy key'i silin ve `systemctl disable --now jev-sonuc.timer`.
+
 ## Sınırlar ve riskler
 
 - Sunucunun Binance'e erişimi bölgeye göre değişebilir; 5. adımdaki `check` bunu doğrular.
