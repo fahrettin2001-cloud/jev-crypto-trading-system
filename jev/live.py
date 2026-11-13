@@ -17,6 +17,8 @@ mum kapanışından kısa süre sonra bir kez çalıştırır. Komut:
 
 Durum klasörü: durum.pkl, ayarlar.json, kararlar.jsonl, islemler.csv,
 varlik_egrisi.csv, redler.csv, gunluk.log, DURDUR (isteğe bağlı).
+İsteğe bağlı Jev gölge modu (`jev_golge.json` varsa): işlem kaydedildikten sonra
+olasılık tahminini `golge.jsonl`'a yazar, kararları değiştirmez (bkz. `jev.jev_golge`).
 `durum.pkl` yalnızca bu programın kendi yazdığı dosyadır; başka kaynaktan
 gelen pkl dosyası yüklenmemelidir.
 """
@@ -42,6 +44,7 @@ from typing import Callable
 from .backtest import BacktestConfig, Simulator, format_report
 from .exchange_rules import ExchangeRules
 from .fees import D, FeeSchedule
+from . import jev_golge
 from .journal import (DecisionJournal, calibration, evaluate, format_calibration)
 from .klines import Candle, bars_from_series
 from .risk import RiskLimits
@@ -274,7 +277,7 @@ def init(directory: Path, settings: dict, *, fetch: Fetch = http_fetch, clock: C
 
 
 def run_once(directory: Path, *, fetch: Fetch = http_fetch, clock: Clock = _utcnow,
-             catchup: int = 48) -> dict:
+             catchup: int = 48, shadow_predictor: jev_golge.Predictor | None = None) -> dict:
     """Yeni kapanan barları işler. Döndürür: özet sözlük."""
     directory = Path(directory)
     with _locked(directory):
@@ -337,7 +340,42 @@ def run_once(directory: Path, *, fetch: Fetch = http_fetch, clock: Clock = _utcn
             last = sim.last_timestamp
             if last is not None and now - last > max_lag + step:
                 _log(directory, f"UYARI: yeni kapanmış mum gelmedi; son bar {last}", now)
+        # İşlem durumu yukarıda kaydedildi; gölge mod ondan sonra ve yalıtılmış çalışır.
+        _run_shadow(directory, state, now, step, max_lag, shadow_predictor)
         return summary
+
+
+def _run_shadow(directory: Path, state: LiveState, now: datetime, step: timedelta,
+                max_lag: timedelta, predictor) -> None:
+    """Jev gölge modu. Hiçbir hatası dışarı taşmaz; işlem durumuna dokunmaz."""
+    try:
+        cfg = jev_golge.ShadowSettings.load(directory)
+        if not cfg.etkin:
+            return
+        if predictor is None:
+            predictor = jev_golge.typesafe_predictor(cfg.model)
+        n = jev_golge.record_predictions(
+            directory, state.sim.closes, state.settings["symbols"], step, now, cfg, predictor,
+            max_lag, log=lambda m: _log(directory, m, now))
+        if n:
+            _log(directory, f"Jev gölge: {n} tahmin kaydedildi (işlemler etkilenmedi)", now)
+    except jev_golge.ShadowError as exc:
+        _log(directory, f"Jev gölge: atlandı ({exc})", now)
+    except Exception as exc:  # noqa: BLE001 - gölge mod botu asla durdurmaz
+        _log(directory, f"Jev gölge: atlandı ({type(exc).__name__})", now)
+
+
+def shadow_report(directory: Path, csv_path: Path | None = None) -> str:
+    directory = Path(directory)
+    state = _load(directory)
+    outcomes = jev_golge.resolve(jev_golge.read_log(directory), state.sim.closes)
+    if csv_path is not None:
+        Path(csv_path).unlink(missing_ok=True)
+        _append_csv(Path(csv_path), jev_golge.RESULT_HEADER, jev_golge.outcome_rows(outcomes))
+    cfg = jev_golge.ShadowSettings.load(directory)
+    head = (f"Ayar: {'AÇIK' if cfg.etkin else 'kapalı'}; ufuk {cfg.ufuk_bar} bar, "
+            f"her {cfg.her_n_bar} barda bir, günde en çok {cfg.gunluk_cagri_siniri} çağrı")
+    return head + "\n" + jev_golge.report(outcomes)
 
 
 def status(directory: Path, horizon: int = 24) -> str:
@@ -363,6 +401,22 @@ def status(directory: Path, horizon: int = 24) -> str:
     return "\n".join(lines)
 
 
+def shadow_try(directory: Path, predictor=None) -> str:
+    """Tek bir Jev çağrısıyla bağlantıyı dener (kayıt yazmaz, işlem yapmaz)."""
+    directory = Path(directory)
+    state = _load(directory)
+    cfg = jev_golge.ShadowSettings.load(directory)
+    symbol = (cfg.semboller or state.settings["symbols"])[0]
+    history = state.sim.closes[symbol][-cfg.gecmis_bar:]
+    step = timedelta(minutes=INTERVALS[state.settings["interval"]])
+    predictor = predictor or jev_golge.typesafe_predictor(cfg.model)
+    p = jev_golge.parse_probability(jev_golge.call_with_timeout(
+        lambda: predictor(symbol, history, cfg.ufuk_bar, step), cfg.zaman_asimi_sn))
+    ts, price = history[-1]
+    return (f"Jev cevap verdi: {symbol} kapanışı {ts + cfg.ufuk_bar * step:%Y-%m-%d %H:%M} UTC'de "
+            f"{price} üstünde olma olasılığı {p} (kayıt yazılmadı, işlem yok)")
+
+
 def check(fetch: Fetch = http_fetch, clock: Clock = _utcnow) -> str:
     now = clock()
     candles = fetch_closed_candles("BTCUSDT", "1h", 3, now, fetch)
@@ -382,6 +436,11 @@ def main(argv=None) -> None:
     p_init = sub.add_parser("init", help="Yeni sanal hesap başlat ve stratejiyi ısındır")
     p_run = sub.add_parser("run", help="Yeni kapanan mumları işle (zamanlayıcıdan çağrılır)")
     p_status = sub.add_parser("status", help="Durum, performans ve karar isabeti")
+    p_golge = sub.add_parser("golge", help="Jev gölge modu tahminlerinin isabet raporu")
+    p_golge.add_argument("--dir", required=True, type=Path, help="Durum klasörü")
+    p_golge.add_argument("--csv", type=Path, help="Sonuçları bu CSV dosyasına da yaz")
+    p_dene = sub.add_parser("golge-dene", help="Tek Jev çağrısıyla bağlantıyı dene (ücretli)")
+    p_dene.add_argument("--dir", required=True, type=Path, help="Durum klasörü")
     for p in (p_init, p_run, p_status):
         p.add_argument("--dir", required=True, type=Path, help="Durum klasörü")
     p_status.add_argument("--horizon", type=int, default=24)
@@ -423,9 +482,13 @@ def main(argv=None) -> None:
             print(status(args.dir))
         elif args.command == "run":
             run_once(args.dir, catchup=args.catchup)
+        elif args.command == "golge":
+            print(shadow_report(args.dir, args.csv))
+        elif args.command == "golge-dene":
+            print(shadow_try(args.dir))
         else:
             print(status(args.dir, args.horizon))
-    except (LiveError, ValueError, OSError) as exc:
+    except (LiveError, ValueError, OSError, jev_golge.ShadowError) as exc:
         parser.exit(1, f"Hata: {exc}\n")
 
 
