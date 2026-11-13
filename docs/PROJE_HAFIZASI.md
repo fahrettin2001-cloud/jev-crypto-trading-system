@@ -26,6 +26,14 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 - PR #10 incelendi (yorum, onay değil): dalda 67 test geçiyor, ancak `SQLitePortfolio.risk` property setter'ı sürüm kontrolü olmadan politikayı değiştirebiliyor; limitli hesapta `account.risk = RiskLimits()` sonrası izin listesi dışı ve limit üstü işlem kabul edildi (denemeyle doğrulandı). CLI etkilenmiyor. Ayrıntı ve öneri PR #10 incelemesinde. PR #11 bu dalın üzerine kurulu olduğu için düzeltmeden etkilenebilir.
 - GOREVLER.md'deki terminal arayüzü notu düzeltildi: PR #8 ana dala birleşmiş.
 
+## İnceleme devri — 13 Kasım 2026
+
+- PR #10 açık: kalıcı risk politikası sürüm kontrolü eksikleri için [PR #14](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/pull/14) bu dala önerildi. Sürüm karşılaştırması eşzamanlı değişikliklerin çakışmasını önler; yetkilendirme mekanizması değildir.
+- PR #11, PR #10'un dalına bağlıdır. [PR #16](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/pull/16) risk sürümüne uyum ve Windows'ta geçici yedek veritabanı bağlantılarının kapatılmasını önerir. Bağımsız inceleme ve testler tamamlanmadan üst PR'ları birleştirmeyin.
+- Yerelde PR #14 tek başına 68 testi geçti; PR #14 ile PR #16 bir arada denendiğinde Windows üzerinde 81 test geçti. PR #16'daki ilgili 8 test ayrıca geçti. Bunlar yerel sonuçlardır; GitHub kontrolleri ve PR'ların güncel dallara entegrasyonu ayrıca doğrulanmalı.
+- Sıra: PR #14'ü PR #10 dalında incele; PR #16'yı PR #11 dalında incele; sonra PR #10 ve PR #11'i güncel tabanlarıyla ve testlerle tekrar değerlendir. PR #3'e dokunulmadı.
+- PR #11'in önerdiği yedekte geçici SQLite kopyaları şifresizdir ve silinmeleri güvenli silme garantisi vermez. Windows'ta `0o600` tek başına kullanıcıya özel ACL garantisi değildir; gerçek hassas veriler öncesi ayrıca çözüm ve hata yolu testleri gerekir. Şifreli SQLite yedeği canlı kullanım için kurulmuş veya doğrulanmış sayılmamalı.
+
 ## Nasıl birlikte çalışılır?
 
 1. GOREVLER.md dosyasında sorumluları kontrol edin; başlamadan görevinizi işaretleyin.
