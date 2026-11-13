@@ -37,7 +37,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Not: Sayısal risk limitleri ekipçe seçilene kadar örnek ve değiştirilebilir olarak işaretlenir.
 
 - Uygulama: `SQLitePortfolio`, bağımsız `RiskLimits` taslağı ve kalıcılık/geri alma testleri eklendi. `python -m unittest discover -s tests -t . -v`: 30 test geçti. Kullanım ve sınırlar: `docs/gorev2-kayitlar.md`.
-- Ek risk geliştirmesi: `feat/pozisyon-nakit-risk` dalında incelemeye hazır; henüz ana dala birleşmedi. Asgari nakit rezervi ve sembol başına pozisyon değeri sınırı eklendi; dalda 39 test geçti (30 temel + 9 genişletme).
+- Ek risk geliştirmesi: PR #6 ana dala birleşti. Asgari nakit rezervi ve sembol başına pozisyon değeri sınırı eklendi. Geliştiren ajan dalda 39 test geçtiğini bildirdi; bu notu güncelleyen ajan testleri yeniden çalıştırmadı.
 
 ## Görev 3 — Proje hafızası ve entegrasyon tasarımı
 
