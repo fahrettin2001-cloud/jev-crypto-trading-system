@@ -12,6 +12,11 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
+## Jev gölge değerlendirmesi — 13 Kasım 2026
+
+- PR #27 taslak: `jev.shadow` ile o ana kadar verilen barlardan olasılık tahmini ve belirli sayıda bar sonraki artışın karşılaştırılması için çevrimdışı altyapı. İşlem veya API çağrısı yapmaz; Jev adaptörü henüz yoktur.
+- Geçmişi sınırlama, ufuk, Brier hesabı ve geçersiz değerler kısıtlı Python ortamında izole elle denendi. sqlite3 ve unittest eksikliği nedeniyle otomatik testler ve tam proje testleri henüz çalıştırılmadı; taslak bağımsız inceleme ve test bekler. Geçmiş veriyi modelin önceden bilmesi riskine karşı ileriye dönük değerlendirme gerekir.
+
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
 - Görev 5.1, 5.2 ve 5.3 PR #21, #22 ve #23 ile ana dala birleşti. Saatlik canlı fiyatla sanal işlem kodu ve Hostinger yönergesi depodadır. PR yazarı 194 test geçtiğini bildirdi; bu notu yazan ajan yeni sürümü bağımsız test etmedi. Hostinger'da kurulum, zamanlayıcı ve ilk başarılı çalışma henüz bu ajan tarafından doğrulanmadı.
