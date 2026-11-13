@@ -20,6 +20,12 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 - Obsidian Copilot içinde Codex bağlantısı kullanılarak not okuma denendi. Sohbetlerin GitHub'a otomatik veya güvenli şekilde aktarılması kurulmuş değildir.
 - Sıradaki işler: ekip arkadaşlarının haber rehberini okuması; yerel dosyaları koruyarak eşitlemenin planlanması; yedekleme betiğinin güvenli koşullarda uçtan uca testi ve şifreli SQLite yedek planı. Sayısal risk limitleri, Binance Global/TR ve haber sağlayıcısının canlı kullanımı ekipçe netleştirilecek.
 
+## Son çalışma durumu — 13 Kasım 2026, akşam (@demirfahrieren-png)
+
+- Görev 1 (sanal işlem çekirdeği) Tamamlandı olarak işaretlendi; ana dalda 60 test yeniden çalıştırıldı ve geçti.
+- PR #10 incelendi (yorum, onay değil): dalda 67 test geçiyor, ancak `SQLitePortfolio.risk` property setter'ı sürüm kontrolü olmadan politikayı değiştirebiliyor; limitli hesapta `account.risk = RiskLimits()` sonrası izin listesi dışı ve limit üstü işlem kabul edildi (denemeyle doğrulandı). CLI etkilenmiyor. Ayrıntı ve öneri PR #10 incelemesinde. PR #11 bu dalın üzerine kurulu olduğu için düzeltmeden etkilenebilir.
+- GOREVLER.md'deki terminal arayüzü notu düzeltildi: PR #8 ana dala birleşmiş.
+
 ## Nasıl birlikte çalışılır?
 
 1. GOREVLER.md dosyasında sorumluları kontrol edin; başlamadan görevinizi işaretleyin.
