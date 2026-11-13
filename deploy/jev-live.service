@@ -1,0 +1,17 @@
+[Unit]
+Description=Jev canli SANAL islem - yeni kapanan mumlari isle (gercek emir yok)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=jev
+Group=jev
+WorkingDirectory=/opt/jev/app
+ExecStart=/usr/bin/python3 -m jev.live run --dir /var/lib/jev/canli
+TimeoutStartSec=300
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/jev

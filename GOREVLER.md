@@ -61,7 +61,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## Görev 5 — Botu geliştirme: ölçüm, risk ve yeni sinyaller
 
 - Sorumlu: @demirfahrieren-png
-- Durum: Devam ediyor — 5.1 tamamlandı (PR #21), 5.2 incelemede.
+- Durum: Devam ediyor — 5.1 tamamlandı (PR #21); 5.2 (PR #22) ve 5.3 canlı sanal işlem incelemede. 5.3 Hostinger'a kurulmayı bekliyor (`docs/CANLI-SANAL-ISLEM.md`).
 - Kapsam: 5.1 oynaklığa göre pozisyon büyüklüğü, 5.2 karar günlüğü ve güven kalibrasyonu, 5.3 canlı sanal işlem, 5.4 haber duygu analizi. Jev bağlantısı (@fahrettin2001-cloud) bu görevin dışında.
 - Sınır: Gerçek emir, hesap veya API anahtarı yok. 5.3 ve 5.4'ün canlı kısımları ağ erişimi olan bir ekip bilgisayarında çalıştırılacak.
 - Ayrıntı: `docs/gorev5-gelistirmeler.md`.

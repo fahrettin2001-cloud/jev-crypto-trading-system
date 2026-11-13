@@ -291,3 +291,20 @@ def _fraction(value) -> Decimal:
     if not f.is_finite() or not 0 < f <= 1:
         raise ValueError("Oran 0 ile 1 arasında olmalı (0 hariç)")
     return f
+
+
+class Combined:
+    """Birden çok stratejiyi birlikte çalıştırır (ör. her sembol için bir SmaCross).
+    Her alt strateji aynı portföy görünümünü görür; öneriler sırayla birleştirilir."""
+
+    def __init__(self, strategies):
+        self.strategies = list(strategies)
+        if not self.strategies:
+            raise ValueError("En az bir strateji gerekli")
+        self.name = " + ".join(getattr(s, "name", type(s).__name__) for s in self.strategies)
+
+    def on_bar(self, bar, view):
+        out = []
+        for s in self.strategies:
+            out.extend(s.on_bar(bar, view) or [])
+        return out

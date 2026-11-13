@@ -127,7 +127,9 @@ class _Engine:
         self.notes: list[FillNote] = []
         self.exits: dict[str, ProtectiveExit] = {}
         self.working: list[list] = []  # [intent, kalan_bar]
-        self.filled: set[int] = set()  # gerçekleşen strateji önerilerinin id()'si
+        # Gerçekleşen öneri nesneleri (id() değil: nesneler diske kaydedilip
+        # geri yüklenince id değişir, nesne bağları korunur)
+        self.filled: list[OrderIntent] = []
 
     # --- tek bir gerçekleşme --------------------------------------------------
 
@@ -140,7 +142,7 @@ class _Engine:
             self.rejections.append(Rejection(bar.timestamp, intent, str(exc), kind))
             return False
         self.notes.append(FillNote(kind, intent.reason))
-        self.filled.add(id(intent))
+        self.filled.append(intent)
         if intent.side == BUY and (intent.stop_loss or intent.take_profit):
             sl, tp = intent.stop_loss, intent.take_profit
             if self.c.rules is not None:
@@ -258,50 +260,71 @@ class _Engine:
         self.working.append([intent, intent.good_for_bars])
 
 
-def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig | None = None,
-                 journal: DecisionJournal | None = None) -> BacktestResult:
-    config = config or BacktestConfig()
-    if not bars:
-        raise ValueError("Backtest için en az bir bar gerekli")
-    if any(b.timestamp >= c.timestamp for b, c in zip(bars, bars[1:])):
-        raise ValueError("Barlar zaman sırasına göre ve tekrarsız olmalı")
+class Simulator:
+    """Backtest ve canlı sanal işlemin ortak motoru: barları tek tek işler.
 
-    e = _Engine(config)
-    last_prices: dict[str, Decimal] = {}
-    equity_curve: list[tuple[datetime, Decimal]] = []
-    pending: list[OrderIntent] = []
-    issued: list[tuple[OrderIntent | Hold, Decision]] = []
-    source = getattr(strategy, "name", type(strategy).__name__)
+    `run_backtest` tüm barları bir seferde verir; canlı çalıştırıcı (`jev.live`)
+    her saat yeni kapanan barı verir ve nesneyi diske kaydedip sonra devam eder.
+    Aynı bar dizisi için ikisi aynı işlemleri üretir.
+    """
 
-    for bar in bars:
-        last_prices.update(bar.prices)
+    def __init__(self, strategy: Strategy, config: BacktestConfig | None = None):
+        self.config = config or BacktestConfig()
+        self.strategy = strategy
+        self.source = getattr(strategy, "name", type(strategy).__name__)
+        self.e = _Engine(self.config)
+        self.last_prices: dict[str, Decimal] = {}
+        self.equity_curve: list[tuple[datetime, Decimal]] = []
+        self.pending: list[OrderIntent] = []
+        self.issued: list[tuple[OrderIntent | Hold, Decision]] = []
+        self.closes: dict[str, list[tuple[datetime, Decimal]]] = {}
+        self.last_timestamp: datetime | None = None
+
+    @property
+    def portfolio(self) -> Portfolio:
+        return self.e.portfolio
+
+    def _accept(self, bar: Bar) -> None:
+        if self.last_timestamp is not None and bar.timestamp <= self.last_timestamp:
+            raise ValueError("Barlar zaman sırasına göre ve tekrarsız olmalı")
+        self.last_timestamp = bar.timestamp
+        self.last_prices.update(bar.prices)
+        for s, p in bar.prices.items():
+            self.closes.setdefault(s, []).append((bar.timestamp, p))
+
+    def _view(self) -> PortfolioView:
+        e = self.e
+        return PortfolioView(
+            cash=e.portfolio.cash,
+            positions={s: p.quantity for s, p in e.portfolio.positions.items()},
+            equity=e.portfolio.equity(self.last_prices),
+            open_orders=tuple(intent for intent, _ in e.working),
+        )
+
+    def step(self, bar: Bar) -> None:
+        """Bir barı işler: çıkışlar, bekleyen emirler, limitler, strateji kararı."""
+        e, config = self.e, self.config
+        self._accept(bar)
         e.check_exits(bar)
-        for intent in pending:
+        for intent in self.pending:
             price = bar.open(intent.symbol) if intent.symbol in bar.prices else None
             if price is None:
                 e.rejections.append(Rejection(bar.timestamp, intent,
                                               f"{intent.symbol} için bu barda fiyat yok"))
                 continue
             e.fill(intent, bar, price, kind=K_MARKET, taker=True, slippage=True)
-        pending = []
+        self.pending = []
         e.check_limits(bar)
 
-        view = PortfolioView(
-            cash=e.portfolio.cash,
-            positions={s: p.quantity for s, p in e.portfolio.positions.items()},
-            equity=e.portfolio.equity(last_prices),
-            open_orders=tuple(intent for intent, _ in e.working),
-        )
-        outputs = list(strategy.on_bar(bar, view) or [])
+        outputs = list(self.strategy.on_bar(bar, self._view()) or [])
         for item in outputs:
             if not isinstance(item, (OrderIntent, Hold)):
                 raise TypeError(f"Strateji OrderIntent / Hold dışında değer döndürdü: {item!r}")
             if item.symbol in bar.prices:
-                issued.append((item, Decision(
+                self.issued.append((item, Decision(
                     bar.timestamp, item.symbol, "HOLD" if isinstance(item, Hold) else item.side,
-                    bar.prices[item.symbol], item.confidence, source, item.reason)))
-        intents = [i for i in outputs if isinstance(i, OrderIntent)]
-        for intent in intents:
+                    bar.prices[item.symbol], item.confidence, self.source, item.reason)))
+        for intent in (i for i in outputs if isinstance(i, OrderIntent)):
             if intent.order_type == LIMIT:
                 e.place_limit(intent, bar)  # sonraki bardan itibaren geçerli
             elif config.execution == "same_bar":
@@ -312,38 +335,73 @@ def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig
                     e.rejections.append(Rejection(bar.timestamp, intent,
                                                   f"{intent.symbol} için bu barda fiyat yok"))
             else:
-                pending.append(intent)
+                self.pending.append(intent)
 
-        equity_curve.append((bar.timestamp, e.portfolio.equity(last_prices)))
+        self.equity_curve.append((bar.timestamp, e.portfolio.equity(self.last_prices)))
 
-    end = bars[-1].timestamp
-    for intent in pending:
-        e.rejections.append(Rejection(end, intent, "Veri bitti; öneri gerçekleştirilemedi"))
-    for intent, _ in e.working:
-        e.rejections.append(Rejection(end, intent, "Veri bitti; limit emir açık kaldı", K_LIMIT))
+    def observe(self, bar: Bar) -> None:
+        """Barı yalnızca stratejiye gösterir (ısınma / eski veri): işlem yapılmaz,
+        kararlar atılır. Portföy değerlemesi güncellenir."""
+        self._accept(bar)
+        self.strategy.on_bar(bar, self._view())
+        self.equity_curve.append((bar.timestamp, self.e.portfolio.equity(self.last_prices)))
 
-    reasons = {id(r.intent): r.reason for r in e.rejections}
-    decisions = []
-    for item, d in issued:
-        status = ("bekle" if isinstance(item, Hold)
-                  else "gerçekleşti" if id(item) in e.filled
-                  else f"reddedildi: {reasons[id(item)]}" if id(item) in reasons else "bilinmiyor")
-        decisions.append(Decision(d.timestamp, d.symbol, d.action, d.price, d.confidence,
-                                  d.source, d.reason, status))
+    def finish(self) -> None:
+        """Veri sonu: bekleyen ve açık limit emirleri reddedilmiş say (yalnızca backtest)."""
+        end = self.last_timestamp
+        for intent in self.pending:
+            self.e.rejections.append(Rejection(end, intent, "Veri bitti; öneri gerçekleştirilemedi"))
+        self.pending = []
+        for intent, _ in self.e.working:
+            self.e.rejections.append(Rejection(end, intent, "Veri bitti; limit emir açık kaldı",
+                                               K_LIMIT))
+        self.e.working = []
+
+    def decisions(self) -> list[Decision]:
+        """Tüm kararlar, güncel durumlarıyla ("bekliyor": henüz sonuçlanmadı)."""
+        filled = {id(x) for x in self.e.filled}
+        reasons = {id(r.intent): r.reason for r in self.e.rejections}
+        out = []
+        for item, d in self.issued:
+            status = ("bekle" if isinstance(item, Hold)
+                      else "gerçekleşti" if id(item) in filled
+                      else f"reddedildi: {reasons[id(item)]}" if id(item) in reasons
+                      else "bekliyor")
+            out.append(Decision(d.timestamp, d.symbol, d.action, d.price, d.confidence,
+                                d.source, d.reason, status))
+        return out
+
+    def result(self) -> BacktestResult:
+        if not self.equity_curve:
+            raise ValueError("Henüz işlenmiş bar yok")
+        return BacktestResult(
+            decisions=self.decisions(),
+            strategy=self.source,
+            config=self.config,
+            portfolio=self.e.portfolio,
+            equity_curve=list(self.equity_curve),
+            rejections=list(self.e.rejections),
+            metrics=compute_metrics(self.equity_curve, self.e.portfolio.trades,
+                                    self.config.initial_cash),
+            notes=list(self.e.notes),
+        )
+
+
+def run_backtest(bars: Sequence[Bar], strategy: Strategy, config: BacktestConfig | None = None,
+                 journal: DecisionJournal | None = None) -> BacktestResult:
+    if not bars:
+        raise ValueError("Backtest için en az bir bar gerekli")
+    if any(b.timestamp >= c.timestamp for b, c in zip(bars, bars[1:])):
+        raise ValueError("Barlar zaman sırasına göre ve tekrarsız olmalı")
+    sim = Simulator(strategy, config)
+    for bar in bars:
+        sim.step(bar)
+    sim.finish()
+    result = sim.result()
     if journal is not None:
-        for d in decisions:
+        for d in result.decisions:
             journal.record(d)
-
-    return BacktestResult(
-        decisions=decisions,
-        strategy=source,
-        config=config,
-        portfolio=e.portfolio,
-        equity_curve=equity_curve,
-        rejections=e.rejections,
-        metrics=compute_metrics(equity_curve, e.portfolio.trades, config.initial_cash),
-        notes=e.notes,
-    )
+    return result
 
 
 # --- rapor ve dışa aktarma ----------------------------------------------------
