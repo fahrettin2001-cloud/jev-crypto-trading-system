@@ -8,7 +8,15 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 İlk aşama, dış servislerden bağımsız sanal işlemler: Python, Decimal, SQLite ve testler için ekipçe planlama yapılmıştır. Hangi uygulama kodunun tamamlandığı güncel depo ve açık değişikliklerden kontrol edilir. Borsa olarak Binance Global seçildi (13 Kasım 2026, `docs/kararlar/2026-11-13-binance-global.md`); onaylanmış risk limitleri henüz seçilmedi. Haber keşfi için CryptoPanic, borsaya özel duyurular için Binance Global başlangıç adayıdır; canlı bağlantı kurulmadı. Ayrıntılar: `docs/HABER-KAYNAKLARI.md`.
 
-## Son çalışma durumu — 13 Kasım 2026, sabah
+## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
+
+- Görev 5.1, 5.2 ve 5.3 PR #21, #22 ve #23 ile ana dala birleşti. Saatlik canlı fiyatla sanal işlem kodu ve Hostinger yönergesi depodadır. PR yazarı 194 test geçtiğini bildirdi; bu notu yazan ajan yeni sürümü bağımsız test etmedi. Hostinger'da kurulum, zamanlayıcı ve ilk başarılı çalışma henüz bu ajan tarafından doğrulanmadı.
+- Ekip tarafından 500 dolarlık, saatlik bir test planlandığı konuşuldu. Bunun sanal bakiye olduğu, yapılandırmanın uygulandığı ve çalışma sonucu henüz bağımsız doğrulanmadı; gerçekleşmiş karar veya kâr olarak kaydetmeyin.
+- Jev API erişimi bulut ortamında ayarlandı. Bulut ajanı, PR #20'deki sentetik örneğin typesafe-sdk 0.7.5 ile tek istekle başarılı çalıştığını ve 0,99 yanıt aldığını bildirdi. Bu, modelin piyasa tahmini veya kârlılığının testi değildir. PR #20 henüz birleşmedi ve Jev'in saatlik sanal sisteme bağlandığı doğrulanmadı.
+- Sıradaki işler: Hostinger'daki ilk saatlik çalışmayı ve 500 birimlik bakiyenin sanal olduğunu ekipten teyit et; PR #20'yi incele; PR #11/#16 için mevcut inceleme ve test durumunu GitHub'dan yeniden kontrol et; saat 23.00 yedekleme görevini uygun zamanda ayrıca doğrula. Genel yedekleme ve geri yükleme eksikleri aşağıda korunmuştur.
+- Yerel Obsidian deposunda kaydedilmemiş değişiklikler bulunuyor; bunlar korunmalı, otomatik sıfırlama veya körlemesine pull yapılmamalı. Anahtarlar ve işlem verileri herkese açık depoya eklenmez.
+
+## Son çalışma durumu — 13 Kasım 2026, sabah (tarihsel kayıt)
 
 - Ana dalda çevrimdışı sanal portföy, SQLite kayıtları, örnek risk kontrolleri ve terminal arayüzü bulunuyor. Binance, Jev, Hermes veya canlı haber bağlantısı kurulu değildir.
 - Yedekleme kuralları PR #9 ile ana dala alındı. Haber kaynakları ve geliştirme sınırları `docs/HABER-KAYNAKLARI.md` dosyasında.
