@@ -4,7 +4,7 @@ Son güncelleme: 13 Kasım 2026
 
 ## Amaç ve mevcut durum
 
-Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; kayıt ve kalıcılık henüz yoktur. Binance Global veya TR seçimi henüz kesinleşmedi. Hostinger bu aşamanın kapsamı dışındadır.
+Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Binance Global veya TR seçimi henüz kesinleşmedi. Hostinger bu aşamanın kapsamı dışındadır.
 
 Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki işler öneridir; kimseye onayı olmadan rol atanmadı.
 
@@ -29,7 +29,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 ## Görev 2 — Kayıtlar ve güvenlik testleri
 
 - Sorumlu: @babakok-prog
-- Durum: İncelemede (dal: `feat/sqlite-kayit-risk`)
+- Durum: Tamamlandı — PR #5 ana dala birleşti (13 Kasım 2026).
 - Kapsam: SQLite işlem kayıtları, bakiye kalıcılığı ve bağımsız risk kontrolü taslağı.
 - Çıktı: İşlem ile bakiye değişikliği tek veritabanı işlemiyle kaydedilir; hata durumunda tamamı geri alınır. Yeniden başlatma sonrası hesap doğru yüklenir.
 - Bitti ölçütü: Başarılı kayıt, yeniden açma, yetersiz bakiye ve hata/geri alma senaryolarını doğrulayan testler.
@@ -37,6 +37,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Not: Sayısal risk limitleri ekipçe seçilene kadar örnek ve değiştirilebilir olarak işaretlenir.
 
 - Uygulama: `SQLitePortfolio`, bağımsız `RiskLimits` taslağı ve kalıcılık/geri alma testleri eklendi. `python -m unittest discover -s tests -t . -v`: 30 test geçti. Kullanım ve sınırlar: `docs/gorev2-kayitlar.md`.
+- Ek risk geliştirmesi: `feat/pozisyon-nakit-risk` dalında incelemeye hazır; henüz ana dala birleşmedi. Asgari nakit rezervi ve sembol başına pozisyon değeri sınırı eklendi; dalda 39 test geçti (30 temel + 9 genişletme).
 
 ## Görev 3 — Proje hafızası ve entegrasyon tasarımı
 

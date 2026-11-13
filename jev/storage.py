@@ -82,6 +82,8 @@ class SQLitePortfolio:
         try:
             p = self._load()
             trade = getattr(p, side)(symbol, quantity, price, taker=taker, timestamp=timestamp)
+            if side == "buy":
+                self.risk.check_after_buy(p, symbol, price)
             positions = json.dumps({s: [str(pos.quantity), str(pos.avg_cost)]
                                     for s, pos in p.positions.items()})
             self._db.execute("UPDATE account SET cash=?, positions=? WHERE id=1",

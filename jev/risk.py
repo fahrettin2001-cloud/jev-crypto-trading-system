@@ -1,6 +1,6 @@
 """Çevrimdışı sanal işlem için bağımsız risk kontrolü taslağı."""
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, DecimalException
 
 from .fees import D
 from .portfolio import TradeError
@@ -16,12 +16,22 @@ class RiskLimits:
     max_trade_notional: Decimal | None = None
     allowed_symbols: frozenset[str] | None = None
 
+    min_cash_reserve: Decimal | None = None
+    max_position_notional: Decimal | None = None
+
     def __post_init__(self):
-        if self.max_trade_notional is not None:
-            limit = D(self.max_trade_notional)
-            if not limit.is_finite() or limit <= 0:
-                raise ValueError("İşlem limiti sonlu ve pozitif olmalı")
-            object.__setattr__(self, "max_trade_notional", limit)
+        for name in ("max_trade_notional", "min_cash_reserve", "max_position_notional"):
+            value = getattr(self, name)
+            if value is None:
+                continue
+            try:
+                limit = D(value)
+                if (not limit.is_finite() or limit < 0
+                        or (name != "min_cash_reserve" and limit == 0)):
+                    raise ValueError(f"Geçersiz risk limiti: {name}")
+            except (DecimalException, TypeError, ValueError) as exc:
+                raise ValueError(f"Geçersiz risk limiti: {name}") from exc
+            object.__setattr__(self, name, limit)
         if self.allowed_symbols is not None:
             object.__setattr__(self, "allowed_symbols", frozenset(self.allowed_symbols))
 
@@ -36,10 +46,27 @@ class RiskLimits:
             notional = quantity * price
             if not notional.is_finite():
                 raise RiskError("İşlem tutarı sonlu olmalı")
-        except (InvalidOperation, OverflowError, TypeError, ValueError) as exc:
+        except (DecimalException, OverflowError, TypeError, ValueError) as exc:
             raise RiskError("Geçersiz miktar veya fiyat") from exc
         if self.allowed_symbols is not None and symbol not in self.allowed_symbols:
             raise RiskError("Sembol izin listesinde değil")
         if self.max_trade_notional is not None and notional > self.max_trade_notional:
             raise RiskError("İşlem tutarı örnek risk limitini aşıyor")
         return quantity, price
+
+    def check_after_buy(self, portfolio, symbol, price):
+        """Henüz kaydedilmemiş alışın komisyon dahil sonuçlarını denetler.
+
+        Pozisyon değeri yalnızca işlem fiyatıyla ölçülür; başka semboller için
+        fiyat tahmini yapılmaz. Bu iki sınır pozisyon azaltan satışa uygulanmaz.
+        """
+        if (self.min_cash_reserve is not None
+                and portfolio.cash < self.min_cash_reserve):
+            raise RiskError("Alış sonrası nakit örnek rezerv limitinin altında")
+        if self.max_position_notional is not None:
+            try:
+                value = portfolio.positions[symbol].quantity * D(price)
+                if not value.is_finite() or value > self.max_position_notional:
+                    raise RiskError("Pozisyon değeri örnek risk limitini aşıyor")
+            except DecimalException as exc:
+                raise RiskError("Pozisyon değeri hesaplanamadı") from exc
