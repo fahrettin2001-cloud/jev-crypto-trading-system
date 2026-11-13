@@ -3,3 +3,13 @@ __pycache__/
 .venv/
 .env
 *.env
+
+# Yerel SQLite hesapları ve günlükleri
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
