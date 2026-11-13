@@ -92,7 +92,9 @@ class PolicyPersistenceTests(unittest.TestCase):
             self.assertIsNone(db.execute('SELECT risk_version FROM trades').fetchone()[0])
 
     def test_constructor_rejects_alternative_schema_without_modification(self):
-        with sqlite3.connect(self.path) as db:
+        from contextlib import closing
+
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute('CREATE TABLE portfolio_meta (cash TEXT)')
         before = self.path.read_bytes()
         with self.assertRaises(ValueError):

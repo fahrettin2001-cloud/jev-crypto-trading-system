@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 import sqlite3
+from contextlib import closing
 import tempfile
 
 from cryptography.exceptions import InvalidTag
@@ -43,7 +44,7 @@ def encrypted_backup(account, destination, key_file):
     with tempfile.TemporaryDirectory(prefix='jev-backup-') as folder:
         snapshot = Path(folder) / 'snapshot.db'
         # SQLite backup API WAL dahil tutarlı anlık görüntüyü alır.
-        with sqlite3.connect(snapshot) as target:
+        with closing(sqlite3.connect(snapshot)) as target:
             account._db.backup(target)
         if snapshot.stat().st_size > MAX_SIZE:
             raise ValueError('Hesap yedek boyutu sınırını aşıyor')
@@ -68,7 +69,7 @@ def restore_backup(source, destination, key_file):
     with tempfile.TemporaryDirectory(prefix='jev-restore-') as folder:
         restored = Path(folder) / 'restored.db'
         write_new(restored, plain)
-        with sqlite3.connect(restored) as db:
+        with closing(sqlite3.connect(restored)) as db:
             if db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
                 raise ValueError('SQLite bütünlük kontrolü başarısız')
         with SQLitePortfolio.open(restored) as account:

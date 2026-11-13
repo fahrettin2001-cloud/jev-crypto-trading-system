@@ -18,7 +18,7 @@ class PortfolioLimitTests(unittest.TestCase):
         self.addCleanup(self.account.close)
 
     def test_daily_gross_loss_blocks_buys_but_allows_sells(self):
-        self.account.set_risk(RiskLimits(max_daily_realized_loss=100))
+        self.account.set_risk(RiskLimits(max_daily_realized_loss=100), expected_version=1)
         self.account.buy('BTCUSDT', 2, 500)
         # Kullanıcının geçmiş timestamp vermesi gerçek yürütme gününü değiştirmez.
         self.account.sell('BTCUSDT', 1, 400, timestamp=self.now-timedelta(days=10))
@@ -36,7 +36,7 @@ class PortfolioLimitTests(unittest.TestCase):
     def test_total_value_requires_all_fresh_other_prices(self):
         self.account.buy('BTCUSDT', 1, 400)
         limits = RiskLimits(max_total_position_notional=500, max_price_age=timedelta(seconds=30))
-        self.account.set_risk(limits)
+        self.account.set_risk(limits, expected_version=1)
         before = self.account.portfolio
         with self.assertRaises(RiskError):
             self.account.buy('ETHUSDT', 1, 100, price_observed_at=self.now)
