@@ -10,12 +10,12 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 ## Çalışma kararı — manuel Obsidian güncellemesi
 
-13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Otomatik 23.00 görevinin devre dışı bırakıldığı henüz doğrulanmadı; eski görev ayrıca kapatılmalı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
+13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
 - Görev 5.1, 5.2 ve 5.3 PR #21, #22 ve #23 ile ana dala birleşti. Saatlik canlı fiyatla sanal işlem kodu ve Hostinger yönergesi depodadır. PR yazarı 194 test geçtiğini bildirdi; bu notu yazan ajan yeni sürümü bağımsız test etmedi. Hostinger'da kurulum, zamanlayıcı ve ilk başarılı çalışma henüz bu ajan tarafından doğrulanmadı.
-- Ekip tarafından 500 dolarlık, saatlik bir test planlandığı konuşuldu. Bunun sanal bakiye olduğu, yapılandırmanın uygulandığı ve çalışma sonucu henüz bağımsız doğrulanmadı; gerçekleşmiş karar veya kâr olarak kaydetmeyin.
+- Proje sahibinin 13 Kasım 2026'da paylaştığı sunucu ekran görüntüsünde 500 USDT sanal bakiye, açık pozisyon ve gerçekleşmiş işlem bulunmadığı, deneme çalışmasının başarılı tamamlandığı ve saatlik zamanlayıcının sonraki çalışma için kurulu olduğu görünüyor. 23.01 Türkiye saati için belirtilen ilk zamanlanmış çalışma henüz bu görüntüde gerçekleşmemişti; otomatik yürütme ve sonraki sonuçlar ayrıca doğrulanmalı.
 - Jev API erişimi bulut ortamında ayarlandı. Bulut ajanı, PR #20'deki sentetik örneğin typesafe-sdk 0.7.5 ile tek istekle başarılı çalıştığını ve 0,99 yanıt aldığını bildirdi. Bu, modelin piyasa tahmini veya kârlılığının testi değildir. PR #20 henüz birleşmedi ve Jev'in saatlik sanal sisteme bağlandığı doğrulanmadı.
 - Sıradaki işler: Hostinger'daki ilk saatlik çalışmayı ve 500 birimlik bakiyenin sanal olduğunu ekipten teyit et; PR #20'yi incele; PR #11/#16 için mevcut inceleme ve test durumunu GitHub'dan yeniden kontrol et; saat 23.00 yedekleme görevini uygun zamanda ayrıca doğrula. Genel yedekleme ve geri yükleme eksikleri aşağıda korunmuştur.
 - Yerel Obsidian deposunda kaydedilmemiş değişiklikler bulunuyor; bunlar korunmalı, otomatik sıfırlama veya körlemesine pull yapılmamalı. Anahtarlar ve işlem verileri herkese açık depoya eklenmez.
