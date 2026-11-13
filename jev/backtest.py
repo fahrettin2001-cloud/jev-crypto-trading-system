@@ -439,6 +439,12 @@ def main(argv=None) -> None:
     parser.add_argument("--fraction", default="0.95", help="Alışta kullanılacak nakit oranı")
     parser.add_argument("--stop-loss-pct", help="SMA alışında zarar durdur, ör. 0.05 = %%5 aşağı")
     parser.add_argument("--take-profit-pct", help="SMA alışında kâr al, ör. 0.10 = %%10 yukarı")
+    parser.add_argument("--vol-target",
+                        help="Oynaklığa göre pozisyon: hedef günlük oynaklık, ör. 0.02 = %%2 "
+                             "(verilirse --fraction yerine kullanılır)")
+    parser.add_argument("--vol-window", type=int, default=72, help="Oynaklık penceresi (bar)")
+    parser.add_argument("--bars-per-day", type=int, default=24,
+                        help="Günlük bar sayısı (1s veri için 24)")
     parser.add_argument("--cash", default="10000")
     parser.add_argument("--taker-rate", default="0.001")
     parser.add_argument("--maker-rate", default="0.001")
@@ -464,8 +470,14 @@ def main(argv=None) -> None:
             execution="same_bar" if args.same_bar else "next_bar",
             max_volume_share=D(args.max_volume_share) if args.max_volume_share else None,
         )
+        sizer = None
+        if args.vol_target:
+            from .sizing import VolatilityTargetSizer
+            sizer = VolatilityTargetSizer(args.vol_target, args.vol_window, args.bars_per_day,
+                                          max_fraction=args.fraction)
         strategy = (SmaCross(args.symbol, args.fast, args.slow, args.fraction,
-                             stop_loss_pct=args.stop_loss_pct, take_profit_pct=args.take_profit_pct)
+                             stop_loss_pct=args.stop_loss_pct, take_profit_pct=args.take_profit_pct,
+                             sizer=sizer)
                     if args.strategy == "sma" else BuyAndHold(args.symbol, args.fraction))
         result = run_backtest(bars, strategy, config)
         benchmark = None

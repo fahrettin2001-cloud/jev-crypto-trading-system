@@ -204,7 +204,7 @@ class SmaCross:
     aşağı keserse tamamını sat. Basit, bilinen bir örnek; kârlılık iddiası yoktur."""
 
     def __init__(self, symbol: str, fast: int = 10, slow: int = 30, fraction="0.95",
-                 stop_loss_pct=None, take_profit_pct=None):
+                 stop_loss_pct=None, take_profit_pct=None, sizer=None):
         if not (isinstance(fast, int) and isinstance(slow, int)) or not 0 < fast < slow:
             raise ValueError("0 < fast < slow tam sayılar olmalı")
         self.symbol, self.fast, self.slow = symbol, fast, slow
@@ -217,6 +217,11 @@ class SmaCross:
             raise ValueError("take_profit_pct pozitif olmalı")
         extras = "".join(f",{k}{v * 100}%" for k, v in (("sl", self.stop_loss_pct),
                                                          ("tp", self.take_profit_pct)) if v)
+        # sizer verilirse alış büyüklüğü sabit oran yerine oynaklığa göre belirlenir
+        # (jev.sizing.VolatilityTargetSizer); `fraction` o durumda kullanılmaz.
+        self.sizer = sizer
+        if sizer is not None:
+            extras += f",{sizer.describe()}"
         self.name = f"sma-kesisim({symbol},{fast}/{slow}{extras})"
         self._prices: deque[Decimal] = deque(maxlen=slow)
         self._prev_diff: Decimal | None = None
@@ -226,6 +231,8 @@ class SmaCross:
         if price is None:
             return []
         self._prices.append(price)
+        if self.sizer is not None:
+            self.sizer.observe(self.symbol, price)
         if len(self._prices) < self.slow:
             return []
         prices = list(self._prices)
@@ -237,9 +244,20 @@ class SmaCross:
             return []
         held = view.quantity(self.symbol)
         if prev <= 0 < diff and held == 0:
+            if self.sizer is None:
+                amount, sizing = view.cash * self.fraction, ""
+            else:
+                frac = self.sizer.fraction(self.symbol)
+                if frac is None or frac <= 0:
+                    return []  # oynaklık için yeterli geçmiş yok
+                # Hedef: toplam varlığın frac kadarı; nakitten fazlası olamaz
+                amount = min(view.equity * frac, view.cash)
+                sizing = f"; oynaklığa göre varlığın %{frac * 100}"
+                if amount <= 0:
+                    return []
             return [OrderIntent(
-                self.symbol, BUY, quote_amount=view.cash * self.fraction,
-                reason=f"SMA{self.fast} SMA{self.slow}'u yukarı kesti",
+                self.symbol, BUY, quote_amount=amount,
+                reason=f"SMA{self.fast} SMA{self.slow}'u yukarı kesti{sizing}",
                 stop_loss=price * (1 - self.stop_loss_pct) if self.stop_loss_pct else None,
                 take_profit=price * (1 + self.take_profit_pct) if self.take_profit_pct else None)]
         if prev >= 0 > diff and held > 0:
