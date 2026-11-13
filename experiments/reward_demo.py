@@ -59,4 +59,3 @@ if __name__ == "__main__":
     print("Ücretler değere dahildir; bir kez daha çıkarılmaz.")
     print(f"Net değişim: {example['net_change']}; ödül: {example['reward']}")
     print("Bu bir öğrenme adımı veya piyasa performansı değildir.")
-
