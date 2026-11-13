@@ -82,3 +82,20 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 - Mevcut SQLite/risk katmanı kullanılır; her işlemde risk dosyası açıkça seçilir.
 - 60 test geçti (52 mevcut, 8 CLI süreç testi). Kullanım: `docs/CLI.md`.
 - Açık PR #3'teki farklı kalıcılık yaklaşımı birleştirilmedi veya kapatılmadı.
+
+## Yeni hazırlıklar — inceleme dalları
+
+- `fix/kalici-risk-politikasi` / PR #10: Fahrettin'in yeniden açılış talebi
+  incelendi; politikasız açılışta limitlerin kaybolduğu doğrulandı. Kalıcı,
+  sürümlü politika ve politikasız işlem reddi uygulandı. Rapor:
+  `docs/RISK-KALICILIK-INCELEMESI.md`.
+- `feat/gelistirme-altyapisi`: PR #10 üzerine kurulu; şifreli yedek/geri yükleme,
+  günlük gerçekleşen zarar ve tüm pozisyonların değer sınırı, rapor, yerel
+  görüntüleme paneli, salt okunur Binance Global adaptörü ve GitHub Actions.
+- Yerel ve temiz sanal ortamda 79 test geçti. CLI yedek/geri yükleme ve Chromium
+  panel kontrolü de geçti. Ayrıntılı kullanım ve dış erişim bekleyen işler:
+  `docs/GELISTIRME-DURUMU.md`. Ana dala birleşmiş sayılmamalıdır.
+- Halka açık veri için kullanıcı Binance Global'i seçti; fiyat sorgusu ortamın
+  ağ politikasında engelli. Alan adı gereksinimi taslağa kaydedildi, yayımlanmadı.
+- Jev/Hermes sağlayıcısı, haber kaynağı, Hostinger hedefi ve ayrı yedek depolama
+  seçimi bekleniyor. Gerçek emir bağlantısı uygulanmadı.

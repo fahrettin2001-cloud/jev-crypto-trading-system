@@ -18,3 +18,12 @@ __pycache__/
 *.sqlite-shm
 *.sqlite3
 *.sqlite3-*
+
+# Yerel şifreli yedekler ve anahtarlar
+*.jevbackup
+*.jevkey
+
+# Paket kurulumu çıktıları
+*.egg-info/
+build/
+dist/

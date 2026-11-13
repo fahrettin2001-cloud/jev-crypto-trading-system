@@ -20,12 +20,15 @@ class RiskLimits:
     min_cash_reserve: Decimal | None = None
     max_position_notional: Decimal | None = None
     max_price_age: timedelta | None = None
+    max_daily_realized_loss: Decimal | None = None
+    max_total_position_notional: Decimal | None = None
 
     def __post_init__(self):
         if self.max_price_age is not None:
             if not isinstance(self.max_price_age, timedelta) or self.max_price_age <= timedelta(0):
                 raise ValueError("Fiyat yaşı limiti pozitif timedelta olmalı")
-        for name in ("max_trade_notional", "min_cash_reserve", "max_position_notional"):
+        for name in ("max_trade_notional", "min_cash_reserve", "max_position_notional",
+                     "max_daily_realized_loss", "max_total_position_notional"):
             value = getattr(self, name)
             if value is None:
                 continue
@@ -37,6 +40,8 @@ class RiskLimits:
             except (DecimalException, TypeError, ValueError) as exc:
                 raise ValueError(f"Geçersiz risk limiti: {name}") from exc
             object.__setattr__(self, name, limit)
+        if self.max_total_position_notional is not None and self.max_price_age is None:
+            raise ValueError("Toplam pozisyon limiti için fiyat yaşı sınırı da gerekli")
         if self.allowed_symbols is not None:
             object.__setattr__(self, "allowed_symbols", frozenset(self.allowed_symbols))
 
@@ -59,7 +64,7 @@ class RiskLimits:
             raise RiskError("İşlem tutarı örnek risk limitini aşıyor")
         return quantity, price
 
-    def check_after_buy(self, portfolio, symbol, price):
+    def check_after_buy(self, portfolio, symbol, price, *, now=None, market_prices=None, daily_loss=None):
         """Henüz kaydedilmemiş alışın komisyon dahil sonuçlarını denetler.
 
         Pozisyon değeri yalnızca işlem fiyatıyla ölçülür; başka semboller için
@@ -75,6 +80,27 @@ class RiskLimits:
                     raise RiskError("Pozisyon değeri örnek risk limitini aşıyor")
             except DecimalException as exc:
                 raise RiskError("Pozisyon değeri hesaplanamadı") from exc
+
+        if self.max_daily_realized_loss is not None:
+            if daily_loss is None or daily_loss >= self.max_daily_realized_loss:
+                raise RiskError("Günlük gerçekleşen zarar limiti yeni alışı durdurdu")
+        if self.max_total_position_notional is not None:
+            total = Decimal(0)
+            for held, position in portfolio.positions.items():
+                if held == symbol:
+                    value = D(price)
+                else:
+                    observation = (market_prices or {}).get(held)
+                    from .market import PriceObservation
+                    if not isinstance(observation, PriceObservation) or observation.symbol != held:
+                        raise RiskError(f"{held} için toplam risk değerleme fiyatı yok")
+                    self.check_price_time(observation.observed_at, now=now)
+                    value = D(observation.price)
+                    if not value.is_finite() or value <= 0:
+                        raise RiskError("Geçersiz değerleme fiyatı")
+                total += position.quantity * value
+            if not total.is_finite() or total > self.max_total_position_notional:
+                raise RiskError("Toplam pozisyon değeri risk limitini aşıyor")
 
     def check_price_time(self, observed_at, *, now):
         """İşlem zamanından bağımsız, karar anındaki saate göre kontrol eder."""
