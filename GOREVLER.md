@@ -38,8 +38,8 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 
 ## Görev 3 — Proje hafızası ve entegrasyon tasarımı
 
-- Sorumlu: Seçilmedi
-- Durum: Bekliyor
+- Sorumlu: @fahrettin2001-cloud ve bu sohbetteki ajan
+- Durum: Çalışılıyor
 - Kapsam: Obsidian ile okunabilir proje notları, ekip çalışma rehberi, geri yükleme ve ilerideki Jev / Hermes / haber sistemi arayüzlerinin tasarımı.
 - Çıktı: Kısa proje özeti, teknik karar ve görev notu şablonları; GitHub kod/not yedeği ve şifreli veritabanı yedeği için plan.
 - Bitti ölçütü: Yeni bir ekip üyesi README ve notları okuyup ilk aşamayı, testleri ve açık kararları anlayabilmeli.
