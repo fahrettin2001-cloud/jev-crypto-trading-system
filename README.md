@@ -22,3 +22,7 @@ Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pul
 - Başlangıç risk limitleri ve haber kaynakları.
 
 Gerçek emir ve canlıya geçiş, sanal testler ve ayrıca değerlendirme sonrasında ele alınacaktır.
+
+## ChatGPT bağlantı testi
+
+Bu not, ChatGPT’nin GitHub deposuna yazma erişimini doğrulamak için eklendi.
