@@ -1,6 +1,6 @@
 # Görev 2 — SQLite kayıtları ve risk kontrolü taslağı
 
-Yerel uygulama tamamlandı, ekip incelemesi bekliyor. Görev 1'in `Portfolio`,
+Uygulama PR #5 ile 13 Kasım 2026 tarihinde ana dala birleşti. Görev 1'in `Portfolio`,
 `Position`, `Trade` ve `FeeSchedule` arayüzleri değiştirilmedi.
 
 ## Kullanım
