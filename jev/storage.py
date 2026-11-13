@@ -23,6 +23,9 @@ class SQLitePortfolio:
         self._db = sqlite3.connect(path, isolation_level=None)
         try:
             self._db.execute("BEGIN IMMEDIATE")
+            tables = {row[0] for row in self._db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
+            if tables and 'account' not in tables:
+                raise ValueError("Uyumsuz SQLite dosyası; yeni hesap oluşturulmadı")
             self._db.execute("""CREATE TABLE IF NOT EXISTS account (
                 id INTEGER PRIMARY KEY CHECK(id=1), cash TEXT NOT NULL,
                 initial_cash TEXT NOT NULL, quote TEXT NOT NULL,

@@ -1,6 +1,6 @@
 # Jev kripto işlem sistemi
 
-Bu proje, kripto piyasasını ve haberleri izleyen, Jev ve güçlü bir modelle değerlendirme yapan bir sistemin geliştirilmesini hedefler. Başlangıç yalnızca sanal işlemdir. Henüz çalışan Binance, Jev veya Hermes bağlantısı yoktur.
+Bu proje, kripto piyasasını ve haberleri izleyen, Jev ve güçlü bir modelle değerlendirme yapan bir sistemin geliştirilmesini hedefler. Başlangıç yalnızca sanal işlemdir. Binance Global için salt okunur veri adaptörü inceleme dalında hazır; canlı ağ erişimi henüz doğrulanmadı. Jev veya Hermes bağlantısı yoktur.
 
 ## İlk aşama
 

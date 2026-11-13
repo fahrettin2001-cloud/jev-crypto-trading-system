@@ -20,7 +20,7 @@ birleştirilmiş gibi değerlendirilmemelidir.
 - Yerel salt okunur web paneli. Chromium'da bakiye/pozisyon/geçmiş ve JavaScript
   hataları kontrol edildi. Windows/Mac masaüstü kurulumu yapılmadı.
 - GitHub Actions: Python 3.10/3.12/3.13 için kurulum, test ve demo akışı hazır.
-  İş akışının GitHub'da çalıştığı ancak gerçek run sonucu görüldüğünde söylenebilir.
+  İlk GitHub run sonucunda üç sürüm de başarılı: https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/actions/runs/43359189952 .
 
 ## Kurulum ve kullanım
 
@@ -88,3 +88,10 @@ başarılı varsayılmaz. İzin uygulandıktan sonra canlı sorgu yeniden denenm
 
 Gizli değerler sohbetten istenmez. Gerekli sağlayıcı seçildikten sonra güvenli
 ortam ayarları kullanılır. Bu eksikler giderilmeden tüm sistem çalışıyor denmez.
+
+## Son doğrulama notu
+
+Yerel test toplamı 80. İlk 79 test temiz sanal ortam kurulumunda da geçti;
+uyumsuz SQLite şemasını reddeden son koruma ayrıca test edildi. CI'nin ilk
+79 testlik koşusu Python 3.10, 3.12 ve 3.13'te başarılı oldu. Son commit için
+uzak CI sonucu ayrıca kontrol edilmelidir.

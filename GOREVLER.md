@@ -4,7 +4,7 @@ Son güncelleme: 13 Kasım 2026
 
 ## Amaç ve mevcut durum
 
-Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Binance Global veya TR seçimi henüz kesinleşmedi. Hostinger bu aşamanın kapsamı dışındadır.
+Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Kullanıcı halka açık veri için Binance Global’i seçti; canlı veri erişimi henüz doğrulanmadı. Hostinger bu aşamanın kapsamı dışındadır.
 
 Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki işler öneridir; kimseye onayı olmadan rol atanmadı.
 
@@ -77,7 +77,7 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 
 ## Terminal arayüzü — incelemeye hazır
 
-- Dal: `feat/portfoy-cli`; henüz ana dala birleşmedi.
+- Dal: `feat/portfoy-cli`; PR #8 ile ana dala birleşti.
 - `python -m jev`: hesap oluşturma, alış, satış, durum ve geçmiş komutları.
 - Mevcut SQLite/risk katmanı kullanılır; her işlemde risk dosyası açıkça seçilir.
 - 60 test geçti (52 mevcut, 8 CLI süreç testi). Kullanım: `docs/CLI.md`.
@@ -92,7 +92,7 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 - `feat/gelistirme-altyapisi`: PR #10 üzerine kurulu; şifreli yedek/geri yükleme,
   günlük gerçekleşen zarar ve tüm pozisyonların değer sınırı, rapor, yerel
   görüntüleme paneli, salt okunur Binance Global adaptörü ve GitHub Actions.
-- Yerel ve temiz sanal ortamda 79 test geçti. CLI yedek/geri yükleme ve Chromium
+- Yerel ve temiz sanal ortamda ilk 79 test geçti; uyumsuz şema korumasıyla güncel yerel toplam 80 testtir. CLI yedek/geri yükleme ve Chromium
   panel kontrolü de geçti. Ayrıntılı kullanım ve dış erişim bekleyen işler:
   `docs/GELISTIRME-DURUMU.md`. Ana dala birleşmiş sayılmamalıdır.
 - Halka açık veri için kullanıcı Binance Global'i seçti; fiyat sorgusu ortamın

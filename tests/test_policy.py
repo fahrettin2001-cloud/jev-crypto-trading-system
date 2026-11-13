@@ -90,3 +90,11 @@ class PolicyPersistenceTests(unittest.TestCase):
             self.assertEqual(account.set_risk(RiskLimits(max_trade_notional=50), expected_version=0), 1)
         with sqlite3.connect(self.path) as db:
             self.assertIsNone(db.execute('SELECT risk_version FROM trades').fetchone()[0])
+
+    def test_constructor_rejects_alternative_schema_without_modification(self):
+        with sqlite3.connect(self.path) as db:
+            db.execute('CREATE TABLE portfolio_meta (cash TEXT)')
+        before = self.path.read_bytes()
+        with self.assertRaises(ValueError):
+            SQLitePortfolio(self.path, initial_cash=1000, risk=RiskLimits())
+        self.assertEqual(self.path.read_bytes(), before)

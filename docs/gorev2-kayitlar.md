@@ -54,9 +54,7 @@ Sayısal limit varsayılanı yoktur. Yetersiz nakit ve fazla satış çekirdekte
 Risk politikası artık sürümlü olarak SQLite’ta tutulur; yeniden açma kayıtlı politikayı kullanır. Eski hesaplar için [göç yönergesini](RISK-KALICILIK-INCELEMESI.md) okuyun.
 Doğrudan `Portfolio` kullanımı bu ek risk katmanını çalıştırmaz.
 
-Bu ilk taslakta günlük zarar, tüm sembolleri kapsayan toplam pozisyon riski ve canlı emir
-kontrolleri yoktur. Şifreleme, yedekleme, şema göçü ve birden fazla hesap desteği
-bu değişikliğin kapsamı dışındadır. SQLite dosyaları yereldir, Git'e eklenmez.
+Görev 2 ilk sürümünde günlük zarar, toplam pozisyon riski, şifreli yedek ve şema göçü yoktu. İnceleme dalındaki yeni özellikler ve doğrulama durumu için [geliştirme raporuna](GELISTIRME-DURUMU.md) bakın. Birden fazla hesap ve canlı emir desteği eklenmedi. SQLite dosyaları yereldir, Git'e eklenmez.
 
 ## Doğrulama
 
