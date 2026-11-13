@@ -13,7 +13,7 @@ class ExtendedRiskTests(unittest.TestCase):
         self.addCleanup(temp.cleanup)
         self.path = Path(temp.name) / 'account.db'
         self.account = SQLitePortfolio(self.path, initial_cash=1000,
-                                       fees=FeeSchedule('0', '0'))
+                                       fees=FeeSchedule('0', '0'), risk=RiskLimits())
         self.addCleanup(self.account.close)
 
     def assert_unchanged_after_rejection(self, quantity, price):
@@ -67,7 +67,8 @@ class ExtendedRiskTests(unittest.TestCase):
 
     def test_limits_reapplied_after_restart(self):
         self.account.buy('BTCUSDT', 4, 100)
-        with SQLitePortfolio(self.path, risk=RiskLimits(max_position_notional=400)) as reopened:
+        self.account.set_risk(RiskLimits(max_position_notional=400))
+        with SQLitePortfolio(self.path) as reopened:
             with self.assertRaises(RiskError):
                 reopened.buy('BTCUSDT', 1, 100)
             self.assertEqual(len(reopened.portfolio.trades), 1)

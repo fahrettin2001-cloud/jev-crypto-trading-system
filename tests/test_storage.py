@@ -17,7 +17,7 @@ class StorageTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.path = Path(self.tmp.name) / 'portfolio.db'
         self.store = SQLitePortfolio(self.path, initial_cash='10000',
-                                    fees=FeeSchedule('0.0005', '0.001'))
+                                    fees=FeeSchedule('0.0005', '0.001'), risk=RiskLimits())
         self.addCleanup(self.store.close)
 
     def test_restart_restores_all_account_fields_and_history(self):
