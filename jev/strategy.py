@@ -153,6 +153,25 @@ class OrderIntent:
 
 
 @dataclass(frozen=True)
+class Hold:
+    """İşlem yapmama kararı ("BEKLE"). İşlem üretmez; yalnızca karar günlüğüne
+    yazılır, böylece modelin bekleme kararlarının isabeti de ölçülebilir."""
+
+    symbol: str
+    reason: str = ""
+    confidence: Decimal | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.symbol, str) or not self.symbol.strip():
+            raise ValueError("Sembol boş olamaz")
+        if self.confidence is not None:
+            c = D(self.confidence)
+            if not c.is_finite() or not 0 <= c <= 1:
+                raise ValueError("confidence 0 ile 1 arasında olmalı")
+            object.__setattr__(self, "confidence", c)
+
+
+@dataclass(frozen=True)
 class PortfolioView:
     """Stratejiye gösterilen salt okunur portföy özeti."""
 
@@ -174,8 +193,9 @@ class PortfolioView:
 class Strategy(Protocol):
     name: str
 
-    def on_bar(self, bar: Bar, view: PortfolioView) -> Iterable[OrderIntent]:
-        """Bar kapandığında çağrılır; öneriler sonraki adımda değerlendirilir."""
+    def on_bar(self, bar: Bar, view: PortfolioView) -> Iterable[OrderIntent | Hold]:
+        """Bar kapandığında çağrılır; öneriler sonraki adımda değerlendirilir.
+        `Hold` döndürmek işlem yapmaz, yalnızca karar günlüğüne yazılır."""
         ...
 
 

@@ -6,10 +6,35 @@ Jev bağlantısı @fahrettin2001-cloud'da; bu görev onunla çakışmayan, Jev g
 
 | # | İş | Neden | Durum |
 |---|---|---|---|
-| 5.1 | Oynaklığa göre pozisyon büyüklüğü | Az emekle riski azaltır | İncelemede (bu PR) |
-| 5.2 | Karar günlüğü ve güven kalibrasyonu | "Jev %70 emin dediğinde %70 haklı mı?" sorusunu cevaplar | Bekliyor |
+| 5.1 | Oynaklığa göre pozisyon büyüklüğü | Az emekle riski azaltır | Tamamlandı (PR #21) |
+| 5.2 | Karar günlüğü ve güven kalibrasyonu | "Jev %70 emin dediğinde %70 haklı mı?" sorusunu cevaplar | İncelemede |
 | 5.3 | Canlı sanal işlem | Büyük modellerin geçmişi "bilmesi" sorununu ve gerçek koşulları ancak bu sınar; ekip bilgisayarında çalışacak | Bekliyor |
 | 5.4 | Haber duygu analizi | Projenin asıl fikri; Jev'e ek girdi. Haberler talimat değil veridir | Bekliyor |
+
+## 5.2 Karar günlüğü ve güven kalibrasyonu
+
+`jev/journal.py`. Stratejinin (ileride Jev'in) her kararı — **AL, SAT ve BEKLE** — güven puanı, o andaki fiyat, kaynak (ör. `jev-1.13.0`), gerekçe ve sonucu (gerçekleşti / reddedildi: neden / bekle) ile kaydedilir. Strateji `jev.strategy.Hold` döndürerek işlem yapmadan "bekle" kararı verebilir.
+
+**Haklı sayılma:** karar anındaki kapanıştan `horizon` bar sonraki kapanışa bakılır (varsayılan 24). Eşik varsayılan olarak bir al-sat turunun maliyetidir (2 × komisyon + 2 × kayma; %0,1 ve 5 bps ile %0,30):
+
+- AL haklı: getiri > eşik · SAT haklı: getiri < −eşik · BEKLE haklı: |getiri| ≤ eşik
+
+İşlemin gerçekleşip gerçekleşmediğinden bağımsızdır; risk kontrolünün reddettiği kararın da isabeti ölçülür (risk kontrolü iyi kararları mı engelliyor, görülebilir).
+
+**Kalibrasyon:** Güven puanı olan kararlar %10'luk aralıklara bölünür; her aralıkta ortalama güven ile gerçek isabet karşılaştırılır. Fark −5 puandan kötüyse "fazla iddialı", +5'ten iyiyse "fazla çekingen", arasıysa "uyumlu". Bir aralıkta varsayılan 20'den az karar varsa "az veri" yazılır ve yorum yapılmaz. Tek sayı özeti olarak **Brier puanı** (ortalama (güven − sonuç)²; 0 mükemmel, 0,25 yazı-tura düzeyi) verilir; Jev sürümlerini karşılaştırmak için kullanılabilir.
+
+```bash
+# Backtest + isabet raporu; --out ile kararlar.csv, --journal ile JSONL günlüğe ekleme
+python -m jev.backtest --prices ... --fast 24 --slow 96 --calibration --journal kararlar.jsonl --out sonuc/
+# Kayıtlı bir günlüğü (ör. canlı sanal işlemden) sonradan değerlendirme
+python -m jev.journal --journal kararlar.jsonl --prices ... --kline-symbols BTCUSDT --horizon 24
+```
+
+Jev için: Jev'in cevabındaki güven (`confidence`) `OrderIntent(..., confidence=...)` ya da `Hold(..., confidence=...)` içine yazılırsa rapor doğrudan çalışır. Kaynak alanına model sürümü (`jev-1.13.0`) yazılması önerilir; TypeSafe takma adların (`jev-latest`) zamanla değişebileceğini belirtiyor.
+
+**Gerçek veride (BTCUSDT 1s, Ağu–Eki 2026, SMA 24/96, 24 saat ufuk, %0,30 eşik):** 22 karar, genel isabet %31,8 (AL %36,4, SAT %27,3). SMA güven puanı vermediği için kalibrasyon tablosu yok. Kesişim sinyalleri 24 saatlik yönü tahmin etmekte yazı-turadan iyi değil; strateji kârını yönü tutturmaktan değil, yükselişte uzun süre pozisyonda kalmaktan elde etti. Bu, "isabet oranı" ile "kârlılığın" farklı şeyler olduğunu gösteriyor.
+
+**Sınırlar:** Yalnızca kapanış fiyatına bakılır (ufuk içindeki yol önemsenmez). Tek bir ufuk seçilir; Jev'in kararlarının hangi süreye göre verildiği netleşince ufuk ona göre ayarlanmalı. Kalibrasyon için yüzlerce karar gerekir; birkaç haftalık canlı sanal işlem (5.3) bunun için gerekli.
 
 ## 5.1 Oynaklığa göre pozisyon büyüklüğü
 
