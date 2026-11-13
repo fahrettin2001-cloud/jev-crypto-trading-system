@@ -12,6 +12,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
+## Görev 6 — ödülle öğrenme deneyi
+
+`feature/gorev6-odulle-ogrenme` dalında sentetik tek adımlı bir örnekte sinir ağı yalnızca +1/-1 ödülden öğrenir. 13 Kasım 2026'da ayrı sentetik testte %97,2, 10 farklı başlangıçta %95,4–%98,9 doğruluk ve toplam 213 proje testi bildirildi. Bu yalnızca oyuncak bir sınıflandırma deneyidir; piyasa veya kârlılık kanıtı değildir. Portföy ödül hesaplayıcısına, Jev'e, Hostinger'a veya işlem motoruna bağlanmamıştır. Ayrıntı `docs/ODULLE-OGRENME-ILK-DENEY.md`.
+
 ## Görev 6 — ilk sentetik sinir ağı deneyi
 
 `feature/gorev6-sinir-agi-deneyi` dalında ayrı bir sentetik XOR sınıflandırma deneyi geliştirildi (Görev #29; tasarım PR #30). 13 Kasım 2026'da eksik Python ortamında elle yürütülen deneyde eğitim öncesi %31, eğitim sonrası %97,75 ve çoğunluk sınıfı tabanı %49,5 elde edildi; sonradan bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu sonuçlar sentetik sınıflandırmaya aittir, piyasa performansı değildir. Jev, ödülle öğrenme, Hostinger ve işlem entegrasyonu yoktur. Ayrıntı `docs/SINIR-AGI-ILK-DENEY.md`.
