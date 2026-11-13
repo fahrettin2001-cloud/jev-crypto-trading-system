@@ -6,7 +6,19 @@ Durum: İlk taslak — 13 Kasım 2026. Bu dosya Obsidian'da açılabilen düz Ma
 
 Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bir model ve Hermes Agent kullanılması planlanan bir sistemdir. İleride bağımsız risk denetimi sonrasında Binance üzerinde gerçek işlemler hedeflenir. Kârlılık garanti edilmez.
 
-İlk aşama, dış servislerden bağımsız sanal işlemler: Python, Decimal, SQLite ve testler için ekipçe planlama yapılmıştır. Hangi uygulama kodunun tamamlandığı güncel depo ve açık değişikliklerden kontrol edilir. Binance çeşidi, risk limitleri ve haber kaynakları henüz seçilmedi.
+İlk aşama, dış servislerden bağımsız sanal işlemler: Python, Decimal, SQLite ve testler için ekipçe planlama yapılmıştır. Hangi uygulama kodunun tamamlandığı güncel depo ve açık değişikliklerden kontrol edilir. Binance çeşidi ve onaylanmış risk limitleri henüz seçilmedi. Haber keşfi için CryptoPanic, borsaya özel duyurular için Binance Global başlangıç adayıdır; canlı bağlantı kurulmadı. Ayrıntılar: `docs/HABER-KAYNAKLARI.md`.
+
+## Son çalışma durumu — 13 Kasım 2026, sabah
+
+- Ana dalda çevrimdışı sanal portföy, SQLite kayıtları, örnek risk kontrolleri ve terminal arayüzü bulunuyor. Binance, Jev, Hermes veya canlı haber bağlantısı kurulu değildir.
+- Yedekleme kuralları PR #9 ile ana dala alındı. Haber kaynakları ve geliştirme sınırları `docs/HABER-KAYNAKLARI.md` dosyasında.
+- PR #3 açık ve çakışmalı; ana daldaki SQLite yaklaşımıyla önemli ölçüde örtüşüyor. İnceleme yapılmadan birleştirilmemeli; kapatma kararı verilmedi.
+- Depo şu anda herkese açıktır. Proje sahibinin bilgisayarındaki yerel yedekleme betiğinde, depo açıkken veya görünürlük doğrulanamadığında gönderimi durduran bir kontrol var. Kontrol sahte cevapla ayrı ortamda denendi; gerçek zamanlanmış çalışma doğrulanmadı. GitHub'daki betik kopyası bu güncellemeyi henüz içermez.
+- Saat 23.00 görevi oluşturuldu; ilk elle yedek başarılıydı. Depo açık kaldığı sürece otomatik gönderim durdurulacak şekilde tasarlandı; 23.00'te başarılı bir GitHub yedeği beklenmemeli. Kaçırılmış görev ve yeniden deneme davranışı henüz doğrulanmadı.
+- Türkçe dosya adı okumasına yerel düzeltme yapıldı ve ayrı Git denemesi başarılı oldu; uçtan uca otomatik test yok. Gönderim hatasından sonra yeniden deneme düzeltmesi taslakta ve teste ihtiyacı var.
+- SQLite için ayrı şifreli yedek kurulmadı. Proje sahibinin yerel Obsidian kopyası güncel ana dalın gerisinde ve yerel değişiklikleri var; bunlar korunarak eşitleme yapılmalı.
+- Obsidian Copilot içinde Codex bağlantısı kullanılarak not okuma denendi. Sohbetlerin GitHub'a otomatik veya güvenli şekilde aktarılması kurulmuş değildir.
+- Sıradaki işler: ekip arkadaşlarının haber rehberini okuması; yerel dosyaları koruyarak eşitlemenin planlanması; yedekleme betiğinin güvenli koşullarda uçtan uca testi ve şifreli SQLite yedek planı. Sayısal risk limitleri, Binance Global/TR ve haber sağlayıcısının canlı kullanımı ekipçe netleştirilecek.
 
 ## Nasıl birlikte çalışılır?
 
