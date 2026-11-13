@@ -73,7 +73,9 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 ## Açık kararlar
 
 - ~~Hangi borsa: Binance Global mi Binance TR mi?~~ → Binance Global ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Türkiye'den gerçek hesap kullanımının yasal durumu canlı aşamadan önce kontrol edilecek.
-- İlk sanal bütçe, işlem çiftleri ve örnek komisyon oranı?
+- İşlem çiftleri: BTCUSDT + ETHUSDT önerildi ([karar önerisi](docs/kararlar/2026-11-13-cift-ve-risk-limitleri.md)) — ekip onayı bekliyor.
+- Risk limitleri: "temkinli" paket önerildi (işlem başına %10, tek coinde %30, nakitte en az %40, günlük zarar %2) — ekip onayı bekliyor.
+- İlk sanal bütçe ve örnek komisyon oranı? (bütçe ekiple konuşulacak)
 - Üç görevden hangisini kim üstlenecek?
 - Strateji, risk sınırları ve haber kaynakları?
 
