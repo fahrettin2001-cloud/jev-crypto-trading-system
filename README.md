@@ -32,6 +32,12 @@ python -m examples.demo                     # örnek senaryo
 Program yeniden açıldığında hesap yüklenir; başarısız yazım tamamen geri alınır.
 Dış bağımlılık gerekmez. Kullanım, risk taslağı ve sınırlar: [Görev 2](docs/gorev2-kayitlar.md).
 
+## Terminalden kullanım
+
+`python -m jev --help` ile komutları görün. Hesap oluşturma, alış/satış,
+bakiye ve geçmiş için [CLI kullanım rehberi](docs/CLI.md). Her işlem mevcut
+SQLite ve risk katmanını kullanır; dış servis bağlantısı yoktur.
+
 ## Ekipçe çalışma
 
 Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pull request ile incelemeye sunun. API anahtarlarını, şifreleri, gerçek hesap bilgilerini ve gizli yapılandırmaları repoya koymayın.
