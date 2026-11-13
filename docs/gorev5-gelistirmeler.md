@@ -7,9 +7,22 @@ Jev bağlantısı @fahrettin2001-cloud'da; bu görev onunla çakışmayan, Jev g
 | # | İş | Neden | Durum |
 |---|---|---|---|
 | 5.1 | Oynaklığa göre pozisyon büyüklüğü | Az emekle riski azaltır | Tamamlandı (PR #21) |
-| 5.2 | Karar günlüğü ve güven kalibrasyonu | "Jev %70 emin dediğinde %70 haklı mı?" sorusunu cevaplar | İncelemede |
-| 5.3 | Canlı sanal işlem | Büyük modellerin geçmişi "bilmesi" sorununu ve gerçek koşulları ancak bu sınar; ekip bilgisayarında çalışacak | Bekliyor |
+| 5.2 | Karar günlüğü ve güven kalibrasyonu | "Jev %70 emin dediğinde %70 haklı mı?" sorusunu cevaplar | İncelemede (PR #22) |
+| 5.3 | Canlı sanal işlem | Büyük modellerin geçmişi "bilmesi" sorununu ve gerçek koşulları ancak bu sınar; Hostinger'da saatlik çalışır | İncelemede — kurulum: `docs/CANLI-SANAL-ISLEM.md` |
 | 5.4 | Haber duygu analizi | Projenin asıl fikri; Jev'e ek girdi. Haberler talimat değil veridir | Bekliyor |
+
+## 5.3 Canlı sanal işlem
+
+`jev/live.py` + `deploy/jev-live.service` / `jev-live.timer`. Sunucu her saat başından 1 dakika sonra `python -m jev.live run` çalıştırır: son kapanan mumlar Binance Global halka açık API'sinden (`data-api.binance.vision`) alınır, **backtest ile aynı motor** (`Simulator`) işler, sonuçlar dosyalara eklenir ve durum kaydedilir. Gerçek emir, hesap veya API anahtarı yoktur.
+
+- Backtest motoru adım adım çalışan `Simulator` sınıfına ayrıldı; `run_backtest` onu kullanır (sonuçlar birebir aynı: 184 test, 700 rastgele senaryo ve gerçek veri sonucu değişmedi).
+- Testte bot 360 saat boyunca her saat kaydedilip yeniden yüklenerek çalıştırıldı ve tek seferlik backtest ile **aynı işlemleri ve varlık eğrisini** üretti.
+- Kesinti sonrası kaçırılan saatler sırayla işlenir; 2 saatten eski barlarla işlem yapılmaz (yalnızca stratejiye gösterilir). Aynı bar iki kez işlenmez; ağ hatasında durum dosyası değişmez; iki çalışma aynı anda olamaz (kilit).
+- `DURDUR` dosyası: acil durdurma; bot ağa bile çıkmaz.
+- Birden çok coin: `jev.strategy.Combined` her sembol için ayrı strateji çalıştırır.
+- Ayrıştırıcı, 13 Kasım 2026'da alınan gerçek bir `api/v3/klines` cevabıyla da doğrulandı.
+
+Kurulum ve günlük kullanım: [`docs/CANLI-SANAL-ISLEM.md`](CANLI-SANAL-ISLEM.md).
 
 ## 5.2 Karar günlüğü ve güven kalibrasyonu
 
