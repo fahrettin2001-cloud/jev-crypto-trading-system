@@ -1,0 +1,10 @@
+[Unit]
+Description=Jev canli sanal islem sonuclarini her gun yayinla (05:20 UTC = 08:20 TR)
+
+[Timer]
+OnCalendar=*-*-* 05:20:00 UTC
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target
