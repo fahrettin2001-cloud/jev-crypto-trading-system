@@ -24,9 +24,9 @@ tohumlarla 1.500 küçük veri grubu adımı sürer.
 13 Kasım 2026'da sınırlı Python 3.13 ortamında deney doğrudan çalıştırıldı:
 eğitim öncesi %31, eğitim sonrası %97,75 ve eğitim kümesindeki çoğunluk sınıfına
 dayalı karşılaştırma %49,5. Ayrıca aynı tohumla tekrarlanabilirlik, etiketler,
-başarım artışı ve boş veri reddi elle denendi. Bu ortamda `unittest` ve
-`sqlite3` eksik olduğundan otomatik test dosyası ve tüm proje testleri henüz
-çalıştırılmadı. Bu sayılar yalnızca kolay, üretilmiş bir sınıflandırma
+başarım artışı ve boş veri reddi elle denendi. Bulut ortamında Python 3.12.14 ile ilgili 7 test ve toplam 207 test geçti.
+Mevcut `test_backtest_orders.py` içindeki iki açık CSV dosyası için
+`ResourceWarning` görüldü; testler başarısız olmadı. Bu sayılar yalnızca kolay, üretilmiş bir sınıflandırma
 probleminin sonuçlarıdır; kripto tahmini, getiri veya kârlılık göstermez.
 
 Bu örnek denetimli öğrenmedir: doğru etiketleri biliyoruz. İşlem sonucunu ödül
