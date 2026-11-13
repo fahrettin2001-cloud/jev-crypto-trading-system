@@ -14,7 +14,7 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 ## Görev 6 — ilk sentetik sinir ağı deneyi
 
-`feature/gorev6-sinir-agi-deneyi` dalında ayrı bir sentetik XOR sınıflandırma deneyi geliştirildi (Görev #29; tasarım PR #30). 13 Kasım 2026'da eksik Python ortamında elle yürütülen deneyde eğitim öncesi %31, eğitim sonrası %97,75 ve çoğunluk sınıfı tabanı %49,5 elde edildi; otomatik ve tam proje testleri bu ortamda çalıştırılamadı. Bu sonuçlar sentetik sınıflandırmaya aittir, piyasa performansı değildir. Jev, ödülle öğrenme, Hostinger ve işlem entegrasyonu yoktur. Ayrıntı `docs/SINIR-AGI-ILK-DENEY.md`.
+`feature/gorev6-sinir-agi-deneyi` dalında ayrı bir sentetik XOR sınıflandırma deneyi geliştirildi (Görev #29; tasarım PR #30). 13 Kasım 2026'da eksik Python ortamında elle yürütülen deneyde eğitim öncesi %31, eğitim sonrası %97,75 ve çoğunluk sınıfı tabanı %49,5 elde edildi; sonradan bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu sonuçlar sentetik sınıflandırmaya aittir, piyasa performansı değildir. Jev, ödülle öğrenme, Hostinger ve işlem entegrasyonu yoktur. Ayrıntı `docs/SINIR-AGI-ILK-DENEY.md`.
 
 ## PR #32 bulut testleri — 13 Kasım 2026
 
@@ -22,7 +22,7 @@ Sinir ağı ve ödül deneyinin 7 ilgili testi ile toplam 207 proje testi Python
 
 ## Görev 6 — sentetik ödül hesabı
 
-PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `docs/ODUL-ILK-DENEY.md` eklendi. Net portföy değerindeki değişim ve isteğe bağlı düşüş artışı cezası örneklenir; ücretler net değere zaten dahilse ikinci kez düşülmez. El ile örnek kazanç/zarar, ceza, yanlış girdiler ve JSONL kayıt kontrolü başarılı; unittest ve bütün proje testleri tam Python ortamında bekliyor. Bu bir eğitim algoritması, Jev entegrasyonu veya gerçek/sanal emir sistemi değildir.
+PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `docs/ODUL-ILK-DENEY.md` eklendi. Net portföy değerindeki değişim ve isteğe bağlı düşüş artışı cezası örneklenir; ücretler net değere zaten dahilse ikinci kez düşülmez. El ile örnek kazanç/zarar, ceza, yanlış girdiler ve JSONL kayıt kontrolü başarılı; bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu bir eğitim algoritması, Jev entegrasyonu veya gerçek/sanal emir sistemi değildir.
 
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
