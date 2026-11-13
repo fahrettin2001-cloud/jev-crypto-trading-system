@@ -38,6 +38,20 @@ Dış bağımlılık gerekmez. Kullanım, risk taslağı ve sınırlar: [Görev 
 bakiye ve geçmiş için [CLI kullanım rehberi](docs/CLI.md). Her işlem mevcut
 SQLite ve risk katmanını kullanır; dış servis bağlantısı yoktur.
 
+## Strateji ve backtest (görev 4)
+
+Bir stratejiyi geçmiş fiyatlarla komisyon, kayma, Binance işlem kuralları, zarar durdur / kâr al, limit emir ve risk limitleriyle çalıştırıp al-tut ile kıyaslar. Backtest ağ bağlantısı kurmaz.
+
+```bash
+# Gerçek Binance verisini indir (anahtarsız, SHA-256 doğrulamalı)
+python -m jev.binance_data --symbols BTCUSDT --interval 1h --start 2026-08 --end 2026-10
+# Sentetik veriyle hemen dene
+python -m jev.backtest --prices data/synthetic_klines/BTCUSDT-1h-sentetik.csv --kline-symbols BTCUSDT \
+    --rules data/exchange_info_sample.json --fast 24 --slow 96 --stop-loss-pct 0.04
+```
+
+`data/synthetic_*` sentetiktir, `data/exchange_info_sample.json` doğrulanmamış örnektir. Ayrıntılar: `docs/gorev4-backtest.md`.
+
 ## Ekipçe çalışma
 
 Her iş için ayrı dal açın, testleri çalıştırın ve değişiklikleri pull request ile incelemeye sunun. API anahtarlarını, şifreleri, gerçek hesap bilgilerini ve gizli yapılandırmaları repoya koymayın.

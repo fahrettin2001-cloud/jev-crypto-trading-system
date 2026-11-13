@@ -48,11 +48,21 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Bitti ölçütü: Yeni bir ekip üyesi README ve notları okuyup ilk aşamayı, testleri ve açık kararları anlayabilmeli.
 - Sınır: Otomatik yedekleme kurulduğunu iddia etme. Hostinger'da veya gerçek hesaplarda işlem yapma.
 
+## Görev 4 — Strateji arayüzü, backtest ve Binance işlem kuralları
+
+- Sorumlu: @demirfahrieren-png
+- Durum: İncelemede — PR #15 (`feat/backtest-strateji`), ana dala birleşmedi.
+- Kapsam: Strateji/öneri arayüzü (ileride Jev'in bağlanacağı yer), geçmiş fiyatlarla backtest, piyasa/limit emir, zarar durdur / kâr al, kayma ve likidite sınırı, performans ölçümü, Binance Global `exchangeInfo` işlem kuralları ve halka açık veri indirme aracı.
+- Çıktı: `python -m jev.backtest` (rapor + `--out` ile CSV/JSON), `python -m jev.binance_data` (SHA-256 doğrulamalı indirme).
+- Sınır: Bu ortamda ağ yok; örnek exchangeInfo doğrulanmadı, test verisi sentetik. Gerçek emir, hesap veya API anahtarı yok.
+- Bitti ölçütü: Testler (geleceği görmeme, komisyon/kayma, emir türleri, kurallar, risk reddi, indirme doğrulaması) ve gerçek Binance verisiyle bir backtest çalıştırılması (bekliyor).
+- Ayrıntı: `docs/gorev4-backtest.md`. Test: `python -m unittest discover -s tests -t .` → 148 test geçti.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
 - [ ] Haber kaynağı, Jev ve güçlü model bağlantılarının test ortamında değerlendirilmesi. Başlangıç için [haber kaynakları ve ajan kuralları](docs/HABER-KAYNAKLARI.md): önce çevrimdışı örnekler; CryptoPanic ve Binance duyuruları henüz bağlı değil.
-- [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi.
+- [ ] Sanal işlem sonuçlarının masraf ve riskle birlikte ölçülmesi. Görev 4'te başlandı (backtest ve ölçümler); gerçek veriyle çalıştırma bekliyor.
 - [ ] Hostinger üzerinde dağıtım ve yedekleme, ayrı plan ve testlerden sonra.
 - [ ] Gerçek emir bağlantısı, ancak sanal testler ve ekip değerlendirmesinden sonra ayrı aşama.
 
