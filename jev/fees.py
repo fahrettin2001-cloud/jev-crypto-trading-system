@@ -32,7 +32,7 @@ class FeeSchedule:
     def __post_init__(self) -> None:
         for name in ("maker_rate", "taker_rate"):
             rate = D(getattr(self, name))
-            if rate < 0 or rate >= 1:
+            if not rate.is_finite() or rate < 0 or rate >= 1:
                 raise ValueError(f"{name} 0 ile 1 arasında olmalı: {rate}")
             object.__setattr__(self, name, rate)
 
