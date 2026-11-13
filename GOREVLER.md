@@ -28,8 +28,8 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 
 ## Görev 2 — Kayıtlar ve güvenlik testleri
 
-- Sorumlu: Seçilmedi
-- Durum: Bekliyor
+- Sorumlu: @babakok-prog
+- Durum: Çalışılıyor
 - Kapsam: SQLite işlem kayıtları, bakiye kalıcılığı ve bağımsız risk kontrolü taslağı.
 - Çıktı: İşlem ile bakiye değişikliği tek veritabanı işlemiyle kaydedilir; hata durumunda tamamı geri alınır. Yeniden başlatma sonrası hesap doğru yüklenir.
 - Bitti ölçütü: Başarılı kayıt, yeniden açma, yetersiz bakiye ve hata/geri alma senaryolarını doğrulayan testler.
