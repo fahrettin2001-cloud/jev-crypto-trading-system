@@ -8,6 +8,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 İlk aşama, dış servislerden bağımsız sanal işlemler: Python, Decimal, SQLite ve testler için ekipçe planlama yapılmıştır. Hangi uygulama kodunun tamamlandığı güncel depo ve açık değişikliklerden kontrol edilir. Borsa olarak Binance Global seçildi (13 Kasım 2026, `docs/kararlar/2026-11-13-binance-global.md`); onaylanmış risk limitleri henüz seçilmedi. Haber keşfi için CryptoPanic, borsaya özel duyurular için Binance Global başlangıç adayıdır; canlı bağlantı kurulmadı. Ayrıntılar: `docs/HABER-KAYNAKLARI.md`.
 
+## Çalışma kararı — manuel Obsidian güncellemesi
+
+13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Otomatik 23.00 görevinin devre dışı bırakıldığı henüz doğrulanmadı; eski görev ayrıca kapatılmalı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
+
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
 - Görev 5.1, 5.2 ve 5.3 PR #21, #22 ve #23 ile ana dala birleşti. Saatlik canlı fiyatla sanal işlem kodu ve Hostinger yönergesi depodadır. PR yazarı 194 test geçtiğini bildirdi; bu notu yazan ajan yeni sürümü bağımsız test etmedi. Hostinger'da kurulum, zamanlayıcı ve ilk başarılı çalışma henüz bu ajan tarafından doğrulanmadı.
