@@ -157,3 +157,16 @@ https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/actions/runs/43
 Yerelde 240 test çalıştı; Windows'a özel 1 test atlandı, başarısız test yok.
 Ayrı hesapta kurtarma betiği başarılı. Hostinger erişimi henüz sağlanmadığı için
 sunucuda geri yükleme/dağıtım yapılmadı. Önceki açık PR #11 notları tarihseldir.
+
+## Canlı sanal hesap için günlük şifreli yedek — 15 Kasım 2026
+
+- Sorumlu: @babakok-prog. Dal: `feat/canli-sifreli-yedek`.
+- SQLite'tan ayrı olan durum.pkl/CSV/ayar klasörü, canlı botla aynı flock kilidi
+  kullanılarak şifreli yedeklenir. Geri yükleme sadece yeni klasöre yapılır.
+- Günlük systemd görevi 00:20 UTC / 03.20 TR için hazır. İlk başarılı yedekten
+  sonra timer açılır. Sunucu kurulum çıktısı henüz doğrulanmadı.
+- 248 test çalıştı, 1 Windows testi Linux'ta atlandı; hata yok. Gerçek sentetik
+  bot durumunun aynı sonuçla sürmesi ayrıca doğrulandı. Açıklama:
+  `docs/CANLI-HESAP-YEDEKLEME.md`.
+- İlk hedef aynı sunucudur; ikinci depolama ve anahtarın ayrı güvenli kopyası
+  kurulmuş sayılmaz. Kaynaklar/önceki yedekler otomatik silinmez.
