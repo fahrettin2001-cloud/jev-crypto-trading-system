@@ -51,6 +51,8 @@ piyasa başarısı, kârlılık veya riskin düşük olduğu anlamına gelmez.
 
 Sınırlı yerel Python 3.13 ile pencere sırası, hedeflerin sınırlarda ayıklanması,
 ayrılan dönemin değiştirilmesinin araştırma örneklerine etkisizliği, aynı örnek
-sayıları ve geçersiz veri elle denendi. Otomatik testler eklendi; yerel Python
-ortamında unittest/sqlite3 eksik olduğundan tüm otomatik testler tam Python
-bulut ortamında çalıştırılıp incelenmelidir.
+sayıları ve geçersiz veri elle denendi. GitHub Actions üzerinde `9cc184e` sürümü Python 3.10, 3.12 ve 3.13 ile
+test edildi ve tüm işler başarılı tamamlandı. Python 3.12 Linux çalışmasında
+261 test çalıştırıldı, 1 Windows'a özel test atlandı; aynı test Windows'taki
+ayrı çalışmada geçti. Yeni dört pencere testi de başarılıydı. Bu sonuç yalnızca
+kod doğrulamasıdır; modelin gerçek piyasa başarısını göstermez.
