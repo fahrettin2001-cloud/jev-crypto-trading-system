@@ -1,7 +1,7 @@
 # Geliştirme durumu — 13 Kasım 2026
 
 PR #10 ve #14 ana dalda; #16, PR #11 dalına birleşmiştir. Bu dal güncel ana dalla
-birleştirilip entegrasyon testinden geçirildi; PR #11 henüz ana dala alınmadı.
+birleştirilip entegrasyon testinden geçirildi; PR #11, 14 Kasım 2026 tarihinde 34b1e2e commit’iyle ana dala alındı.
 
 ## Hazırlanan ve yerelde doğrulananlar
 
@@ -143,3 +143,11 @@ Windows DACL testi atlandı. Windows yedek/DACL testleri GitHub Actions'a eklend
 Bu oturumda SSH dizini/anahtarı, SSH agent, ortam secret veya sunucu bağlantısı
 yok. Hostinger doğrulaması için sunucu adresi, kullanıcı ve güvenli erişim
 sağlanmalı. Yerel kurtarma başarısı sunucuda çalıştırılmış gibi raporlanmaz.
+
+## Sonuç — ana dalda
+
+PR #11 birleşti (34b1e2e). Son CI koşusundaki tüm işler başarılı:
+https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/actions/runs/43545932280
+Python 3.10/3.12/3.13 ve native Windows dosya izinleri doğrulandı. Önceki
+bölümlerdeki bekleyen CI/birleştirme notları bu kayıtla güncellenmiştir.
+Sunucu erişimi olmadan Hostinger doğrulaması yapılmış sayılmadı.

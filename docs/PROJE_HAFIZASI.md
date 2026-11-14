@@ -81,6 +81,19 @@ başarısız test yok. `deploy/verify-sqlite-recovery.sh` ayrı hesapta başarı
 SSH erişimi bulunmadığından Hostinger'a bağlanılmadı; sunucu doğrulaması bekliyor.
 Ayrıntı `docs/GELISTIRME-DURUMU.md`; PR #11'in son CI durumu kontrol edilmelidir.
 
+## PR #11 birleşmesi ve kalan dış işlem — 14 Kasım 2026
+
+PR #11, tüm son CI kontrolleri geçtikten sonra 34b1e2e commit'iyle ana dala alındı.
+Python 3.10/3.12/3.13 ve gerçek Windows yedek/DACL testleri başarılıdır. Yerelde
+240 test (1 Windows testi atlandı) ve ayrı geçici hesap kurtarma betiği başarılı.
+Önceki inceleme notlarındaki PR #11 açık/çakışmalı bilgisi artık tarihsel durumdur.
+Şifresiz geçici dosyalar uygulamadan kaldırıldı; yeni Windows dosyaları kullanıcıya
+özel DACL ile oluşturulur. Eski dosya izinleri otomatik değişmez; OS swap/pagefile
+bu uygulamanın güven sınırı dışındadır. Hostinger'a erişim sağlanmadı: bu ortamda
+SSH dizini/agent, secret veya sunucu bağlantısı bulunmuyor. Sunucuda ayrı hesapla
+`bash deploy/verify-sqlite-recovery.sh` çalıştırılması ve kontrollü dağıtım kaldı;
+çalışan bot bu oturumda değiştirilmedi.
+
 ## Nasıl birlikte çalışılır?
 
 1. GOREVLER.md dosyasında sorumluları kontrol edin; başlamadan görevinizi işaretleyin.
