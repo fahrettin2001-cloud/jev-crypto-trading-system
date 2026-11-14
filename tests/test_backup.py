@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextlib import closing
 import sqlite3
 import tempfile
 import unittest
@@ -108,7 +109,7 @@ class BackupTests(unittest.TestCase):
         import os
         from cryptography.hazmat.primitives.ciphers.aead import AESGCM
         from jev.backup import LEGACY_MAGIC
-        with sqlite3.connect(self.folder/'account.db') as db:
+        with closing(sqlite3.connect(self.folder/'account.db')) as db:
             plain = db.serialize()
         nonce = os.urandom(12)
         self.backup.write_bytes(LEGACY_MAGIC + nonce + AESGCM(self.key.read_bytes()).encrypt(nonce, plain, LEGACY_MAGIC))

@@ -81,7 +81,9 @@ def _restore_in_memory(plain, magic):
                 return sqlite3.SQLITE_OK
             db.set_authorizer(authorize)
             db.executescript(plain.decode('utf-8'))
-            db.set_authorizer(None)
+            # Python 3.10 None ile authorizer kaldırmayı desteklemez.
+            # Döküm yüklemesi bitti; bundan sonra yalnızca kendi doğrulama SQL’imiz çalışır.
+            db.set_authorizer(lambda *args: sqlite3.SQLITE_OK)
         if db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
             raise ValueError('SQLite bütünlük kontrolü başarısız')
         account = SQLitePortfolio.__new__(SQLitePortfolio)

@@ -45,6 +45,22 @@ class PrivateFileTests(unittest.TestCase):
                 sddl = text.value
                 self.assertIn('D:P',sddl)
                 self.assertEqual(sddl.count('(A;'),1)
-                self.assertIn('(A;;FA;;;'+_windows_user_sid()+')',sddl)
+                # SDDL yerel Administrator SID'ini LA takma adıyla gösterebilir.
+                # Metin yerine ACE içindeki gerçek SID'i karşılaştır.
+                advapi.GetSecurityDescriptorDacl.argtypes = [ctypes.c_void_p,
+                    ctypes.POINTER(wintypes.BOOL),ctypes.POINTER(ctypes.c_void_p),ctypes.POINTER(wintypes.BOOL)]
+                advapi.GetAce.argtypes = [ctypes.c_void_p,wintypes.DWORD,ctypes.POINTER(ctypes.c_void_p)]
+                advapi.ConvertSidToStringSidW.argtypes = [ctypes.c_void_p,ctypes.POINTER(wintypes.LPWSTR)]
+                present,defaulted = wintypes.BOOL(),wintypes.BOOL()
+                dacl,ace = ctypes.c_void_p(),ctypes.c_void_p()
+                self.assertTrue(advapi.GetSecurityDescriptorDacl(buf,ctypes.byref(present),ctypes.byref(dacl),ctypes.byref(defaulted)))
+                self.assertTrue(present.value)
+                self.assertTrue(advapi.GetAce(dacl,0,ctypes.byref(ace)))
+                actual_sid = wintypes.LPWSTR()
+                self.assertTrue(advapi.ConvertSidToStringSidW(ctypes.c_void_p(ace.value+8),ctypes.byref(actual_sid)))
+                try:
+                    self.assertEqual(actual_sid.value,_windows_user_sid())
+                finally:
+                    kernel.LocalFree(ctypes.cast(actual_sid,ctypes.c_void_p))
             finally:
                 kernel.LocalFree(ctypes.cast(text,ctypes.c_void_p))
