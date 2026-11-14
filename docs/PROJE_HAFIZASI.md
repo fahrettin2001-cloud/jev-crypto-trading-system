@@ -15,7 +15,7 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 <<<<<<< HEAD
 ## Görev 6 — zaman sıralı sinir ağı karşılaştırması
 
-`feature/gorev6-zamanli-sinir-agi` dalında PR #32'nin küçük ağı ve PR #35'in zaman sıralı araştırma düzeni ayrı bir araştırmada birleştirildi. Ölçek ve ağ yalnızca eğitim bölümünden hesaplanır; aynı dönemlerde lojistik ve sabit olasılıkla karşılaştırılır. Sentetik BTC testinde ağın Brier puanı 0,2690, sabit 0,5 tabanı 0,2500 çıktı; ağ bu örnekte tabanı geçmedi. Veri test dönemi önceki deneyde de görülmüştür, bağımsız nihai test değildir. Yerel örnek ve veri sızıntısına yönelik manuel kontroller başarılı; tam otomatik test ve inceleme bekliyor. Hiçbir işlem veya Hostinger entegrasyonu yok. Ayrıntı `docs/GOREV6-ZAMANLI-SINIR-AGI.md`.
+`feature/gorev6-zamanli-sinir-agi` dalında PR #32'nin küçük ağı ve PR #35'in zaman sıralı araştırma düzeni ayrı bir araştırmada birleştirildi. Ölçek ve ağ yalnızca eğitim bölümünden hesaplanır; aynı dönemlerde lojistik ve sabit olasılıkla karşılaştırılır. Sentetik BTC testinde ağın Brier puanı 0,2690, sabit 0,5 tabanı 0,2500 çıktı; ağ bu örnekte tabanı geçmedi. Veri test dönemi önceki deneyde de görülmüştür, bağımsız nihai test değildir. Bulut ajanı ilgili 12 testin geçtiğini ve genel testte 257 test raporlandığını (1 atlanan test) bildirdi; iki CSV ResourceWarning sürüyor. Atlanan testin adı ve nedeni henüz kaydedilmedi. Hiçbir işlem veya Hostinger entegrasyonu yok. Ayrıntı `docs/GOREV6-ZAMANLI-SINIR-AGI.md`.
 
 ## Görev 6 — ödülle öğrenme deneyi
 
