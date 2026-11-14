@@ -12,7 +12,14 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
-<<<<<<< HEAD
+## Görev 6 - karşılaştırma güvencesi
+
+PR #38 araştırmasına, aynı örneklerle hesaplanan pencere sonuçlarının örnek sayısına göre ağırlıklı özeti ve model ayarlarının kaydı eklendi. Dört sentetik pencerenin toplam 852 örneğinde ağın Brier puanı 0,2577; lojistik modelinki 0,2507 ve sabit 0,5 tabanınki 0,2500. Örneklerin hedefleri örtüşebilir; bu sonuç gerçek piyasa başarısı değildir. Ayrılmış son dönem geçmiş deneylerde görülmüştür. Yeni kontroller yerelde elle denendi; bu değişikliklerin GitHub test sonucu ayrıca doğrulanmalıdır.
+
+## Görev 6 — ileriye dönük pencere araştırması
+
+`feature/gorev6-yuruyen-arastirma` dalında #37'ye bağlı çevrimdışı genişleyen eğitim pencereleri eklendi. Dört araştırma penceresi ile son %20'lik ayrılmış bölüm var; hedefi sınırı aşan örnekler ayıklanır. Sentetik BTC örneğinde ağ yalnızca 1/4 pencerede sabit 0,5 Brier tabanını geçti ve 4/4 pencerede lojistik modelden geride kaldı. Ayrılmış bölüm önceki deneylerde incelendiği için bağımsız nihai test sayılmaz. `9cc184e` sürümü GitHub Actions'ta Python 3.10/3.12/3.13 ve ayrı Windows kontrollerinden geçti; Python 3.12 Linux'ta 261 testten Windows'a özel biri atlandı ve Windows çalışmasında başarılı oldu. Bağımsız kod incelemesi bekliyor. Ayrıntı `docs/GOREV6-ILERI-DONUK-ARASTIRMA.md`; Jev veya işlem bağlantısı yoktur.
+
 ## Görev 6 — zaman sıralı sinir ağı karşılaştırması
 
 `feature/gorev6-zamanli-sinir-agi` dalında PR #32'nin küçük ağı ve PR #35'in zaman sıralı araştırma düzeni ayrı bir araştırmada birleştirildi. Ölçek ve ağ yalnızca eğitim bölümünden hesaplanır; aynı dönemlerde lojistik ve sabit olasılıkla karşılaştırılır. Sentetik BTC testinde ağın Brier puanı 0,2690, sabit 0,5 tabanı 0,2500 çıktı; ağ bu örnekte tabanı geçmedi. Veri test dönemi önceki deneyde de görülmüştür, bağımsız nihai test değildir. Bulut ajanı ilgili 12 testin geçtiğini ve genel testte 257 test raporlandığını (1 atlanan test) bildirdi; iki CSV ResourceWarning sürüyor. Atlanan testin adı ve nedeni henüz kaydedilmedi. Hiçbir işlem veya Hostinger entegrasyonu yok. Ayrıntı `docs/GOREV6-ZAMANLI-SINIR-AGI.md`.
@@ -32,15 +39,13 @@ Sinir ağı ve ödül deneyinin 7 ilgili testi ile toplam 207 proje testi Python
 ## Görev 6 — sentetik ödül hesabı
 
 PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `docs/ODUL-ILK-DENEY.md` eklendi. Net portföy değerindeki değişim ve isteğe bağlı düşüş artışı cezası örneklenir; ücretler net değere zaten dahilse ikinci kez düşülmez. El ile örnek kazanç/zarar, ceza, yanlış girdiler ve JSONL kayıt kontrolü başarılı; bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu bir eğitim algoritması, Jev entegrasyonu veya gerçek/sanal emir sistemi değildir.
-=======
 ## Yeni görev — sinir ağı ve ödül araştırması
 
-Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik verilerle ayrı bir küçük ağ deneyi ve risk/maliyet duyarlı ödül kaydı planlanıyor; bunlar henüz uygulanmadı. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
+Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik verilerle ayrı bir küçük ağ deneyi ve risk/maliyet duyarlı ödül kaydı planlandı; yukarıdaki notlarda deneylerin güncel durumu anlatılıyor. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
 
 ## Görev 6 — piyasa araştırma ortamı
 
 `feature/gorev6-piyasa-arastirma` dalında geçmiş fiyatlardan zaman sıralı eğitim/doğrulama/test ayıran, hedefi sınırı aşan örnekleri çıkaran ve lojistik temel modeli basit olasılıklarla karşılaştıran çevrimdışı araştırma taslağı hazırlandı. Sentetik BTCUSDT örneğinde test Brier 0,2566, sabit 0,5 tabanı 0,25; örnek model tabanı geçmedi. 8 özel ve 214 toplam test geçti; mevcut iki CSV ResourceWarning sürüyor. Bu performans kripto piyasası veya kârlılık kanıtı değildir. Ayrıntı `docs/GOREV6-PIYASA-ARASTIRMA.md`.
->>>>>>> origin/main
 
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
