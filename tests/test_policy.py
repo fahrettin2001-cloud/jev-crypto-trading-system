@@ -1,3 +1,4 @@
+from contextlib import closing
 from datetime import timedelta
 import json
 from pathlib import Path
@@ -55,14 +56,14 @@ class PolicyPersistenceTests(unittest.TestCase):
                 first.buy('BTCUSDT', 1, 40)
                 with self.assertRaises(RiskError):
                     first.set_risk(RiskLimits(), expected_version=1)
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             self.assertEqual(db.execute('SELECT risk_version FROM trades ORDER BY id').fetchall(), [(1,), (2,)])
             self.assertEqual(db.execute('SELECT count(*) FROM risk_policies').fetchone()[0], 2)
 
     def test_corrupt_or_unknown_schema_fails_closed(self):
         with SQLitePortfolio(self.path, initial_cash=1000, risk=RiskLimits()) as account:
             for payload, schema in (('{}', 1), ('broken', 1), ('{}', 999)):
-                with sqlite3.connect(self.path) as db:
+                with closing(sqlite3.connect(self.path)) as db, db:
                     db.execute('UPDATE risk_policies SET policy=?,schema_version=?', (payload, schema))
                 with self.assertRaises(RiskError):
                     account.buy('BTCUSDT', 1, 100)
@@ -70,17 +71,37 @@ class PolicyPersistenceTests(unittest.TestCase):
 
     def test_policy_write_failure_rolls_back(self):
         with SQLitePortfolio(self.path, initial_cash=1000, risk=RiskLimits(max_trade_notional=50)) as account:
-            with sqlite3.connect(self.path) as db:
+            with closing(sqlite3.connect(self.path)) as db, db:
                 db.execute("CREATE TRIGGER fail_policy BEFORE INSERT ON risk_policies BEGIN SELECT RAISE(ABORT,'failure'); END")
             with self.assertRaises(sqlite3.IntegrityError):
-                account.set_risk(RiskLimits())
+                account.set_risk(RiskLimits(), expected_version=1)
             self.assertEqual(account.risk.max_trade_notional, 50)
+
+    def test_policy_changes_require_current_version(self):
+        strict = RiskLimits(max_trade_notional=50, allowed_symbols={'BTCUSDT'})
+        with SQLitePortfolio(self.path, initial_cash=1000, risk=strict) as account:
+            before = account.portfolio
+            with self.assertRaises(AttributeError):
+                account.risk = RiskLimits()
+            with self.assertRaises(TypeError):
+                account.set_risk(RiskLimits())
+            for bad in (None, -1, True, '1'):
+                with self.subTest(expected_version=bad):
+                    with self.assertRaises(ValueError):
+                        account.set_risk(RiskLimits(), expected_version=bad)
+            with self.assertRaises(RiskError):
+                account.set_risk(RiskLimits(), expected_version=0)
+            self.assertEqual(account.policy_status(), (1, strict))
+            self.assertEqual(account.portfolio, before)
+            with self.assertRaises(RiskError):
+                account.buy('DOGEUSDT', 1, 100)
+            self.assertEqual(account.portfolio, before)
 
     def test_legacy_schema_migrates_without_inventing_policy(self):
         with SQLitePortfolio(self.path, initial_cash=1000, risk=RiskLimits()) as account:
             account.buy('BTCUSDT', 1, 100)
             expected = account.portfolio
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute('DROP TABLE risk_policies')
             db.execute('ALTER TABLE trades DROP COLUMN risk_version')
         with SQLitePortfolio.open(self.path) as account:
@@ -88,7 +109,7 @@ class PolicyPersistenceTests(unittest.TestCase):
             with self.assertRaises(RiskError):
                 account.buy('BTCUSDT', 1, 100)
             self.assertEqual(account.set_risk(RiskLimits(max_trade_notional=50), expected_version=0), 1)
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             self.assertIsNone(db.execute('SELECT risk_version FROM trades').fetchone()[0])
 
     def test_constructor_rejects_alternative_schema_without_modification(self):

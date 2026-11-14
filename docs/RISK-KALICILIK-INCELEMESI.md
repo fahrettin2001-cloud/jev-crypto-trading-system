@@ -42,7 +42,8 @@ python -m jev --db paper.db risk-set --risk risk.json --expected-version 0
 ile görülen sürüm kullanılır. Boş `{}` açıkça seçilmiş sınırsız sanal politika
 olarak kabul edilir; otomatik varsayılan değildir. Ekip sayısal limitleri seçmelidir.
 Python'da `account.set_risk(limits, expected_version=version)` kullanılır.
-`account.risk = limits` de açık politika değişikliğidir; yeni sürüm kaydeder.
+`account.risk` salt okunurdur. Değişiklik için güncel sürümün açıkça belirtilmesi
+zorunludur; doğrudan atama ve sürümsüz çağrı reddedilir.
 
 ## Güven sınırı
 

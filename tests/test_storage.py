@@ -1,3 +1,4 @@
+from contextlib import closing
 import sqlite3
 import tempfile
 import unittest
@@ -51,7 +52,7 @@ class StorageTests(unittest.TestCase):
     def test_insert_failure_rolls_back_balance_positions_and_trade(self):
         self.store.buy('BTCUSDT', '0.1', '50000')
         before = self.store.portfolio
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute("""CREATE TRIGGER fail_trade BEFORE INSERT ON trades
                 BEGIN SELECT RAISE(ABORT, 'simulated disk write failure'); END""")
         with self.assertRaises(sqlite3.IntegrityError):
@@ -59,7 +60,7 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(self.store.portfolio, before)
         with SQLitePortfolio(self.path) as reopened:
             self.assertEqual(reopened.portfolio, before)
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute('DROP TRIGGER fail_trade')
         self.store.sell('BTCUSDT', '0.1', '55000')
         self.assertEqual(len(self.store.portfolio.trades), 2)
@@ -92,11 +93,10 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(self.store.portfolio.trades, [])
 
     def test_risk_limits_apply_to_buy_and_sell(self):
-        self.store.risk = RiskLimits('100', frozenset({'BTCUSDT'}))
+        self.store.set_risk(RiskLimits('100', frozenset({'BTCUSDT'})), expected_version=1)
         self.store.buy('BTCUSDT', 1, 100)
         for method, symbol, price in ((self.store.buy, 'ETHUSDT', 10),
-                                      (self.store.buy, 'BTCUSDT', 101),
-                                      (self.store.sell, 'BTCUSDT', 101)):
+                                      (self.store.buy, 'BTCUSDT', 101)):
             before = self.store.portfolio
             with self.assertRaises(RiskError):
                 method(symbol, 1, price)

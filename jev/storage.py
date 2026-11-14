@@ -116,16 +116,14 @@ class SQLitePortfolio:
     def risk(self):
         return self._read_policy()[1]
 
-    @risk.setter
-    def risk(self, value):
-        self.set_risk(value)
-
-    def set_risk(self, risk, *, expected_version=None):
+    def set_risk(self, risk, *, expected_version):
         """Bilinçli politika değişikliği; sürüm geçmişini korur."""
+        if type(expected_version) is not int or expected_version < 0:
+            raise ValueError("Beklenen risk sürümü negatif olmayan tam sayı olmalı")
         self._db.execute("BEGIN IMMEDIATE")
         try:
             current = self._db.execute("SELECT COALESCE(MAX(version),0) FROM risk_policies").fetchone()[0]
-            if expected_version is not None and current != expected_version:
+            if current != expected_version:
                 raise RiskError("Risk sürümü değişti; güncel politikayı yeniden okuyun")
             version = self._insert_policy(risk)
             self._db.commit()
@@ -178,7 +176,7 @@ class SQLitePortfolio:
         self._db.execute("BEGIN IMMEDIATE")
         try:
             version, risk = self._read_policy()
-            quantity, price = risk.check(symbol, quantity, price)
+            quantity, price = risk.check(symbol, quantity, price, side=side.upper())
             p = self._load()
             # Kilit beklerken fiyat eskimiş olabilir; kontrolü kilitten sonra yap.
             now = self._clock()
@@ -190,9 +188,14 @@ class SQLitePortfolio:
             if side == "buy":
                 losses = Decimal(0)
                 if risk.max_daily_realized_loss is not None:
-                    for pnl, executed in self._db.execute("SELECT realized_pnl,executed_at FROM trades"):
-                        # Eski güvenilir yürütme zamanı olmayan kayıplar konservatif sayılır.
-                        if executed is None or datetime.fromisoformat(executed).date() == now.date():
+                    for pnl, executed, recorded in self._db.execute(
+                            "SELECT realized_pnl,executed_at,timestamp FROM trades"):
+                        # Eski kayıtta güvenilir yürütme zamanı yoksa kayıt tarihini
+                        # kullan; geçmiş zararları her gün yeniden sayma.
+                        trade_time = datetime.fromisoformat(executed if executed is not None else recorded)
+                        if trade_time.utcoffset() is None:
+                            raise RiskError("Günlük zarar için saat dilimsiz eski işlem tarihi düzeltilmeli")
+                        if trade_time.astimezone(timezone.utc).date() == now.date():
                             losses += max(-Decimal(pnl), Decimal(0))
                 risk.check_after_buy(p, symbol, price, now=now,
                                      market_prices=market_prices, daily_loss=losses)

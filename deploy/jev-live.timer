@@ -1,0 +1,11 @@
+[Unit]
+Description=Jev canli sanal islem - her saat basindan 1 dakika sonra calistir
+
+[Timer]
+OnCalendar=*-*-* *:01:00
+# Sunucu kapaliyken kacirilan calismayi acilista yap
+Persistent=true
+RandomizedDelaySec=20
+
+[Install]
+WantedBy=timers.target

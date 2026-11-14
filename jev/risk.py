@@ -45,7 +45,9 @@ class RiskLimits:
         if self.allowed_symbols is not None:
             object.__setattr__(self, "allowed_symbols", frozenset(self.allowed_symbols))
 
-    def check(self, symbol, quantity, price):
+    def check(self, symbol, quantity, price, *, side="BUY"):
+        if side not in ("BUY", "SELL"):
+            raise RiskError("İşlem yönü BUY veya SELL olmalı")
         if not isinstance(symbol, str) or not symbol.strip():
             raise RiskError("Sembol boş olamaz")
         try:
@@ -60,7 +62,7 @@ class RiskLimits:
             raise RiskError("Geçersiz miktar veya fiyat") from exc
         if self.allowed_symbols is not None and symbol not in self.allowed_symbols:
             raise RiskError("Sembol izin listesinde değil")
-        if self.max_trade_notional is not None and notional > self.max_trade_notional:
+        if side == "BUY" and self.max_trade_notional is not None and notional > self.max_trade_notional:
             raise RiskError("İşlem tutarı örnek risk limitini aşıyor")
         return quantity, price
 

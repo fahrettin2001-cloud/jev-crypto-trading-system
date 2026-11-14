@@ -1,0 +1,16 @@
+[Unit]
+Description=Jev canli sanal islem sonuclarini sonuc deposuna yayinla
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=jev
+Group=jev
+ExecStart=/bin/bash /opt/jev/app/deploy/sonuc-yayinla.sh
+TimeoutStartSec=300
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/jev

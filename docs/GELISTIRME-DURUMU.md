@@ -1,7 +1,7 @@
 # Geliştirme durumu — 13 Kasım 2026
 
-Bu çalışma kalıcı risk politikası PR #10 üzerine kuruludur. Henüz ana dala
-birleştirilmiş gibi değerlendirilmemelidir.
+PR #10 ve #14 ana dalda; #16, PR #11 dalına birleşmiştir. Bu dal güncel ana dalla
+birleştirilip entegrasyon testinden geçirildi; PR #11 henüz ana dala alınmadı.
 
 ## Hazırlanan ve yerelde doğrulananlar
 
@@ -10,7 +10,8 @@ birleştirilmiş gibi değerlendirilmemelidir.
 - Günlük gerçekleşen kayıp limiti: UTC yürütme günündeki negatif gerçekleşen
   sonuçların mutlak toplamı. Kârlar kaybı silmez. Eşik dolunca yeni alış durur;
   satış sürer. Açık pozisyonun gerçekleşmemiş zararı bu limit değildir.
-- Eski yürütme zamanı bilinmeyen kayıtların kayıpları ihtiyatlı biçimde sayılır.
+- Eski `executed_at` alanı boş kayıtlarda kayıtlı `timestamp` UTC gününe çevrilir;
+  yalnızca ilgili günün kaybı sayılır. Önceki günlerin zararı hesabı kalıcı kilitlemez.
   İşlem için kullanıcı tarih vermesi yürütme gününü değiştirmez. Güvenilir saat
   sağlayıcı test/simülasyon içindir; dış içerik saat sağlayıcı olamaz.
 - Tüm pozisyonlar için değer sınırı: `max_total_position_notional`. Bu limit
@@ -95,3 +96,23 @@ Yerel test toplamı 80. İlk 79 test temiz sanal ortam kurulumunda da geçti;
 uyumsuz SQLite şemasını reddeden son koruma ayrıca test edildi. CI'nin ilk
 79 testlik koşusu Python 3.10, 3.12 ve 3.13'te başarılı oldu. Son commit için
 uzak CI sonucu ayrıca kontrol edilmelidir.
+
+## PR #11 entegrasyon düzeltmesi — 14 Kasım 2026
+
+- Güncel main alındı ve GOREVLER.md çakışması iki tarafın bilgisi korunarak çözüldü.
+- #14'ün zorunlu politika sürümü kontrolü, #16'nın Windows SQLite bağlantı
+  kapatma düzeltmesi korundu. Setter veya sürümsüz politika değişikliği geri gelmedi.
+- SQLite alış tutarı üst limiti satışa uygulanmaz. Satışta sembol izin listesi,
+  sonlu/pozitif miktar/fiyat ve etkin fiyat güncelliği kontrolü sürer.
+- Günlük zarar UTC takvim günüyle hesaplanır; Türkiye saatiyle 03.00'te yeni güne
+  geçer. Eski kaydın timestamp'i saat dilimsizse tahmin edilmez, açık hata verilir.
+  Geçerli eski kayıtlar değiştirilmez; sadece günlük hesaptaki tarih kaynağı düzelir.
+- Backtest günlük kaybı ve diğer sembollerin değerleme fiyatlarını yeni risk
+  arayüzüne verir. next_bar modunda gelecekteki kapanışlar yerine bar açılışları
+  kullanılır. Bu, bar tabanlı simülasyondur; fiyatların bar içi anlık değerleri bilinmez.
+- 235 entegrasyon testi geçti. İki mevcut testte açık CSV ResourceWarning uyarısı
+  var; başarısız test yok. UTC gün sınırı, yeniden açma, eski zarar, aynı gün zarar,
+  kârdaki satış, satış doğrulamaları ve backtest risk uyumu regresyonlarla kapsanır.
+- Hostinger'a dağıtım yapılmadı; çalışan sanal bot değiştirilmedi. Şifreli yedeğin
+  geçici dosyaları güvenli silme garantisi vermez; Windows 0o600 kullanıcıya özel
+  ACL garantisi değildir. Gerçek hassas veriyle kullanım öncesi bu sınırlar çözülmeli.
