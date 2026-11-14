@@ -57,6 +57,30 @@ Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-clo
 - Sıra: PR #16'yı PR #11 dalında incele; PR #11'in güncel ana dalla çakışmasını çöz ve tüm testleri yeniden çalıştır. Demir'in incelemesinde ana dal, PR #10 ve #14 birlikte 156 test geçtiği bildirildi. PR #3'e dokunulmadı.
 - PR #11'in önerdiği yedekte geçici SQLite kopyaları şifresizdir ve silinmeleri güvenli silme garantisi vermez. Windows'ta `0o600` tek başına kullanıcıya özel ACL garantisi değildir; gerçek hassas veriler öncesi ayrıca çözüm ve hata yolu testleri gerekir. Şifreli SQLite yedeği canlı kullanım için kurulmuş veya doğrulanmış sayılmamalı.
 
+## PR #11 düzeltme ve entegrasyon — 14 Kasım 2026
+
+@babakok-prog: PR #16'nın #11 dalına zaten birleştiği doğrulandı. Güncel main
+(8f4af9f) alındı; GOREVLER.md çakışması çözüldü. Günlük zararda eski timestamp'in
+UTC günü kullanılarak kalıcı kilit düzeltildi; aynı günün kaybı hâlâ limiti uygular.
+Alış tutar limiti satışa uygulanmıyor, satış girdi/sembol/fiyat zamanı kontrolleri
+korunuyor. #14'ün zorunlu expected_version koruması ve #16 Windows düzeltmesi mevcut.
+Backtest günlük zarar ve çoklu sembol değerlemesi için yeni risk parametrelerini
+geçiriyor; next_bar hesaplarında henüz bilinmeyen kapanışlar kullanılmıyor.
+Yerelde 235 test geçti (iki mevcut CSV ResourceWarning uyarısı). Düzeltmeler PR #11
+dalındadır, henüz main'e birleşmedi ve Hostinger'a kurulmadı. Ayrıntılı sınırlar:
+`docs/GELISTIRME-DURUMU.md`. #17 ve #18 zaten birleşmiş; eski mesajdaki kapatma
+önerisi güncel değil, bu PR'larda işlem yapılmadı.
+
+## PR #11 yedek güvenliği — 14 Kasım 2026
+
+Şifresiz geçici dosya yerine SQLite bellek kopyası ve şifreli v2 döküm kullanıldı.
+Geri yükleme bellekte doğrulanır; Windows yeni anahtar/yedek/hesap dosyaları özel
+DACL ile oluşturulur. Hata yolu, mevcut dosya koruması, v1 uyumu ve Windows ACL
+regresyonları eklendi. Yerelde 240 test çalıştı, Windows'a özel 1 test atlandı;
+başarısız test yok. `deploy/verify-sqlite-recovery.sh` ayrı hesapta başarılı.
+SSH erişimi bulunmadığından Hostinger'a bağlanılmadı; sunucu doğrulaması bekliyor.
+Ayrıntı `docs/GELISTIRME-DURUMU.md`; PR #11'in son CI durumu kontrol edilmelidir.
+
 ## Nasıl birlikte çalışılır?
 
 1. GOREVLER.md dosyasında sorumluları kontrol edin; başlamadan görevinizi işaretleyin.

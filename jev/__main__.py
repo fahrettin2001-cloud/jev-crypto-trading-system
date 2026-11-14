@@ -9,6 +9,7 @@ import sqlite3
 
 from . import FeeSchedule, RiskLimits, SQLitePortfolio
 from .policy import parse_policy, policy_dict
+from .reporting import account_report
 
 
 def read_risk(path):
@@ -39,14 +40,33 @@ def main(argv=None):
         command.add_argument("--maker", action="store_true")
         command.add_argument("--risk", type=Path, help="JSON risk politikası")
         command.add_argument("--price-observed-at", help="Saat dilimli ISO 8601 fiyat gözlem zamanı")
+        command.add_argument("--valuation-file", type=Path, help="Diğer pozisyonlar için zamanlı fiyat JSON dosyası")
     commands.add_parser("status", help="Bakiye, pozisyonlar, komisyonlar ve gerçekleşen K/Z")
     commands.add_parser("history", help="İşlem geçmişi")
+    commands.add_parser("report", help="Masraf, gerçekleşen sonuç ve risk politikası raporu")
     commands.add_parser("risk-show", help="Hesabın kayıtlı risk politikası ve sürümü")
     risk_set = commands.add_parser("risk-set", help="Risk politikasını açıkça değiştir")
     risk_set.add_argument("--risk", required=True, type=Path)
     risk_set.add_argument("--expected-version", required=True, type=int)
+    backup = commands.add_parser("backup", help="Şifreli SQLite yedeği oluştur")
+    backup.add_argument("destination", type=Path)
+    backup.add_argument("--key-file", required=True, type=Path)
+    restore = commands.add_parser("restore", help="Şifreli yedeği yeni hesaba geri yükle")
+    restore.add_argument("source", type=Path)
+    restore.add_argument("--key-file", required=True, type=Path)
+    keygen = commands.add_parser("backup-keygen", help="Yeni yerel 256 bit yedek anahtarı oluştur")
+    keygen.add_argument("--key-file", required=True, type=Path)
     args = parser.parse_args(argv)
     try:
+        if args.command in ("restore", "backup-keygen"):
+            from .backup import create_key, restore_backup
+            if args.command == "restore":
+                restore_backup(args.source, args.db, args.key_file)
+                output({"restored": str(args.db)})
+            else:
+                create_key(args.key_file)
+                output({"key_file": str(args.key_file)})
+            return
         if args.command == "init":
             cash = Decimal(args.cash)
             if not cash.is_finite() or cash < 0 or not args.quote.strip():
@@ -68,10 +88,27 @@ def main(argv=None):
         observed_at = (datetime.fromisoformat(args.price_observed_at)
                        if getattr(args, "price_observed_at", None) else None)
         with SQLitePortfolio.open(args.db, risk=risk) as account:
-            if args.command in ("buy", "sell"):
+            if args.command == "backup":
+                from .backup import encrypted_backup
+                encrypted_backup(account, args.destination, args.key_file)
+                output({"backup": str(args.destination)})
+            elif args.command in ("buy", "sell"):
+                valuations = None
+                if args.valuation_file is not None:
+                    from .market import PriceObservation
+                    raw = json.loads(args.valuation_file.read_text(encoding="utf-8"))
+                    if not isinstance(raw, dict):
+                        raise ValueError("Değerleme fiyatları JSON nesnesi olmalı")
+                    valuations = {}
+                    for symbol, quote in raw.items():
+                        valuations[symbol] = PriceObservation(symbol, Decimal(quote["price"]),
+                            datetime.fromisoformat(quote["observed_at"]), datetime.now().astimezone(),
+                            source="local valuation", average_minutes=0)
                 trade = getattr(account, args.command)(args.symbol, args.quantity, args.price,
-                    taker=not args.maker, price_observed_at=observed_at)
+                    taker=not args.maker, price_observed_at=observed_at, market_prices=valuations)
                 output(asdict(trade))
+            elif args.command == "report":
+                output(account_report(account))
             elif args.command == "risk-set":
                 version = account.set_risk(read_risk(args.risk), expected_version=args.expected_version)
                 output({"risk_version": version})
@@ -86,7 +123,7 @@ def main(argv=None):
                     output({"cash": p.cash, "initial_cash": p.initial_cash, "quote": p.quote,
                             "positions": {s: asdict(pos) for s, pos in p.positions.items()},
                             "total_fees": p.total_fees, "realized_pnl": p.realized_pnl})
-    except (OSError, ValueError, TypeError, DecimalException, OverflowError, sqlite3.Error) as exc:
+    except (OSError, ValueError, TypeError, KeyError, DecimalException, OverflowError, sqlite3.Error) as exc:
         parser.exit(1, f"Hata: {exc}\n")
 
 

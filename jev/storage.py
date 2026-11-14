@@ -23,6 +23,9 @@ class SQLitePortfolio:
         self._db = sqlite3.connect(path, isolation_level=None)
         try:
             self._db.execute("BEGIN IMMEDIATE")
+            tables = {row[0] for row in self._db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
+            if tables and 'account' not in tables:
+                raise ValueError("Uyumsuz SQLite dosyası; yeni hesap oluşturulmadı")
             self._db.execute("""CREATE TABLE IF NOT EXISTS account (
                 id INTEGER PRIMARY KEY CHECK(id=1), cash TEXT NOT NULL,
                 initial_cash TEXT NOT NULL, quote TEXT NOT NULL,
@@ -82,6 +85,8 @@ class SQLitePortfolio:
         columns = {row[1] for row in self._db.execute("PRAGMA table_info(trades)")}
         if "risk_version" not in columns:
             self._db.execute("ALTER TABLE trades ADD COLUMN risk_version INTEGER")
+        if "executed_at" not in columns:
+            self._db.execute("ALTER TABLE trades ADD COLUMN executed_at TEXT")
 
     def _read_policy(self):
         row = self._db.execute("SELECT version,schema_version,policy FROM risk_policies ORDER BY version DESC LIMIT 1").fetchone()
@@ -163,7 +168,7 @@ class SQLitePortfolio:
             raise
 
     def _trade(self, side, symbol, quantity, price, *, taker=True, timestamp=None,
-               price_observed_at=None):
+               price_observed_at=None, market_prices=None):
         if timestamp is not None:
             if not isinstance(timestamp, datetime) or timestamp.utcoffset() is None:
                 raise ValueError("İşlem zamanı saat dilimi içermeli")
@@ -171,21 +176,37 @@ class SQLitePortfolio:
         self._db.execute("BEGIN IMMEDIATE")
         try:
             version, risk = self._read_policy()
-            quantity, price = risk.check(symbol, quantity, price)
+            quantity, price = risk.check(symbol, quantity, price, side=side.upper())
             p = self._load()
             # Kilit beklerken fiyat eskimiş olabilir; kontrolü kilitten sonra yap.
-            risk.check_price_time(price_observed_at, now=self._clock())
+            now = self._clock()
+            if not isinstance(now, datetime) or now.utcoffset() is None:
+                raise RiskError("Kontrol zamanı saat dilimi içermeli")
+            now = now.astimezone(timezone.utc)
+            risk.check_price_time(price_observed_at, now=now)
             trade = getattr(p, side)(symbol, quantity, price, taker=taker, timestamp=timestamp)
             if side == "buy":
-                risk.check_after_buy(p, symbol, price)
+                losses = Decimal(0)
+                if risk.max_daily_realized_loss is not None:
+                    for pnl, executed, recorded in self._db.execute(
+                            "SELECT realized_pnl,executed_at,timestamp FROM trades"):
+                        # Eski kayıtta güvenilir yürütme zamanı yoksa kayıt tarihini
+                        # kullan; geçmiş zararları her gün yeniden sayma.
+                        trade_time = datetime.fromisoformat(executed if executed is not None else recorded)
+                        if trade_time.utcoffset() is None:
+                            raise RiskError("Günlük zarar için saat dilimsiz eski işlem tarihi düzeltilmeli")
+                        if trade_time.astimezone(timezone.utc).date() == now.date():
+                            losses += max(-Decimal(pnl), Decimal(0))
+                risk.check_after_buy(p, symbol, price, now=now,
+                                     market_prices=market_prices, daily_loss=losses)
             positions = json.dumps({s: [str(pos.quantity), str(pos.avg_cost)]
                                     for s, pos in p.positions.items()})
             self._db.execute("UPDATE account SET cash=?, positions=? WHERE id=1",
                              (str(p.cash), positions))
             self._db.execute("""INSERT INTO trades
-                (timestamp,symbol,side,quantity,price,fee,realized_pnl,risk_version)
-                VALUES (?,?,?,?,?,?,?,?)""", (trade.timestamp.isoformat(), trade.symbol,
-                trade.side, str(trade.quantity), str(trade.price), str(trade.fee), str(trade.realized_pnl), version))
+                (timestamp,symbol,side,quantity,price,fee,realized_pnl,risk_version,executed_at)
+                VALUES (?,?,?,?,?,?,?,?,?)""", (trade.timestamp.isoformat(), trade.symbol,
+                trade.side, str(trade.quantity), str(trade.price), str(trade.fee), str(trade.realized_pnl), version, now.isoformat()))
             self._db.commit()
             return trade
         except BaseException:
@@ -193,14 +214,14 @@ class SQLitePortfolio:
             raise
 
     def buy(self, symbol, quantity, price, *, taker=True, timestamp=None,
-            price_observed_at=None):
+            price_observed_at=None, market_prices=None):
         return self._trade("buy", symbol, quantity, price, taker=taker, timestamp=timestamp,
-                           price_observed_at=price_observed_at)
+                           price_observed_at=price_observed_at, market_prices=market_prices)
 
     def sell(self, symbol, quantity, price, *, taker=True, timestamp=None,
-             price_observed_at=None):
+             price_observed_at=None, market_prices=None):
         return self._trade("sell", symbol, quantity, price, taker=taker, timestamp=timestamp,
-                           price_observed_at=price_observed_at)
+                           price_observed_at=price_observed_at, market_prices=market_prices)
 
     def close(self):
         self._db.close()

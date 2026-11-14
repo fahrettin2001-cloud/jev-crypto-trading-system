@@ -4,7 +4,7 @@ Son güncelleme: 13 Kasım 2026
 
 ## Amaç ve mevcut durum
 
-Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Borsa olarak Binance Global seçildi ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Hostinger bu aşamanın kapsamı dışındadır.
+Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. Ana dalda sanal işlem çekirdeği (Görev 1), SQLite kayıtları ve kalıcı risk politikası (Görev 2) bulunur. Borsa olarak Binance Global seçildi ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Hostinger'daki canlı verili sanal çalışma Görev 5.3 kapsamındadır; bu oturumda sunucuya doğrudan erişilmedi.
 
 Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki işler öneridir; kimseye onayı olmadan rol atanmadı.
 
@@ -112,3 +112,38 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 - Mevcut SQLite/risk katmanı kullanılır; her işlemde risk dosyası açıkça seçilir.
 - 60 test geçti (52 mevcut, 8 CLI süreç testi). Kullanım: `docs/CLI.md`.
 - Açık PR #3'teki farklı kalıcılık yaklaşımı birleştirilmedi veya kapatılmadı.
+
+## Yeni hazırlıklar — inceleme dalları
+
+- `fix/kalici-risk-politikasi` / PR #10: Fahrettin'in yeniden açılış talebi
+  incelendi; politikasız açılışta limitlerin kaybolduğu doğrulandı. Kalıcı,
+  sürümlü politika ve politikasız işlem reddi uygulandı. Rapor:
+  `docs/RISK-KALICILIK-INCELEMESI.md`.
+- `feat/gelistirme-altyapisi`: PR #10 üzerine kurulu; şifreli yedek/geri yükleme,
+  günlük gerçekleşen zarar ve tüm pozisyonların değer sınırı, rapor, yerel
+  görüntüleme paneli, salt okunur Binance Global adaptörü ve GitHub Actions.
+- Yerel ve temiz sanal ortamda ilk 79 test geçti; uyumsuz şema korumasıyla güncel yerel toplam 80 testtir. CLI yedek/geri yükleme ve Chromium
+  panel kontrolü de geçti. Ayrıntılı kullanım ve dış erişim bekleyen işler:
+  `docs/GELISTIRME-DURUMU.md`. Ana dala birleşmiş sayılmamalıdır.
+- Halka açık veri için kullanıcı Binance Global'i seçti; fiyat sorgusu ortamın
+  ağ politikasında engelli. Alan adı gereksinimi taslağa kaydedildi, yayımlanmadı.
+- Jev/Hermes sağlayıcısı, haber kaynağı, Hostinger hedefi ve ayrı yedek depolama
+  seçimi bekleniyor. Gerçek emir bağlantısı uygulanmadı.
+
+## Görev 2 / PR #11 inceleme düzeltmeleri — 14 Kasım 2026
+
+- Sorumlu: @babakok-prog. Durum: PR #11 güncellendi; ana dala birleşmedi.
+- PR #16 zaten #11 dalında; #14'ün risk sürümü koruması ile güncel main alındı.
+- Eski kayıtlardaki günlük zarar kalıcı alış kilidi ve değer kazanan pozisyonun
+  tutar sınırı yüzünden satılamaması düzeltildi; UTC/yeniden açma testleri eklendi.
+- Backtest günlük kayıp ve zamanlı fiyat verilerini genişletilmiş risk katmanına
+  geçiriyor; next_bar için diğer sembollerin gelecek kapanışını kullanmıyor.
+- 235 test geçti. GitHub CI sonucu PR #11 üzerinden kontrol edilmeli. Ayrıntı:
+  `docs/GELISTIRME-DURUMU.md`. Hostinger botuna dağıtım yapılmadı.
+
+## Görev 2 kurtarma doğrulaması — 14 Kasım 2026
+
+PR #11'de geçici şifresiz yedek dosyaları kaldırıldı; Windows özel DACL eklendi.
+240 yerel test çalıştı (1 Windows testi yerelde atlandı), hata yok. Ayrı hesapla
+kurtarma betiği yerelde geçti. Windows CI ve PR #11'in birleşmesi kontrol edilecek.
+Hostinger doğrulaması erişim bekliyor; çalışan sanal bot değiştirilmedi.
