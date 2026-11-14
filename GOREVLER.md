@@ -140,3 +140,10 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
   geçiriyor; next_bar için diğer sembollerin gelecek kapanışını kullanmıyor.
 - 235 test geçti. GitHub CI sonucu PR #11 üzerinden kontrol edilmeli. Ayrıntı:
   `docs/GELISTIRME-DURUMU.md`. Hostinger botuna dağıtım yapılmadı.
+
+## Görev 2 kurtarma doğrulaması — 14 Kasım 2026
+
+PR #11'de geçici şifresiz yedek dosyaları kaldırıldı; Windows özel DACL eklendi.
+240 yerel test çalıştı (1 Windows testi yerelde atlandı), hata yok. Ayrı hesapla
+kurtarma betiği yerelde geçti. Windows CI ve PR #11'in birleşmesi kontrol edilecek.
+Hostinger doğrulaması erişim bekliyor; çalışan sanal bot değiştirilmedi.

@@ -47,8 +47,10 @@ python -m jev --db restored.db report
 ```
 
 Yedekleme anahtarı ve çıktı dosyaları yeni oluşturulur, mevcut dosyalar ezilmez.
-Ham SQLite kopyası sadece erişimi sınırlandırılmış geçici klasörde oluşturulur,
-işlem sonunda kaldırılır; çıktı kimlik doğrulamalı şifrelidir. Yedek ve anahtarın
+Yedek anlık görüntüsü ve geri yükleme doğrulaması SQLite bellek veritabanında yapılır;
+uygulama şifresiz geçici dosya üretmez. Yalnızca şifreli yedek ve kullanıcının açıkça
+istediği nihai hesap dosyası diske yazılır. Windows yeni dosyaları, miras alınan
+izinleri kapatan ve yalnızca mevcut kullanıcıya erişim veren DACL ile oluşturur. Yedek ve anahtarın
 ayrı saklanması, hedef depolama ve zamanlanmış görev bu kütüphane tarafından
 kurulmaz. Şifreleme için `cryptography>=46,<51` bağımlılığı eklenmiştir.
 
@@ -116,3 +118,28 @@ uzak CI sonucu ayrıca kontrol edilmelidir.
 - Hostinger'a dağıtım yapılmadı; çalışan sanal bot değiştirilmedi. Şifreli yedeğin
   geçici dosyaları güvenli silme garantisi vermez; Windows 0o600 kullanıcıya özel
   ACL garantisi değildir. Gerçek hassas veriyle kullanım öncesi bu sınırlar çözülmeli.
+
+## Yedek güvenliği ve kurtarma doğrulaması — 14 Kasım 2026
+
+Şifresiz geçici SQLite dosyaları kaldırıldı: backup API belleğe tutarlı kopya alır,
+Python 3.10 uyumlu SQL dökümü bellekte AES-GCM ile şifrelenir. Geri yükleme MAC,
+bütünlük ve hesap/politika doğrulamasını bellekte bitirir; sonra yalnızca istenen
+nihai yeni dosyayı oluşturur. SQL yüklemesinde ATTACH/DETACH, PRAGMA ve uzantı
+yükleme reddedilir. Mevcut dosyalar ezilmez; yazım hatasında yeni çıktı temizlenir.
+
+Yeni yedek biçimi v2'dir. Eski v1 yedekler Python 3.11+ deserialize desteğiyle
+bellekte okunabilir; Python 3.10'da açık yükseltme hatası verilir, geçici şifresiz
+kopyaya dönülmez. Eski anahtar/yedeklerin ACL'leri otomatik değiştirilmez. Windows
+için yeni dosya oluşturma özel DACL'i atomik CreateFile çağrısında verir; 0o600'a
+güvenilmez. POSIX'te 0600 kullanılır. Sistem yöneticisi, süreç belleği, swap/pagefile
+ve disk şifrelemesi bu uygulama mekanizmasının güven sınırı dışındadır.
+
+`bash deploy/verify-sqlite-recovery.sh` ayrı geçici hesapta yedek/geri yükleme,
+kayıtlı politika ve limit üstü satış denemesini doğrular; canlı bot dizinine
+veya servislerine dokunmaz. Bu ortamda başarılı çalıştı. Tüm yerel testler:
+240 çalıştı, 239 başarılı, yalnızca yerel işletim sisteminde geçerli olmayan
+Windows DACL testi atlandı. Windows yedek/DACL testleri GitHub Actions'a eklendi.
+
+Bu oturumda SSH dizini/anahtarı, SSH agent, ortam secret veya sunucu bağlantısı
+yok. Hostinger doğrulaması için sunucu adresi, kullanıcı ve güvenli erişim
+sağlanmalı. Yerel kurtarma başarısı sunucuda çalıştırılmış gibi raporlanmaz.

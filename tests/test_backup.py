@@ -73,3 +73,46 @@ class BackupTests(unittest.TestCase):
         with SQLitePortfolio.open(dest) as restored:
             with self.assertRaises(RiskError):
                 restored.buy('BTCUSDT', 1, 100)
+
+    def test_backup_and_restore_use_no_plaintext_temporary_file(self):
+        from unittest.mock import patch
+        original = sqlite3.connect
+        opened = []
+        def connect(path, *args, **kwargs):
+            opened.append(str(path))
+            return original(path, *args, **kwargs)
+        dest = self.folder/'restored.db'
+        with patch('jev.backup.sqlite3.connect', side_effect=connect):
+            encrypted_backup(self.account, self.backup, self.key)
+            restore_backup(self.backup, dest, self.key)
+        self.assertEqual(opened, [':memory:', ':memory:', str(dest)])
+        self.assertEqual({p.name for p in self.folder.iterdir()},
+                         {'key.jevkey','backup.jevbackup','account.db','restored.db'})
+
+    def test_restore_write_failure_cleans_destination_and_closes_handles(self):
+        from unittest.mock import Mock, patch
+        encrypted_backup(self.account, self.backup, self.key)
+        memory = Mock()
+        memory.backup.side_effect = OSError('simulated disk write failure')
+        dest = self.folder/'failed.db'
+        with patch('jev.backup._restore_in_memory', return_value=memory):
+            with self.assertRaises(OSError):
+                restore_backup(self.backup, dest, self.key)
+        memory.close.assert_called_once()
+        self.assertFalse(dest.exists())
+        with SQLitePortfolio.open(self.folder/'account.db') as source:
+            self.assertEqual(source.portfolio.cash, 1000)
+
+    @unittest.skipUnless(hasattr(sqlite3.Connection, 'deserialize'), 'Legacy v1 requires Python 3.11+')
+    def test_old_v1_backup_restored_in_memory(self):
+        import os
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+        from jev.backup import LEGACY_MAGIC
+        with sqlite3.connect(self.folder/'account.db') as db:
+            plain = db.serialize()
+        nonce = os.urandom(12)
+        self.backup.write_bytes(LEGACY_MAGIC + nonce + AESGCM(self.key.read_bytes()).encrypt(nonce, plain, LEGACY_MAGIC))
+        dest = self.folder/'legacy-restored.db'
+        restore_backup(self.backup, dest, self.key)
+        with SQLitePortfolio.open(dest) as restored:
+            self.assertEqual(restored.risk, self.account.risk)

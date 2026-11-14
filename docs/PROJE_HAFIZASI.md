@@ -71,6 +71,16 @@ dalındadır, henüz main'e birleşmedi ve Hostinger'a kurulmadı. Ayrıntılı 
 `docs/GELISTIRME-DURUMU.md`. #17 ve #18 zaten birleşmiş; eski mesajdaki kapatma
 önerisi güncel değil, bu PR'larda işlem yapılmadı.
 
+## PR #11 yedek güvenliği — 14 Kasım 2026
+
+Şifresiz geçici dosya yerine SQLite bellek kopyası ve şifreli v2 döküm kullanıldı.
+Geri yükleme bellekte doğrulanır; Windows yeni anahtar/yedek/hesap dosyaları özel
+DACL ile oluşturulur. Hata yolu, mevcut dosya koruması, v1 uyumu ve Windows ACL
+regresyonları eklendi. Yerelde 240 test çalıştı, Windows'a özel 1 test atlandı;
+başarısız test yok. `deploy/verify-sqlite-recovery.sh` ayrı hesapta başarılı.
+SSH erişimi bulunmadığından Hostinger'a bağlanılmadı; sunucu doğrulaması bekliyor.
+Ayrıntı `docs/GELISTIRME-DURUMU.md`; PR #11'in son CI durumu kontrol edilmelidir.
+
 ## Nasıl birlikte çalışılır?
 
 1. GOREVLER.md dosyasında sorumluları kontrol edin; başlamadan görevinizi işaretleyin.
