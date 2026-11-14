@@ -13,6 +13,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
 <<<<<<< HEAD
+## Görev 6 — ileriye dönük pencere araştırması
+
+`feature/gorev6-yuruyen-arastirma` dalında #37'ye bağlı çevrimdışı genişleyen eğitim pencereleri eklendi. Dört araştırma penceresi ile son %20'lik ayrılmış bölüm var; hedefi sınırı aşan örnekler ayıklanır. Sentetik BTC örneğinde ağ yalnızca 1/4 pencerede sabit 0,5 Brier tabanını geçti ve 4/4 pencerede lojistik modelden geride kaldı. Ayrılmış bölüm önceki deneylerde incelendiği için bağımsız nihai test sayılmaz. Yerel temel denetimler geçti; tam otomatik test ve bağımsız inceleme bekliyor. Ayrıntı `docs/GOREV6-ILERI-DONUK-ARASTIRMA.md`; Jev veya işlem bağlantısı yoktur.
+
 ## Görev 6 — zaman sıralı sinir ağı karşılaştırması
 
 `feature/gorev6-zamanli-sinir-agi` dalında PR #32'nin küçük ağı ve PR #35'in zaman sıralı araştırma düzeni ayrı bir araştırmada birleştirildi. Ölçek ve ağ yalnızca eğitim bölümünden hesaplanır; aynı dönemlerde lojistik ve sabit olasılıkla karşılaştırılır. Sentetik BTC testinde ağın Brier puanı 0,2690, sabit 0,5 tabanı 0,2500 çıktı; ağ bu örnekte tabanı geçmedi. Veri test dönemi önceki deneyde de görülmüştür, bağımsız nihai test değildir. Bulut ajanı ilgili 12 testin geçtiğini ve genel testte 257 test raporlandığını (1 atlanan test) bildirdi; iki CSV ResourceWarning sürüyor. Atlanan testin adı ve nedeni henüz kaydedilmedi. Hiçbir işlem veya Hostinger entegrasyonu yok. Ayrıntı `docs/GOREV6-ZAMANLI-SINIR-AGI.md`.

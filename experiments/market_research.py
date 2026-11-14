@@ -55,15 +55,8 @@ def load_prices(path: Path, symbol: str, interval: timedelta) -> list[Price]:
     return result
 
 
-def build_splits(prices: list[Price], *, lookback: int, horizon: int,
-                 train_end: int, validation_end: int):
-    """Hedefi bölüm sınırını aşan örnekleri at; geçmiş özellikleri koru."""
-    n = len(prices)
-    if (type(lookback) is not int or type(horizon) is not int
-            or type(train_end) is not int or type(validation_end) is not int
-            or lookback < 2 or horizon < 1
-            or not 0 < train_end < validation_end < n):
-        raise ValueError("Geçersiz bakış aralığı, ufuk veya bölüm sınırları")
+def validate_series(prices):
+    """Bellekte sağlanan değerlerin zaman ve fiyat bütünlüğünü de denetle."""
     interval = None
     for i, item in enumerate(prices):
         if item.time.utcoffset() is None or not item.close.is_finite() or item.close <= 0:
@@ -73,6 +66,30 @@ def build_splits(prices: list[Price], *, lookback: int, horizon: int,
             if step <= timedelta(0) or (interval is not None and step != interval):
                 raise ValueError("Zamanlar sıralı, benzersiz ve eşit aralıklı olmalı")
             interval = step
+
+
+def make_example(prices, index, lookback, horizon):
+    """Yalnızca index'e kadarki fiyatlardan özellik; sonraki fiyattan etiket."""
+    target = index + horizon
+    now = prices[index].close
+    features = (float((now / prices[index - 1].close - 1) * 100),
+                float((now / prices[index - lookback].close - 1) * 100))
+    if not all(math.isfinite(v) for v in features):
+        raise ValueError("Özellikler sonlu olmalı")
+    return Example(index, target, prices[index].time, prices[target].time,
+                   features, int(prices[target].close > now))
+
+
+def build_splits(prices: list[Price], *, lookback: int, horizon: int,
+                 train_end: int, validation_end: int):
+    """Hedefi bölüm sınırını aşan örnekleri at; geçmiş özellikleri koru."""
+    n = len(prices)
+    if (type(lookback) is not int or type(horizon) is not int
+            or type(train_end) is not int or type(validation_end) is not int
+            or lookback < 2 or horizon < 1
+            or not 0 < train_end < validation_end < n):
+        raise ValueError("Geçersiz bakış aralığı, ufuk veya bölüm sınırları")
+    validate_series(prices)
     parts = {"train": [], "validation": [], "test": []}
     for i in range(lookback, n - horizon):
         target = i + horizon
@@ -84,13 +101,7 @@ def build_splits(prices: list[Price], *, lookback: int, horizon: int,
             part = "test"
         else:
             continue  # hedefi sonraki bölüme uzayan örnekler kullanılmaz
-        now = prices[i].close
-        features = (float((now / prices[i - 1].close - 1) * 100),
-                    float((now / prices[i - lookback].close - 1) * 100))
-        if not all(math.isfinite(v) for v in features):
-            raise ValueError("Özellikler sonlu olmalı")
-        parts[part].append(Example(i, target, prices[i].time, prices[target].time,
-                                   features, int(prices[target].close > now)))
+        parts[part].append(make_example(prices, i, lookback, horizon))
     if any(not examples for examples in parts.values()):
         raise ValueError("Her veri bölümünde en az bir örnek gerekli")
     return parts
