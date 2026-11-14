@@ -12,6 +12,7 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
+<<<<<<< HEAD
 ## Görev 6 — ödülle öğrenme deneyi
 
 `feature/gorev6-odulle-ogrenme` dalında sentetik tek adımlı bir örnekte sinir ağı yalnızca +1/-1 ödülden öğrenir. 13 Kasım 2026'da ayrı sentetik testte %97,2, 10 farklı başlangıçta %95,4–%98,9 doğruluk ve toplam 213 proje testi bildirildi. Bu yalnızca oyuncak bir sınıflandırma deneyidir; piyasa veya kârlılık kanıtı değildir. Portföy ödül hesaplayıcısına, Jev'e, Hostinger'a veya işlem motoruna bağlanmamıştır. Ayrıntı `docs/ODULLE-OGRENME-ILK-DENEY.md`.
@@ -27,6 +28,15 @@ Sinir ağı ve ödül deneyinin 7 ilgili testi ile toplam 207 proje testi Python
 ## Görev 6 — sentetik ödül hesabı
 
 PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `docs/ODUL-ILK-DENEY.md` eklendi. Net portföy değerindeki değişim ve isteğe bağlı düşüş artışı cezası örneklenir; ücretler net değere zaten dahilse ikinci kez düşülmez. El ile örnek kazanç/zarar, ceza, yanlış girdiler ve JSONL kayıt kontrolü başarılı; bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu bir eğitim algoritması, Jev entegrasyonu veya gerçek/sanal emir sistemi değildir.
+=======
+## Yeni görev — sinir ağı ve ödül araştırması
+
+Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik verilerle ayrı bir küçük ağ deneyi ve risk/maliyet duyarlı ödül kaydı planlanıyor; bunlar henüz uygulanmadı. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
+
+## Görev 6 — piyasa araştırma ortamı
+
+`feature/gorev6-piyasa-arastirma` dalında geçmiş fiyatlardan zaman sıralı eğitim/doğrulama/test ayıran, hedefi sınırı aşan örnekleri çıkaran ve lojistik temel modeli basit olasılıklarla karşılaştıran çevrimdışı araştırma taslağı hazırlandı. Sentetik BTCUSDT örneğinde test Brier 0,2566, sabit 0,5 tabanı 0,25; örnek model tabanı geçmedi. 8 özel ve 214 toplam test geçti; mevcut iki CSV ResourceWarning sürüyor. Bu performans kripto piyasası veya kârlılık kanıtı değildir. Ayrıntı `docs/GOREV6-PIYASA-ARASTIRMA.md`.
+>>>>>>> origin/main
 
 ## Güncel ekip devri — 13 Kasım 2026, 22.23 sonrası
 
@@ -64,6 +74,43 @@ PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `doc
 - Yerelde PR #14 tek başına 68 testi geçti; PR #14 ile PR #16 bir arada denendiğinde Windows üzerinde 81 test geçti. PR #16'daki ilgili 8 test ayrıca geçti. Bunlar yerel sonuçlardır; GitHub kontrolleri ve PR'ların güncel dallara entegrasyonu ayrıca doğrulanmalı.
 - Sıra: PR #16'yı PR #11 dalında incele; PR #11'in güncel ana dalla çakışmasını çöz ve tüm testleri yeniden çalıştır. Demir'in incelemesinde ana dal, PR #10 ve #14 birlikte 156 test geçtiği bildirildi. PR #3'e dokunulmadı.
 - PR #11'in önerdiği yedekte geçici SQLite kopyaları şifresizdir ve silinmeleri güvenli silme garantisi vermez. Windows'ta `0o600` tek başına kullanıcıya özel ACL garantisi değildir; gerçek hassas veriler öncesi ayrıca çözüm ve hata yolu testleri gerekir. Şifreli SQLite yedeği canlı kullanım için kurulmuş veya doğrulanmış sayılmamalı.
+
+## PR #11 düzeltme ve entegrasyon — 14 Kasım 2026
+
+@babakok-prog: PR #16'nın #11 dalına zaten birleştiği doğrulandı. Güncel main
+(8f4af9f) alındı; GOREVLER.md çakışması çözüldü. Günlük zararda eski timestamp'in
+UTC günü kullanılarak kalıcı kilit düzeltildi; aynı günün kaybı hâlâ limiti uygular.
+Alış tutar limiti satışa uygulanmıyor, satış girdi/sembol/fiyat zamanı kontrolleri
+korunuyor. #14'ün zorunlu expected_version koruması ve #16 Windows düzeltmesi mevcut.
+Backtest günlük zarar ve çoklu sembol değerlemesi için yeni risk parametrelerini
+geçiriyor; next_bar hesaplarında henüz bilinmeyen kapanışlar kullanılmıyor.
+Yerelde 235 test geçti (iki mevcut CSV ResourceWarning uyarısı). Düzeltmeler PR #11
+dalındadır, henüz main'e birleşmedi ve Hostinger'a kurulmadı. Ayrıntılı sınırlar:
+`docs/GELISTIRME-DURUMU.md`. #17 ve #18 zaten birleşmiş; eski mesajdaki kapatma
+önerisi güncel değil, bu PR'larda işlem yapılmadı.
+
+## PR #11 yedek güvenliği — 14 Kasım 2026
+
+Şifresiz geçici dosya yerine SQLite bellek kopyası ve şifreli v2 döküm kullanıldı.
+Geri yükleme bellekte doğrulanır; Windows yeni anahtar/yedek/hesap dosyaları özel
+DACL ile oluşturulur. Hata yolu, mevcut dosya koruması, v1 uyumu ve Windows ACL
+regresyonları eklendi. Yerelde 240 test çalıştı, Windows'a özel 1 test atlandı;
+başarısız test yok. `deploy/verify-sqlite-recovery.sh` ayrı hesapta başarılı.
+SSH erişimi bulunmadığından Hostinger'a bağlanılmadı; sunucu doğrulaması bekliyor.
+Ayrıntı `docs/GELISTIRME-DURUMU.md`; PR #11'in son CI durumu kontrol edilmelidir.
+
+## PR #11 birleşmesi ve kalan dış işlem — 14 Kasım 2026
+
+PR #11, tüm son CI kontrolleri geçtikten sonra 34b1e2e commit'iyle ana dala alındı.
+Python 3.10/3.12/3.13 ve gerçek Windows yedek/DACL testleri başarılıdır. Yerelde
+240 test (1 Windows testi atlandı) ve ayrı geçici hesap kurtarma betiği başarılı.
+Önceki inceleme notlarındaki PR #11 açık/çakışmalı bilgisi artık tarihsel durumdur.
+Şifresiz geçici dosyalar uygulamadan kaldırıldı; yeni Windows dosyaları kullanıcıya
+özel DACL ile oluşturulur. Eski dosya izinleri otomatik değişmez; OS swap/pagefile
+bu uygulamanın güven sınırı dışındadır. Hostinger'a erişim sağlanmadı: bu ortamda
+SSH dizini/agent, secret veya sunucu bağlantısı bulunmuyor. Sunucuda ayrı hesapla
+`bash deploy/verify-sqlite-recovery.sh` çalıştırılması ve kontrollü dağıtım kaldı;
+çalışan bot bu oturumda değiştirilmedi.
 
 ## Nasıl birlikte çalışılır?
 

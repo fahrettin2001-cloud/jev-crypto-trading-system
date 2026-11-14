@@ -48,15 +48,13 @@ boş sembol, sonlu/pozitif olmayan fiyat veya miktar reddedilir. İsteğe bağl�
 sembol izin listesi ve komisyon hariç işlem tutarı üst limiti uygulanır.
 Alıştan sonra komisyon dahil asgari nakit (`min_cash_reserve`) ve işlem fiyatıyla
 ölçülen tek sembol pozisyon değeri (`max_position_notional`) sınırları da
-isteğe bağlıdır. Bu iki kontrol satışlara uygulanmaz; işlem tutarı ve sembol
-kontrolleri alış ve satışta sürer. Risk reddi hiçbir kayıt yazmadan rollback yapar.
+isteğe bağlıdır. Nakit/pozisyon ve işlem tutarı sınırları yalnızca alışlara uygulanır. Sembol ve
+geçerli miktar/fiyat kontrolleri alış ve satışta sürer. Risk reddi hiçbir kayıt yazmadan rollback yapar.
 Sayısal limit varsayılanı yoktur. Yetersiz nakit ve fazla satış çekirdekte reddedilir.
 Risk politikası artık sürümlü olarak SQLite’ta tutulur; yeniden açma kayıtlı politikayı kullanır. Eski hesaplar için [göç yönergesini](RISK-KALICILIK-INCELEMESI.md) okuyun.
 Doğrudan `Portfolio` kullanımı bu ek risk katmanını çalıştırmaz.
 
-Bu ilk taslakta günlük zarar, tüm sembolleri kapsayan toplam pozisyon riski ve canlı emir
-kontrolleri yoktur. Şifreleme, yedekleme, şema göçü ve birden fazla hesap desteği
-bu değişikliğin kapsamı dışındadır. SQLite dosyaları yereldir, Git'e eklenmez.
+Görev 2 ilk sürümünde günlük zarar, toplam pozisyon riski, şifreli yedek ve şema göçü yoktu. İnceleme dalındaki yeni özellikler ve doğrulama durumu için [geliştirme raporuna](GELISTIRME-DURUMU.md) bakın. Birden fazla hesap ve canlı emir desteği eklenmedi. SQLite dosyaları yereldir, Git'e eklenmez.
 
 ## Doğrulama
 
@@ -128,7 +126,7 @@ eskiletmek yeterli değildir.
 Politika yeniden açılışta SQLite’tan yüklenir. Bu katman bir veri kaynağına
 bağlanmaz; gözlem zamanının kaynaktaki doğruluğunu veya fiyatın gerçek piyasa fiyatı
 olduğunu doğrulamaz. Gözlem zamanı bu sürümde veritabanına ayrıca kaydedilmez.
-Fiyat hatasında satış için de geçerli bir fiyat gerekir; nakit/pozisyon üst limitleri
+Fiyat hatasında satış için de geçerli bir fiyat gerekir; alış tutarı/nakit/pozisyon üst limitleri
 nedeniyle satışa tanınan istisna güncellik kontrolünü kaldırmaz.
 
 Güncellik geliştirmesi sonrası 52 test geçti (39 mevcut, 13 yeni): güncel ve tam
