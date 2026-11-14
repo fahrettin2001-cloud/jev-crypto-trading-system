@@ -15,7 +15,7 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 <<<<<<< HEAD
 ## Görev 6 — ileriye dönük pencere araştırması
 
-`feature/gorev6-yuruyen-arastirma` dalında #37'ye bağlı çevrimdışı genişleyen eğitim pencereleri eklendi. Dört araştırma penceresi ile son %20'lik ayrılmış bölüm var; hedefi sınırı aşan örnekler ayıklanır. Sentetik BTC örneğinde ağ yalnızca 1/4 pencerede sabit 0,5 Brier tabanını geçti ve 4/4 pencerede lojistik modelden geride kaldı. Ayrılmış bölüm önceki deneylerde incelendiği için bağımsız nihai test sayılmaz. Yerel temel denetimler geçti; tam otomatik test ve bağımsız inceleme bekliyor. Ayrıntı `docs/GOREV6-ILERI-DONUK-ARASTIRMA.md`; Jev veya işlem bağlantısı yoktur.
+`feature/gorev6-yuruyen-arastirma` dalında #37'ye bağlı çevrimdışı genişleyen eğitim pencereleri eklendi. Dört araştırma penceresi ile son %20'lik ayrılmış bölüm var; hedefi sınırı aşan örnekler ayıklanır. Sentetik BTC örneğinde ağ yalnızca 1/4 pencerede sabit 0,5 Brier tabanını geçti ve 4/4 pencerede lojistik modelden geride kaldı. Ayrılmış bölüm önceki deneylerde incelendiği için bağımsız nihai test sayılmaz. `9cc184e` sürümü GitHub Actions'ta Python 3.10/3.12/3.13 ve ayrı Windows kontrollerinden geçti; Python 3.12 Linux'ta 261 testten Windows'a özel biri atlandı ve Windows çalışmasında başarılı oldu. Bağımsız kod incelemesi bekliyor. Ayrıntı `docs/GOREV6-ILERI-DONUK-ARASTIRMA.md`; Jev veya işlem bağlantısı yoktur.
 
 ## Görev 6 — zaman sıralı sinir ağı karşılaştırması
 
