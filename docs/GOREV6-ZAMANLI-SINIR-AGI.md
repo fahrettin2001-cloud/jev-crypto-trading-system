@@ -50,7 +50,8 @@ Parametreler bu sonuçları gördükten sonra iyileştirilmedi.
 Yerelde erişilebilen sınırlı Python 3.13 ile örnek çalıştırıldı. Eğitimden
 sonraki fiyatların değiştirilmesi, eğitilen ağırlık ve eğitimden hesaplanan
 ölçekleri değiştirmedi; sabit özellik, tekrarlanabilirlik ve karşılaştırılan
-örnek sayıları elle kontrol edildi. Ayrı otomatik testler eklendi; bu ortamda
-`unittest` ve `sqlite3` eksik olduğundan tam Python bulut ortamında çalıştırılıp
-bağımsız incelenmeleri gerekir. Eski veri doğrulama kodu tüm olası sızıntıları
+örnek sayıları elle kontrol edildi. Bulut ajanı 14 Kasım 2026'da ilgili 12 testin geçtiğini, proje genelinde 257
+olarak raporlanan test çalışmasının 1 atlanan test içerdiğini bildirdi. Atlanan
+testin adı ve nedeni henüz kaydedilmedi. Mevcut testlerde iki CSV dosyası için
+ResourceWarning bildirildi. Eski veri doğrulama kodu tüm olası sızıntıları
 veya modelin eğitildiği diğer kaynakları otomatik garanti etmez.
