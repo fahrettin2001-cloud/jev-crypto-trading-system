@@ -94,6 +94,17 @@ SSH dizini/agent, secret veya sunucu bağlantısı bulunmuyor. Sunucuda ayrı he
 `bash deploy/verify-sqlite-recovery.sh` çalıştırılması ve kontrollü dağıtım kaldı;
 çalışan bot bu oturumda değiştirilmedi.
 
+## Canlı hesap yedeği — 15 Kasım 2026
+
+Kullanıcı konsol görüntüsünde sunucu kodu PR #36 (23eec16), jev-live.timer aktif,
+servis başarılı ve 500 USDT sanal varlıkla saatlik devam ediyor. Düzenli bot yedeği
+yoktu; SQLite aracı canlı botun pickle/CSV klasörünü kapsamıyordu. Bu yüzden
+`jev.live_backup` ve günlük systemd yedek görevi eklendi. Canlı botun kendi
+kilidiyle tutarlı kopya, AES-GCM, dosya hash'i, sadece yeni klasöre dönüş ve
+DURDUR durumunun korunması test edildi. 248 test, 1 platform atlaması, hata yok.
+Sunucuda kurulum ve saatli çalışma ayrı konsol çıktısıyla doğrulanmalı; ayrıntı
+`docs/CANLI-HESAP-YEDEKLEME.md`. Aynı sunucu yedeği uzak felaket yedeği değildir.
+
 ## Nasıl birlikte çalışılır?
 
 1. GOREVLER.md dosyasında sorumluları kontrol edin; başlamadan görevinizi işaretleyin.
