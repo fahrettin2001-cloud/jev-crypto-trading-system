@@ -147,3 +147,13 @@ PR #11'de geçici şifresiz yedek dosyaları kaldırıldı; Windows özel DACL e
 240 yerel test çalıştı (1 Windows testi yerelde atlandı), hata yok. Ayrı hesapla
 kurtarma betiği yerelde geçti. Windows CI ve PR #11'in birleşmesi kontrol edilecek.
 Hostinger doğrulaması erişim bekliyor; çalışan sanal bot değiştirilmedi.
+
+## PR #11 tamamlandı — 14 Kasım 2026
+
+PR #11 ana dala birleşti (34b1e2e). Eski zarar/satış sınırı düzeltmeleri,
+backtest uyumu, şifreli bellek yedeği ve Windows DACL koruması ana daldadır.
+Son CI'da Python 3.10, 3.12, 3.13 ve Windows yedek/izin kontrolleri başarılı:
+https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/actions/runs/43545932280
+Yerelde 240 test çalıştı; Windows'a özel 1 test atlandı, başarısız test yok.
+Ayrı hesapta kurtarma betiği başarılı. Hostinger erişimi henüz sağlanmadığı için
+sunucuda geri yükleme/dağıtım yapılmadı. Önceki açık PR #11 notları tarihseldir.
