@@ -2,12 +2,43 @@
 import argparse
 import hashlib
 import json
+import math
 from datetime import timedelta
 from pathlib import Path
 
-from experiments.market_neural import fit_neural, transform
-from experiments.market_research import (load_prices, make_example, metrics,
+from experiments.market_neural import (BATCH_SIZE, MODEL_SEED, RATE, SAMPLE_SEED,
+                                       STEPS, fit_neural, transform)
+from experiments.market_research import (LOGISTIC_EPOCHS, LOGISTIC_RATE,
+                                         load_prices, make_example, metrics,
                                          probability, train_model, validate_series)
+
+MODELS = ("neural", "logistic", "train_prevalence", "constant_half")
+
+
+def aggregate_windows(windows):
+    """Her pencerede aynı örneklerle hesaplanmış metrikleri sayıyla ağırlıkla."""
+    if not windows:
+        raise ValueError("En az bir pencere gerekli")
+    for window in windows:
+        counts = [window[model]["count"] for model in MODELS]
+        if any(type(n) is not int or n <= 0 for n in counts) or len(set(counts)) != 1:
+            raise ValueError("Pencere içindeki model örnek sayıları uyuşmuyor")
+        for model in MODELS:
+            for metric in ("accuracy", "brier"):
+                value = window[model][metric]
+                if not math.isfinite(value) or not 0 <= value <= 1:
+                    raise ValueError("Metrikler 0 ile 1 arasında sonlu olmalı")
+    results = {}
+    for model in MODELS:
+        count = sum(w[model]["count"] for w in windows)
+        if count <= 0:
+            raise ValueError("Örnek sayısı pozitif olmalı")
+        results[model] = {
+            "count": count,
+            "accuracy": sum(w[model]["accuracy"] * w[model]["count"] for w in windows) / count,
+            "brier": sum(w[model]["brier"] * w[model]["count"] for w in windows) / count,
+        }
+    return results
 
 
 def make_windows(prices, *, lookback=6, horizon=3):
@@ -63,7 +94,12 @@ def run_walk_forward(prices, *, lookback=6, horizon=3):
     return {"lookback_bars": lookback, "horizon_bars": horizon,
             "reserved_bars": len(prices) - reserved_start,
             "reserved_first": prices[reserved_start].time.isoformat(),
-            "reserved_evaluated": False, "windows": report}
+            "reserved_evaluated": False,
+            "neural_settings": {"hidden_neurons": len(model.weights), "model_seed": MODEL_SEED,
+                                "sample_seed": SAMPLE_SEED, "steps": STEPS,
+                                "batch_size": BATCH_SIZE, "learning_rate": RATE},
+            "logistic_settings": {"epochs": LOGISTIC_EPOCHS, "learning_rate": LOGISTIC_RATE},
+            "aggregate": aggregate_windows(report), "windows": report}
 
 
 def main():

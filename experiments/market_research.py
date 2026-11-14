@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
+LOGISTIC_EPOCHS = 300
+LOGISTIC_RATE = 0.02
+
 
 @dataclass(frozen=True)
 class Price:
@@ -112,7 +115,7 @@ def probability(weights, features):
     return 1 / (1 + math.exp(-max(-40, min(40, z))))
 
 
-def train_model(examples, epochs=300, rate=0.02):
+def train_model(examples, epochs=LOGISTIC_EPOCHS, rate=LOGISTIC_RATE):
     """Sabit ayarlı küçük lojistik karşılaştırma modeli; yalnızca eğitim verisi."""
     weights = [0.0, 0.0, 0.0]
     for _ in range(epochs):
