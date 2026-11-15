@@ -116,3 +116,7 @@ Elle yayın: `systemctl start jev-sonuc.service`. Erişimi kaldırmak: GitHub'da
 - Durum dosyası `pickle` biçimindedir; yalnızca botun kendi yazdığı dosya yüklenmelidir.
 - Sanal sonuçlar gerçek emirlerdeki kısmi gerçekleşme, gecikme ve sipariş defteri derinliğini tam yansıtmaz.
 - Kalibrasyon tablosu için yüzlerce karar gerekir; SMA günde birkaç karar verir. Jev bağlanınca (karar sayısı artınca) rapor anlamlı hale gelir.
+
+## Jev gölge modu (isteğe bağlı)
+
+Bota Jev eklemek için önce yalnızca gölge mod kullanılır: Jev'e düzenli soru sorulur, cevap kaydedilir, işlemler değişmez. Kurulum ve sorulan sorunun anlamı: [JEV-GOLGE-CANLI.md](JEV-GOLGE-CANLI.md).

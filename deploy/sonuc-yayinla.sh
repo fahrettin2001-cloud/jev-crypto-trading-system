@@ -19,7 +19,8 @@ cd "$OUT_DIR"
 git pull -q --ff-only 2>/dev/null || true   # boş depo ya da ilk yayın
 
 mkdir -p son
-for f in islemler.csv kararlar.jsonl varlik_egrisi.csv redler.csv ayarlar.json; do
+for f in islemler.csv kararlar.jsonl varlik_egrisi.csv redler.csv ayarlar.json \
+         golge.jsonl jev_golge.json; do
     if [ -f "$STATE_DIR/$f" ]; then
         cp "$STATE_DIR/$f" "son/$f"
     fi
@@ -28,6 +29,8 @@ if [ -f "$STATE_DIR/gunluk.log" ]; then
     tail -n 300 "$STATE_DIR/gunluk.log" > son/gunluk-son.log
 fi
 (cd "$APP_DIR" && "$PYTHON" -m jev.live status --dir "$STATE_DIR") > son/durum.txt 2>&1 || true
+(cd "$APP_DIR" && "$PYTHON" -m jev.live golge --dir "$STATE_DIR" --csv "$OUT_DIR/son/golge_sonuclar.csv") \
+    > son/golge.txt 2>&1 || true
 {
     echo "yayin_zamani_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     echo "kod_surumu: $(git -C "$APP_DIR" rev-parse --short HEAD 2>/dev/null || echo bilinmiyor)"
@@ -48,6 +51,8 @@ https://github.com/fahrettin2001-cloud/jev-crypto-trading-system (`jev.live`).
 - `son/islemler.csv`, `son/kararlar.jsonl`, `son/varlik_egrisi.csv`, `son/redler.csv`
 - `son/gunluk-son.log` — son çalışmaların özeti ve uyarılar
 - `son/sunucu.txt` — yayın zamanı, kod sürümü, zamanlayıcı ve durdurma durumu
+- `son/golge.txt`, `son/golge.jsonl`, `son/golge_sonuclar.csv` — Jev gölge modu
+  (işlemleri etkilemeyen olasılık tahminleri ve isabeti)
 EOF
 fi
 
