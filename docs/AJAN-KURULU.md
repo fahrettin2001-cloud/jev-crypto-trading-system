@@ -27,7 +27,7 @@ Karar gününün kapanışından **5 gün sonraki** kapanışa bakılır. Fiyat 
 
 ## Maliyet
 
-Bir coin için tek çalışma onlarca LLM çağrısı yapar. Varsayılan ayar ucuz tutuldu: tartışma turu 1, hızlı katman `claude-haiku-4-5`, derin katman `claude-sonnet-5`. Günde 2 coin çalışır. İlk birkaç günün faturasını sağlayıcı panelinden kontrol edin ve gerekirse sağlayıcıda harcama sınırı koyun.
+Bir coin için tek çalışma onlarca LLM çağrısı yapar. Ekip kararıyla (16 Kasım 2026) iki katman da `claude-sonnet-5-5` (Anthropic); tartışma turu 1. Sonnet 5.5 TradingAgents v0.7.1'in model listesinde olmadığından günlükte "unknown model" uyarısı görünür, çalışmayı etkilemez. Maliyet düşürmek gerekirse hızlı katman `claude-haiku-4-5` yapılabilir. Günde 2 coin çalışır. İlk birkaç günün faturasını sağlayıcı panelinden kontrol edin ve gerekirse sağlayıcıda harcama sınırı koyun.
 
 ## Sunucuya kurulum (root)
 
