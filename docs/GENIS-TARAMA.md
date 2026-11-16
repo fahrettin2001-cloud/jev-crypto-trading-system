@@ -83,3 +83,4 @@ Karışım oranı önceden sabitlendi; optimize edilmedi.
 - Evren seçimi geçmiş tarihe göre yapıldı, ama tamamen yanlılıksız değil (ör. 2020'de var olup Binance'te USDT çifti olmayan coinler yok).
 - Karışık portföyde iki yarı arasındaki yeniden dengeleme masrafsız varsayıldı; iki stratejinin kendi masrafları dahil.
 - Yahoo verisi temettü ve bölünme düzeltmeli. ETF masrafı (%0,05) aracı kuruma göre değişir.
+- Testler kararın günlük kapanış fiyatıyla uygulandığını varsayar. Kriptoda bu ertesi açılışa eşittir; ABD ETF'lerinde gece fiyat boşlukları yüzünden iyimser bir varsayımdır. Gerçekte işlem ertesi açılışta ya da kapanış emriyle yapılır (denetimde tespit edildi, 16 Kasım 2026).

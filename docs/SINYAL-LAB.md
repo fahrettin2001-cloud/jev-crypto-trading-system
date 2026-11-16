@@ -52,3 +52,48 @@ Sıralama üç dönemde de aynı yönde, ama fark mütevazı. Bu bir zamanlama s
 - **Hacim ve gün içi yüksek/düşük verisi kullanılmadı.** Uzmanların hacim tabanlı 5 önerisi (CLV, ATR kırılımı, imzalı hacim z skoru, Amihud likiditesi, VWAP sapması) Binance günlük arşivinde mevcut. Bunlar bir sonraki turda aynı ön kayıt yöntemiyle test edilebilir.
 - **Evren 26 coin;** kesitsel sonuçlar daha geniş evrende tekrar sınanmalı.
 - **Sonraki deney:** İdiosenkratik oynaklık filtresinin trend stratejisine eklenmesi, örneğin trendi yalnızca en düşük oynaklıklı K coinde uygulamak. Aynı eğitim, doğrulama ve sınav düzeniyle denenmeli.
+
+## 2. tur — hacim sinyalleri ve trend filtresi (16 Kasım 2026)
+
+### Hacim ve gün içi aralık (27 ön kayıtlı test)
+
+Veri: Binance günlük arşivinden 26 coinin açılış, yüksek, düşük ve kapanış fiyatıyla USDT hacmi (sonuç deposunda `veri/genis/kripto_ohlcv/`). 9 sinyal veri gelmeden önce sabitlendi (`experiments/sinyal_lab/hacim_sinyalleri.py`, commit `c0462af`):
+- Uzman teknik analistin 5 önerisi: CLV, ATR kırılımı, imzalı hacim z skoru, Amihud likiditesi, VWAP sapması.
+- Baş eğitmenin "haber ya da ilgi kaynaklı yükseliş" fikri için 4 hacim vekili: son hafta hacmi / 3 aylık hacim, bunun coinler arası sırası, hacimle gelen 7 günlük yükseliş, piyasa hacmindeki pay değişimi.
+
+**Sonuç: hiçbiri sağlam değil; hiçbiri eğitimde bile |t| ≥ 3'e ulaşmadı.**
+- En güçlüsü ATR kırılımı, 20 gün: eğitimde t = +2,8, doğrulama ve sınavda 0.
+- "Hacimle gelen yükseliş" sınavda hafif negatif (5 günde t = −2,1). Yani ilgi patlamasından sonra coin biraz geride kalma eğiliminde, ama bu sağlam değil.
+- Haber ve ilgi kaynaklı hareketleri hacimden yakalayıp önden gitmek bu veride mümkün olmadı.
+
+Tam tablo: `experiments/sinyal_lab/hacim_sonuc_2026-11-16.md`.
+
+### Trend + idiosenkratik oynaklık filtresi
+
+Ön kayıt: `experiments/trend_filtre/deney.py`. Kurgu: her 20 günde bir idiosenkratik oynaklığı en düşük K coin seçilir ve trend kuralları yalnızca onlara uygulanır (K ∈ {2, 3, 5, 8}). BTC, BTC'ye göre artığı sıfır olduğu için her zaman seçilir.
+
+| | Eğitim Sharpe / düşüş | Test Sharpe / düşüş |
+|---|---|---|
+| BTC+ETH trend (taban) | 1,43 / −%50 | 1,01 / −%32,5 |
+| K=2 (eğitimde seçilen; BTC + çoğunlukla ETH, TRX ya da BNB) | 1,48 / −%39 | 0,96 / −%19,7 |
+| K=3 / 5 / 8 | 1,43 / 1,24 / 1,24 | 0,91 / 0,79 / 0,35 |
+
+**Bağımsız denetim (alt ajan):**
+- Geleceği görme hatası yok, sonuçlar tekrarlanabilir.
+- Test başlangıcını bir gün kaydırmak K=2'nin test Sharpe'ını 0,96'dan 1,17'ye çıkarıyor. Yani K=2 ile taban arasındaki fark gürültü düzeyinde.
+- Coin sayısı arttıkça sonuç düzenli olarak kötüleşiyor.
+
+**Karar:** Filtre BTC+ETH trendini güvenilir biçimde geçmiyor; mevcut strateji kalır.
+
+**Zamanlama notu (denetimden):** Testler, kararın günlük kapanış fiyatıyla uygulandığını varsayıyor. Kriptoda günlük kapanış ertesi günün açılışına eşit olduğu için bu sorun değil; canlı motor da işlemi ertesi açılışta yapıyor. ABD ETF testinde ise gece fiyat boşlukları yüzünden bu varsayım iyimser (`docs/GENIS-TARAMA.md`).
+
+## Genel sonuç (iki tur, 165 test)
+
+| Soru | Sonuç |
+|---|---|
+| Grafikten piyasanın ya da coinin yönü tahmin edilebilir mi? | Hayır: 165 testte sağlam yön sinyali yok. Ajan deneyi de aynı sonucu verdi. |
+| Hacim ya da haber kaynaklı hareketler önceden yakalanabilir mi? | Hayır: 27 hacim testinden hiçbiri sağlam değil. |
+| Coinler arası seçimde işe yarayan bir şey var mı? | Evet: düşük idiosenkratik oynaklık ve piyango coinlerinden kaçınma, üç dönemde de tutarlı. |
+| Bu, mevcut stratejiyi iyileştiriyor mu? | Hayır: bilgi zaten BTC+ETH seçiminde var; dinamik filtre geçemedi. |
+
+Ajanın kontrol listesi aynı kalıyor: yön tahmini yerine test edilmiş trend kuralları, seçimde düşük oynaklıklı büyük coinler, piyango coinlerinden kaçınma.
