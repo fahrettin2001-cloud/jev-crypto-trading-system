@@ -76,6 +76,14 @@ class TestDownload(unittest.TestCase):
             G.EVRENLER["kripto"] = old
 
 
+class TestMonths(unittest.TestCase):
+    def test_more_than_60_months(self):
+        ms = G._months("2019-06", "2026-10")
+        self.assertEqual(len(ms), 89)
+        self.assertEqual((ms[0], ms[-1]), ("2019-06", "2026-10"))
+        self.assertIn("2020-01", ms)
+
+
 class TestUniverse(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

@@ -36,7 +36,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 
-from .binance_data import DownloadError, download_month, http_fetch, months_between
+from .binance_data import DownloadError, download_month, http_fetch
 from .duygu import trend_weights
 
 KRIPTO = ("BTC ETH XRP BCH LTC BNB EOS XTZ LINK XLM ADA TRX XMR ETC NEO DASH ATOM ZEC VET "
@@ -80,7 +80,7 @@ def download_crypto(out: Path, cache: Path, start="2019-06", end: str | None = N
     end = end or _last_full_month()
     for sym in EVRENLER["kripto"][1]:
         series, missing, errors = {}, 0, []
-        for month in months_between(start, end):
+        for month in _months(start, end):
             try:
                 path = download_month(sym, "1d", month, cache / sym, fetch=fetch)
             except (DownloadError, OSError, ValueError) as exc:
@@ -119,6 +119,17 @@ def download_us(out: Path, start="2006-01-01", log=print) -> None:
                 log(f"{s}: {len(series)} gün ({min(series)} → {max(series)})")
             else:
                 log(f"{s}: veri yok")
+
+
+def _months(start: str, end: str) -> list[str]:
+    """YYYY-AA aralığı (binance_data.months_between'deki 60 ay sınırı olmadan)."""
+    y, m = map(int, start.split("-"))
+    ey, em = map(int, end.split("-"))
+    out = []
+    while (y, m) <= (ey, em):
+        out.append(f"{y:04d}-{m:02d}")
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+    return out
 
 
 def _last_full_month() -> str:
