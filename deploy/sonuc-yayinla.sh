@@ -43,6 +43,14 @@ if [ -f "$AJAN_DIR/ajan_kararlar.jsonl" ]; then
     find "$AJAN_DIR/raporlar" -name '*.md' -mtime -14 -exec cp -p {} son/ajan/raporlar/ \; 2>/dev/null || true
     find son/ajan/raporlar -name '*.md' -mtime +14 -delete 2>/dev/null || true
 fi
+# Duygu endeksi (bedava; Korku/Açgözlülük + Binance fonlama/long-short) — kuruluysa.
+DUYGU_DIR=${DUYGU_DIR:-/var/lib/jev/duygu}
+if [ -f "$DUYGU_DIR/duygu_kayit.jsonl" ]; then
+    mkdir -p son/duygu
+    for f in duygu_kayit.jsonl duygu_ozet.md gecmis_testi.md; do
+        if [ -f "$DUYGU_DIR/$f" ]; then cp "$DUYGU_DIR/$f" son/duygu/; fi
+    done
+fi
 {
     echo "yayin_zamani_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     echo "kod_surumu: $(git -C "$APP_DIR" rev-parse --short HEAD 2>/dev/null || echo bilinmiyor)"
@@ -66,6 +74,7 @@ https://github.com/fahrettin2001-cloud/jev-crypto-trading-system (`jev.live`).
 - `son/golge.txt`, `son/golge.jsonl`, `son/golge_sonuclar.csv` — Jev gölge modu
   (işlemleri etkilemeyen olasılık tahminleri ve isabeti)
 - `son/ajan/` — TradingAgents ajan kurulu (gölge mod): `ozet.md`, kararlar, raporlar
+- `son/duygu/` — duygu endeksi (Korku/Açgözlülük, fonlama, long/short) ve geçmiş testi
 EOF
 fi
 

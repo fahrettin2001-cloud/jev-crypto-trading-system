@@ -83,6 +83,12 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Sınır: Emir yok; sanal portföy, canlı bot ve risk katmanı değişmez. API anahtarı yalnızca sunucudaki `/etc/jev/ajan.env` dosyasında durur.
 - Bekleyen: model sağlayıcısı ve API anahtarı seçimi, Hostinger'da `deploy/install-ajan.sh`. Ayrıntı: `docs/AJAN-KURULU.md`.
 
+## Görev 8 — Bedava duygu endeksi
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: İncelemede — kod ve testler hazır; geçmiş testi sunucuda çalıştırılacak.
+- Kapsam: Korku/Açgözlülük Endeksi (alternative.me), Binance fonlama ve long/short oranı; anahtarsız ve model çağrısı yok. Trend topluluğuna filtre olarak eğitim/test ayrımıyla geçmiş testi; günlük kayıt.
+- Sınır: Emir yok. Filtre, geçmiş testi ve gölge izlemeden sonra ayrı PR ile stratejiye eklenir. Ayrıntı: `docs/DUYGU-ENDEKSI.md`.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
