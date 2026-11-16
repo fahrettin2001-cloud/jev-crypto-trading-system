@@ -1,0 +1,17 @@
+[Unit]
+Description=Jev duygu endeksi - gunluk kayit (Korku/Acgozluluk, fonlama, long/short); ucretsiz, emir yok
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=jev
+Group=jev
+WorkingDirectory=/opt/jev/app
+ExecStart=/usr/bin/python3 -m jev.duygu gunluk --dir /var/lib/jev/duygu
+TimeoutStartSec=300
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/jev/duygu

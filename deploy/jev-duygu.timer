@@ -1,0 +1,10 @@
+[Unit]
+Description=Jev duygu endeksi - her gun 00:15 UTC (03:15 TR)
+
+[Timer]
+OnCalendar=*-*-* 00:15:00 UTC
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target
