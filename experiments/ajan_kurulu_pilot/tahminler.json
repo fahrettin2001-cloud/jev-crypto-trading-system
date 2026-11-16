@@ -1,0 +1,13 @@
+{
+  "scope": "exploratory 20-day direction forecasts; no trading or training",
+  "method": "three specialist opinions, simple equal-weight mean, compared with constant 0.5",
+  "access_limit": "agents were instructed not to use tools; shared workspace is not a technical sandbox",
+  "episodes": [
+    {"id":"1A","features":[-0.092,-0.353,-0.579,-0.269,0.044,-0.586],"bull":0.53,"bear":0.44,"risk":0.46},
+    {"id":"1B","features":[-0.135,-0.417,-0.692,-0.335,0.058,-0.699],"bull":0.54,"bear":0.40,"risk":0.44},
+    {"id":"2A","features":[-0.010,-0.116,-0.047,-0.094,0.021,-0.180],"bull":0.51,"bear":0.46,"risk":0.48},
+    {"id":"2B","features":[-0.015,-0.115,-0.139,-0.096,0.019,-0.187],"bull":0.51,"bear":0.45,"risk":0.47},
+    {"id":"3A","features":[-0.108,-0.068,-0.167,-0.076,0.035,-0.194],"bull":0.51,"bear":0.45,"risk":0.46},
+    {"id":"3B","features":[-0.117,-0.189,-0.356,-0.163,0.045,-0.373],"bull":0.53,"bear":0.41,"risk":0.43}
+  ]
+}
