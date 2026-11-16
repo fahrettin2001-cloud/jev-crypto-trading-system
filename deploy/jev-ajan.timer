@@ -1,0 +1,10 @@
+[Unit]
+Description=Jev ajan kurulu - her gun 00:30 UTC (03:30 TR), gunluk mum kapandiktan sonra
+
+[Timer]
+OnCalendar=*-*-* 00:30:00 UTC
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

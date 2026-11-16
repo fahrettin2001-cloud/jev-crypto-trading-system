@@ -76,6 +76,13 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Sınır: Jev'in modeli yeniden eğitilmez; çalışan Hostinger botuna bağlanmaz ve emir verilmez. Bağımsız risk sistemi korunur.
 - Bitti ölçütü ve iş sırası: [Görev 6 tasarımı](docs/GOREV6-SINIR-AGI-ODUL.md). PR #27 ayrı bir gölge ölçüm taslağıdır; sinir ağı değildir.
 
+## Görev 7 — Ajan kurulu (TradingAgents, gölge mod)
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: İncelemede — kod ve testler hazır, sunucuya kurulmadı.
+- Kapsam: TradingAgents v0.7.1 çok ajanlı analizi her gün BTCUSDT/ETHUSDT için çalıştırılır; notlar karar günlüğüne yazılır ve 5 günlük isabetle ölçülür. Duygu analisti isteğe bağlı olarak Jev kullanır.
+- Sınır: Emir yok; sanal portföy, canlı bot ve risk katmanı değişmez. API anahtarı yalnızca sunucudaki `/etc/jev/ajan.env` dosyasında durur.
+- Bekleyen: model sağlayıcısı ve API anahtarı seçimi, Hostinger'da `deploy/install-ajan.sh`. Ayrıntı: `docs/AJAN-KURULU.md`.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
