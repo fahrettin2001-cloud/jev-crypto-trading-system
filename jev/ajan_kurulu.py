@@ -79,7 +79,7 @@ Runner = Callable[[str, str], tuple[dict, str]]
 
 
 def tradingagents_runner(config_overrides: dict | None = None,
-                         analysts: Iterable[str] = ("market", "social", "news")) -> Runner:
+                         analysts: Iterable[str] = ("market", "news")) -> Runner:
     """Gerçek TradingAgents çalıştırıcısı. Paket yalnızca burada içe aktarılır; ana
     proje ve testler TradingAgents kurulu olmadan çalışır."""
     try:
@@ -270,8 +270,10 @@ def main(argv=None) -> None:
     run.add_argument("--dir", type=Path, default=DEFAULT_DIR)
     run.add_argument("--symbols", nargs="+", default=["BTCUSDT", "ETHUSDT"])
     run.add_argument("--date", help="Analiz günü YYYY-AA-GG (varsayılan: dün, UTC)")
-    run.add_argument("--analysts", nargs="+", default=["market", "social", "news"],
-                     help="TradingAgents analistleri (kripto için temel analiz genelde boş)")
+    run.add_argument("--analysts", nargs="+", default=["market", "news"],
+                     help="TradingAgents analistleri: market, news, social, fundamentals. "
+                          "social varsayılan kapalı (sunucudan Reddit/StockTwits 403); "
+                          "kripto için fundamentals genelde boş")
     run.add_argument("--language", default="Turkish", help="Rapor dili")
     summ = sub.add_parser("ozet", help="Özet raporu yeniden yaz ve göster")
     summ.add_argument("--dir", type=Path, default=DEFAULT_DIR)

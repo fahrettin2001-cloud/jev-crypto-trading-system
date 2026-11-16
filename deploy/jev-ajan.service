@@ -16,7 +16,8 @@ Environment=HOME=/var/lib/jev/ajan/ev
 Environment=TRADINGAGENTS_RESULTS_DIR=/var/lib/jev/ajan/ta/sonuclar
 Environment=TRADINGAGENTS_CACHE_DIR=/var/lib/jev/ajan/ta/onbellek
 Environment=TRADINGAGENTS_MEMORY_LOG_PATH=/var/lib/jev/ajan/ta/hafiza/trading_memory.md
-ExecStart=/opt/jev/ajan-venv/bin/python -m jev.ajan_kurulu calistir --dir /var/lib/jev/ajan --symbols BTCUSDT ETHUSDT
+# Duygu analisti (social) kapali: Reddit/StockTwits veri merkezi IP'sinden 403 veriyor.
+ExecStart=/opt/jev/ajan-venv/bin/python -m jev.ajan_kurulu calistir --dir /var/lib/jev/ajan --symbols BTCUSDT ETHUSDT --analysts market news
 # Bir calisma (2 coin) LLM cagrilariyla uzun surebilir
 TimeoutStartSec=3600
 NoNewPrivileges=true
