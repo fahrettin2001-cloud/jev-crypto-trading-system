@@ -96,6 +96,12 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Kanıt: kurallar için hiç görülmemiş 2018–2023 döneminde Sharpe 1,10; 2018–2026 en büyük düşüş −%49 (al-tut −%84). Canlı ayarla 2024-11 → 2026-10 simülasyonu: +%25,8, düşüş −%15,2, 0 red.
 - Sınır: Sanal para, emir yok. Ayrıntı: `docs/TREND-SANAL-HESAP.md`.
 
+## Görev 10 — Geniş tarama (çok coin, ABD ETF ve hisse)
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: Tamamlandı (araştırma).
+- Sonuç: 26 coine yayılmak ve "en iyi K" BTC+ETH trendinden kötü. ETF trendi getiriyi değil düşüşü azaltıyor; BTC+ETH trendiyle %50/%50 karışım düşüşü yaklaşık yarıya indirip Sharpe'ı korudu. Ayrıntı: `docs/GENIS-TARAMA.md`.
+- Önerilen sonraki adım: %50 BTC+ETH trend + %50 ETF trend için üçüncü sanal hesap (ekip kararı).
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
