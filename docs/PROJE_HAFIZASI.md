@@ -12,13 +12,28 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
+## Görev 6 — ödülle öğrenme deneyi
+
+`feature/gorev6-odulle-ogrenme` dalında sentetik tek adımlı bir örnekte sinir ağı yalnızca +1/-1 ödülden öğrenir. 13 Kasım 2026'da ayrı sentetik testte %97,2, 10 farklı başlangıçta %95,4–%98,9 doğruluk ve toplam 213 proje testi bildirildi. Bu yalnızca oyuncak bir sınıflandırma deneyidir; piyasa veya kârlılık kanıtı değildir. Portföy ödül hesaplayıcısına, Jev'e, Hostinger'a veya işlem motoruna bağlanmamıştır. Ayrıntı `docs/ODULLE-OGRENME-ILK-DENEY.md`.
+
+## Görev 6 — ilk sentetik sinir ağı deneyi
+
+`feature/gorev6-sinir-agi-deneyi` dalında ayrı bir sentetik XOR sınıflandırma deneyi geliştirildi (Görev #29; tasarım PR #30). 13 Kasım 2026'da eksik Python ortamında elle yürütülen deneyde eğitim öncesi %31, eğitim sonrası %97,75 ve çoğunluk sınıfı tabanı %49,5 elde edildi; sonradan bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu sonuçlar sentetik sınıflandırmaya aittir, piyasa performansı değildir. Jev, ödülle öğrenme, Hostinger ve işlem entegrasyonu yoktur. Ayrıntı `docs/SINIR-AGI-ILK-DENEY.md`.
+
+## PR #32 bulut testleri — 13 Kasım 2026
+
+Sinir ağı ve ödül deneyinin 7 ilgili testi ile toplam 207 proje testi Python 3.12.14 bulut ortamında geçti. Önceden mevcut `tests/test_backtest_orders.py` içinde iki kapatılmamış CSV dosyası için ResourceWarning görüldü; takip edilmeli. Üç dosyanın sondaki boşluk/boş satır uyarısı giderildi. Hesaplayıcı henüz ağa, bota veya öğrenme döngüsüne bağlı değildir.
+
+## Görev 6 — sentetik ödül hesabı
+
+PR #32 dalına `experiments/reward_demo.py`, `tests/test_reward_demo.py` ve `docs/ODUL-ILK-DENEY.md` eklendi. Net portföy değerindeki değişim ve isteğe bağlı düşüş artışı cezası örneklenir; ücretler net değere zaten dahilse ikinci kez düşülmez. El ile örnek kazanç/zarar, ceza, yanlış girdiler ve JSONL kayıt kontrolü başarılı; bulut ortamında 7 ilgili test ve 207 proje testi geçti. Bu bir eğitim algoritması, Jev entegrasyonu veya gerçek/sanal emir sistemi değildir.
 ## Görev 7 — Ajan kurulu (16 Kasım 2026)
 
 TradingAgents (Tauric Research, Apache-2.0, v0.7.1) gölge modda projeye bağlandı: `jev/ajan_kurulu.py`, `deploy/jev-ajan.*`, `deploy/install-ajan.sh`, `docs/AJAN-KURULU.md`. Günlük not → BUY/HOLD/SELL karar kaydı; emir yok. 11 yeni test sahte ajanla geçti. Gerçek TradingAgents bu ortamda çalıştırılmadı (ağ ve paket kurulumu kapalı); sunucudaki ilk çalışma doğrulanmalı.
 
 ## Yeni görev — sinir ağı ve ödül araştırması
 
-Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik verilerle ayrı bir küçük ağ deneyi ve risk/maliyet duyarlı ödül kaydı planlanıyor; bunlar henüz uygulanmadı. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
+Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik ağ ve ödül deneylerinin durumu yukarıda açıklanmıştır; risk/maliyet duyarlı çalışmalar devam etmektedir. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
 
 ## Görev 6 — piyasa araştırma ortamı
 
