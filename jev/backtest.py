@@ -30,7 +30,7 @@ import copy
 import csv
 import json
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 from typing import Sequence
@@ -202,7 +202,20 @@ class _Engine:
         if intent.side == BUY:
             trial.buy(intent.symbol, quantity, fill, taker=taker, timestamp=bar.timestamp)
             if apply_risk and c.risk is not None:
-                c.risk.check_after_buy(trial, intent.symbol, fill)
+                from .market import PriceObservation
+                now = bar.timestamp.astimezone(timezone.utc)
+                daily_loss = sum((max(-t.realized_pnl, Decimal(0))
+                                  for t in portfolio.trades
+                                  if t.timestamp.astimezone(timezone.utc).date() == now.date()),
+                                 Decimal(0))
+                # next_bar yürütmesinde diğer sembollerin kapanışını kullanma:
+                # henüz gerçekleşmemiş kapanışlar geleceğe bakmak olurdu.
+                marks = {symbol: PriceObservation(symbol,
+                            bar.prices[symbol] if c.execution == "same_bar" else bar.open(symbol),
+                            bar.timestamp, bar.timestamp, source="backtest bar", average_minutes=0)
+                         for symbol in bar.prices}
+                c.risk.check_after_buy(trial, intent.symbol, fill, now=now,
+                                       market_prices=marks, daily_loss=daily_loss)
         else:
             trial.sell(intent.symbol, quantity, fill, taker=taker, timestamp=bar.timestamp)
         return trial

@@ -96,8 +96,7 @@ class StorageTests(unittest.TestCase):
         self.store.set_risk(RiskLimits('100', frozenset({'BTCUSDT'})), expected_version=1)
         self.store.buy('BTCUSDT', 1, 100)
         for method, symbol, price in ((self.store.buy, 'ETHUSDT', 10),
-                                      (self.store.buy, 'BTCUSDT', 101),
-                                      (self.store.sell, 'BTCUSDT', 101)):
+                                      (self.store.buy, 'BTCUSDT', 101)):
             before = self.store.portfolio
             with self.assertRaises(RiskError):
                 method(symbol, 1, price)

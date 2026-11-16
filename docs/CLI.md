@@ -1,6 +1,6 @@
 # Sanal portföy komut satırı
 
-Depo kökünde Python 3.10+ ile çalışır; dış bağımlılık gerekmez. PR #3'ün farklı
+Depo kökünde Python 3.10+ ile çalışır; `python -m pip install -e .` ile şifreleme bağımlılığını kurun. PR #3'ün farklı
 kalıcılık yaklaşımını kullanmaz; mevcut `SQLitePortfolio` ve `RiskLimits`
 üzerinden çalışır. Gerçek borsa emri göndermez, fiyatlar elle sağlanır.
 

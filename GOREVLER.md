@@ -4,7 +4,7 @@ Son güncelleme: 13 Kasım 2026
 
 ## Amaç ve mevcut durum
 
-Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. İlk aşama yalnızca çevrimdışı sanal işlemlerden oluşur. Ana dalda sanal işlem çekirdeği (Görev 1, `jev/` paketi) bulunur; SQLite kayıtları ve kalıcılık (Görev 2, PR #5) da ana dala birleşmiştir. Borsa olarak Binance Global seçildi ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Hostinger bu aşamanın kapsamı dışındadır.
+Üç kişilik ekip, ileride Binance kripto piyasasında çalışması hedeflenen Jev ve Hermes destekli sistemi geliştirecek. Ana dalda sanal işlem çekirdeği (Görev 1), SQLite kayıtları ve kalıcı risk politikası (Görev 2) bulunur. Borsa olarak Binance Global seçildi ([karar kaydı](docs/kararlar/2026-11-13-binance-global.md)). Hostinger'daki canlı verili sanal çalışma Görev 5.3 kapsamındadır; bu oturumda sunucuya doğrudan erişilmedi.
 
 Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki işler öneridir; kimseye onayı olmadan rol atanmadı.
 
@@ -68,6 +68,40 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Sınır: Gerçek emir, hesap veya API anahtarı yok. 5.3 ve 5.4'ün canlı kısımları ağ erişimi olan bir ekip bilgisayarında çalıştırılacak.
 - Ayrıntı: `docs/gorev5-gelistirmeler.md`.
 
+## Görev 6 — Yapay sinir ağı ve ödül sistemi araştırması
+
+- Sorumlu: @fahrettin2001-cloud ve bu sohbetteki ajan.
+- Durum: Planlandı; takip [#29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29).
+- Kapsam: Sentetik veriyle küçük sinir ağı deneyi; daha sonra geçmiş verilerde ayrı değerlendirme; sanal sonuçlardan maliyet ve riski gözeten ödül kaydı tasarımı.
+- Sınır: Jev'in modeli yeniden eğitilmez; çalışan Hostinger botuna bağlanmaz ve emir verilmez. Bağımsız risk sistemi korunur.
+- Bitti ölçütü ve iş sırası: [Görev 6 tasarımı](docs/GOREV6-SINIR-AGI-ODUL.md). PR #27 ayrı bir gölge ölçüm taslağıdır; sinir ağı değildir.
+
+## Görev 7 — Ajan kurulu (TradingAgents, gölge mod)
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: İncelemede — kod ve testler hazır, sunucuya kurulmadı.
+- Kapsam: TradingAgents v0.7.1 çok ajanlı analizi her gün BTCUSDT/ETHUSDT için çalıştırılır; notlar karar günlüğüne yazılır ve 5 günlük isabetle ölçülür. Duygu analisti isteğe bağlı olarak Jev kullanır.
+- Sınır: Emir yok; sanal portföy, canlı bot ve risk katmanı değişmez. API anahtarı yalnızca sunucudaki `/etc/jev/ajan.env` dosyasında durur.
+- Bekleyen: model sağlayıcısı ve API anahtarı seçimi, Hostinger'da `deploy/install-ajan.sh`. Ayrıntı: `docs/AJAN-KURULU.md`.
+
+## Görev 8 — Bedava duygu endeksi
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: Tamamlandı — geçmiş testinde filtre trendi iyileştirmedi (test Sharpe 1,01 → 1,00); stratejiye eklenmedi, endeks yalnızca bilgi amaçlı kaydedilir.
+- Kapsam: Korku/Açgözlülük Endeksi (alternative.me), Binance fonlama ve long/short oranı; anahtarsız ve model çağrısı yok. Trend topluluğuna filtre olarak eğitim/test ayrımıyla geçmiş testi; günlük kayıt.
+- Sınır: Emir yok. Filtre, geçmiş testi ve gölge izlemeden sonra ayrı PR ile stratejiye eklenir. Ayrıntı: `docs/DUYGU-ENDEKSI.md`.
+
+## Görev 9 — Trend topluluğu: ikinci sanal hesap
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: Tamamlandı (kod); sunucuya kurulum bekliyor.
+- Kapsam: Günlük mumlarla 4 kurallı yavaş trend topluluğu (`TrendTopluluk`); 500 USDT, temkinli limitler; mevcut SMA 24/96 bot kıyas için çalışmaya devam eder.
+- Kanıt: kurallar için hiç görülmemiş 2018–2023 döneminde Sharpe 1,10; 2018–2026 en büyük düşüş −%49 (al-tut −%84). Canlı ayarla 2024-11 → 2026-10 simülasyonu: +%25,8, düşüş −%15,2, 0 red.
+- Sınır: Sanal para, emir yok. Ayrıntı: `docs/TREND-SANAL-HESAP.md`.
+
+## Görev 10 — Geniş tarama (çok coin, ABD ETF ve hisse)
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: Tamamlandı (araştırma).
+- Sonuç: 26 coine yayılmak ve "en iyi K" BTC+ETH trendinden kötü. ETF trendi getiriyi değil düşüşü azaltıyor; BTC+ETH trendiyle %50/%50 karışım düşüşü yaklaşık yarıya indirip Sharpe'ı korudu. Ayrıntı: `docs/GENIS-TARAMA.md`.
+- Önerilen sonraki adım: %50 BTC+ETH trend + %50 ETF trend için üçüncü sanal hesap (ekip kararı).
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
@@ -104,3 +138,61 @@ API anahtarı, şifre, hesap bilgisi ve .env gibi gizli dosyaları GitHub'a veya
 - Mevcut SQLite/risk katmanı kullanılır; her işlemde risk dosyası açıkça seçilir.
 - 60 test geçti (52 mevcut, 8 CLI süreç testi). Kullanım: `docs/CLI.md`.
 - Açık PR #3'teki farklı kalıcılık yaklaşımı birleştirilmedi veya kapatılmadı.
+
+## Yeni hazırlıklar — inceleme dalları
+
+- `fix/kalici-risk-politikasi` / PR #10: Fahrettin'in yeniden açılış talebi
+  incelendi; politikasız açılışta limitlerin kaybolduğu doğrulandı. Kalıcı,
+  sürümlü politika ve politikasız işlem reddi uygulandı. Rapor:
+  `docs/RISK-KALICILIK-INCELEMESI.md`.
+- `feat/gelistirme-altyapisi`: PR #10 üzerine kurulu; şifreli yedek/geri yükleme,
+  günlük gerçekleşen zarar ve tüm pozisyonların değer sınırı, rapor, yerel
+  görüntüleme paneli, salt okunur Binance Global adaptörü ve GitHub Actions.
+- Yerel ve temiz sanal ortamda ilk 79 test geçti; uyumsuz şema korumasıyla güncel yerel toplam 80 testtir. CLI yedek/geri yükleme ve Chromium
+  panel kontrolü de geçti. Ayrıntılı kullanım ve dış erişim bekleyen işler:
+  `docs/GELISTIRME-DURUMU.md`. Ana dala birleşmiş sayılmamalıdır.
+- Halka açık veri için kullanıcı Binance Global'i seçti; fiyat sorgusu ortamın
+  ağ politikasında engelli. Alan adı gereksinimi taslağa kaydedildi, yayımlanmadı.
+- Jev/Hermes sağlayıcısı, haber kaynağı, Hostinger hedefi ve ayrı yedek depolama
+  seçimi bekleniyor. Gerçek emir bağlantısı uygulanmadı.
+
+## Görev 2 / PR #11 inceleme düzeltmeleri — 14 Kasım 2026
+
+- Sorumlu: @babakok-prog. Durum: PR #11 güncellendi; ana dala birleşmedi.
+- PR #16 zaten #11 dalında; #14'ün risk sürümü koruması ile güncel main alındı.
+- Eski kayıtlardaki günlük zarar kalıcı alış kilidi ve değer kazanan pozisyonun
+  tutar sınırı yüzünden satılamaması düzeltildi; UTC/yeniden açma testleri eklendi.
+- Backtest günlük kayıp ve zamanlı fiyat verilerini genişletilmiş risk katmanına
+  geçiriyor; next_bar için diğer sembollerin gelecek kapanışını kullanmıyor.
+- 235 test geçti. GitHub CI sonucu PR #11 üzerinden kontrol edilmeli. Ayrıntı:
+  `docs/GELISTIRME-DURUMU.md`. Hostinger botuna dağıtım yapılmadı.
+
+## Görev 2 kurtarma doğrulaması — 14 Kasım 2026
+
+PR #11'de geçici şifresiz yedek dosyaları kaldırıldı; Windows özel DACL eklendi.
+240 yerel test çalıştı (1 Windows testi yerelde atlandı), hata yok. Ayrı hesapla
+kurtarma betiği yerelde geçti. Windows CI ve PR #11'in birleşmesi kontrol edilecek.
+Hostinger doğrulaması erişim bekliyor; çalışan sanal bot değiştirilmedi.
+
+## PR #11 tamamlandı — 14 Kasım 2026
+
+PR #11 ana dala birleşti (34b1e2e). Eski zarar/satış sınırı düzeltmeleri,
+backtest uyumu, şifreli bellek yedeği ve Windows DACL koruması ana daldadır.
+Son CI'da Python 3.10, 3.12, 3.13 ve Windows yedek/izin kontrolleri başarılı:
+https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/actions/runs/43545932280
+Yerelde 240 test çalıştı; Windows'a özel 1 test atlandı, başarısız test yok.
+Ayrı hesapta kurtarma betiği başarılı. Hostinger erişimi henüz sağlanmadığı için
+sunucuda geri yükleme/dağıtım yapılmadı. Önceki açık PR #11 notları tarihseldir.
+
+## Canlı sanal hesap için günlük şifreli yedek — 15 Kasım 2026
+
+- Sorumlu: @babakok-prog. Dal: `feat/canli-sifreli-yedek`.
+- SQLite'tan ayrı olan durum.pkl/CSV/ayar klasörü, canlı botla aynı flock kilidi
+  kullanılarak şifreli yedeklenir. Geri yükleme sadece yeni klasöre yapılır.
+- Günlük systemd görevi 00:20 UTC / 03.20 TR için hazır. İlk başarılı yedekten
+  sonra timer açılır. Sunucu kurulum çıktısı henüz doğrulanmadı.
+- 248 test çalıştı, 1 Windows testi Linux'ta atlandı; hata yok. Gerçek sentetik
+  bot durumunun aynı sonuçla sürmesi ayrıca doğrulandı. Açıklama:
+  `docs/CANLI-HESAP-YEDEKLEME.md`.
+- İlk hedef aynı sunucudur; ikinci depolama ve anahtarın ayrı güvenli kopyası
+  kurulmuş sayılmaz. Kaynaklar/önceki yedekler otomatik silinmez.

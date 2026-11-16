@@ -1,0 +1,17 @@
+[Unit]
+Description=Jev canli sanal hesap klasorunu sifreli yedekle
+
+[Service]
+Type=oneshot
+User=jev
+Group=jev
+WorkingDirectory=/opt/jev/app
+ExecStart=/opt/jev/backup-venv/bin/python -m jev.live_backup backup --dir /var/lib/jev/canli --destination-dir /var/lib/jev/backups --key-file /var/lib/jev/backup-keys/live.jevkey
+TimeoutStartSec=180
+Restart=on-failure
+RestartSec=5min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/jev/canli/.kilit /var/lib/jev/backups

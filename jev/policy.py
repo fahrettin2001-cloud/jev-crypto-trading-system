@@ -11,6 +11,8 @@ def policy_dict(risk):
         raise ValueError('RiskLimits gerekli')
     return {
         'max_trade_notional': _number(risk.max_trade_notional),
+        'max_daily_realized_loss': _number(risk.max_daily_realized_loss),
+        'max_total_position_notional': _number(risk.max_total_position_notional),
         'min_cash_reserve': _number(risk.min_cash_reserve),
         'max_position_notional': _number(risk.max_position_notional),
         'allowed_symbols': sorted(risk.allowed_symbols) if risk.allowed_symbols is not None else None,
@@ -26,7 +28,8 @@ def _number(value):
 
 def parse_policy(data):
     names = {'max_trade_notional', 'min_cash_reserve', 'max_position_notional',
-             'allowed_symbols', 'max_price_age_seconds'}
+             'allowed_symbols', 'max_price_age_seconds', 'max_daily_realized_loss',
+             'max_total_position_notional'}
     if not isinstance(data, dict) or data.keys() - names:
         raise ValueError('Risk politikası desteklenen alanlardan oluşan JSON nesnesi olmalı')
     data = dict(data)
@@ -55,6 +58,8 @@ def encode_policy(risk):
 def decode_policy(text):
     data = json.loads(text, parse_float=Decimal)
     # Saklanan politikada eksik alanlar bozulma olarak kabul edilir.
-    if not isinstance(data, dict) or data.keys() != policy_dict(RiskLimits()).keys():
+    expected = policy_dict(RiskLimits()).keys()
+    old = expected - {'max_daily_realized_loss', 'max_total_position_notional'}
+    if not isinstance(data, dict) or data.keys() not in (expected, old):
         raise ValueError('Eksik veya desteklenmeyen kayıtlı risk politikası')
     return parse_policy(data)
