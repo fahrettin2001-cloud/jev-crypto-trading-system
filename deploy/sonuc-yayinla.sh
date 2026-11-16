@@ -43,6 +43,18 @@ if [ -f "$AJAN_DIR/ajan_kararlar.jsonl" ]; then
     find "$AJAN_DIR/raporlar" -name '*.md' -mtime -14 -exec cp -p {} son/ajan/raporlar/ \; 2>/dev/null || true
     find son/ajan/raporlar -name '*.md' -mtime +14 -delete 2>/dev/null || true
 fi
+# Trend topluluğu (ikinci sanal hesap, günlük mum) — kuruluysa.
+TREND_DIR=${TREND_DIR:-/var/lib/jev/trend}
+if [ -f "$TREND_DIR/durum.pkl" ]; then
+    mkdir -p son/trend
+    for f in islemler.csv kararlar.jsonl varlik_egrisi.csv redler.csv ayarlar.json; do
+        if [ -f "$TREND_DIR/$f" ]; then cp "$TREND_DIR/$f" son/trend/; fi
+    done
+    if [ -f "$TREND_DIR/gunluk.log" ]; then tail -n 200 "$TREND_DIR/gunluk.log" > son/trend/gunluk-son.log; fi
+    (cd "$APP_DIR" && "$PYTHON" -m jev.live status --dir "$TREND_DIR" --horizon 5) > son/trend/durum.txt 2>&1 || true
+    echo "trend_zamanlayici: $(systemctl is-active jev-trend.timer 2>/dev/null || echo bilinmiyor)" > son/trend/sunucu.txt
+fi
+
 # Duygu endeksi (bedava; Korku/Açgözlülük + Binance fonlama/long-short) — kuruluysa.
 DUYGU_DIR=${DUYGU_DIR:-/var/lib/jev/duygu}
 if [ -f "$DUYGU_DIR/duygu_kayit.jsonl" ]; then
@@ -74,6 +86,7 @@ https://github.com/fahrettin2001-cloud/jev-crypto-trading-system (`jev.live`).
 - `son/golge.txt`, `son/golge.jsonl`, `son/golge_sonuclar.csv` — Jev gölge modu
   (işlemleri etkilemeyen olasılık tahminleri ve isabeti)
 - `son/ajan/` — TradingAgents ajan kurulu (gölge mod): `ozet.md`, kararlar, raporlar
+- `son/trend/` — ikinci sanal hesap: trend topluluğu (günlük mum); `durum.txt`, işlemler
 - `son/duygu/` — duygu endeksi (Korku/Açgözlülük, fonlama, long/short) ve geçmiş testi
 EOF
 fi

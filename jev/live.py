@@ -49,7 +49,7 @@ from .journal import (DecisionJournal, calibration, evaluate, format_calibration
 from .klines import Candle, bars_from_series
 from .risk import RiskLimits
 from .sizing import VolatilityTargetSizer
-from .strategy import BuyAndHold, Combined, SmaCross
+from .strategy import BuyAndHold, Combined, SmaCross, TrendTopluluk
 
 KLINES_URL = "https://data-api.binance.vision/api/v3/klines"
 INTERVALS = {"1m": 1, "5m": 5, "15m": 15, "30m": 30, "1h": 60, "4h": 240, "1d": 1440}
@@ -209,6 +209,14 @@ def build_strategy(settings: dict):
         if settings["strategy"] == "al-tut":
             parts.append(BuyAndHold(symbol, Decimal(settings["fraction"]) / len(settings["symbols"])))
             continue
+        if settings["strategy"] == "trend":
+            # fraction: trend tam açıkken toplam varlığın yatırılacak oranı (coinlere eşit bölünür)
+            parts.append(TrendTopluluk(symbol, Decimal(settings["fraction"]) / len(settings["symbols"]),
+                                       rebalance=settings.get("rebalance") or "0.1",
+                                       max_quote=settings.get("max_trade_notional"),
+                                       max_position=settings.get("max_position_notional"),
+                                       min_cash=settings.get("min_cash_reserve")))
+            continue
         sizer = None
         if settings.get("vol_target"):
             sizer = VolatilityTargetSizer(settings["vol_target"], settings["vol_window"],
@@ -238,6 +246,8 @@ def build_config(settings: dict) -> BacktestConfig:
 def warmup_bars_needed(settings: dict) -> int:
     if settings["strategy"] == "al-tut":
         return 0
+    if settings["strategy"] == "trend":
+        return 100                      # SMA100 için
     return max(settings["slow"] + 1,
                (settings.get("vol_window") or 0) + 1 if settings.get("vol_target") else 0)
 
@@ -389,7 +399,13 @@ def status(directory: Path, horizon: int = 24) -> str:
              f"Eski veri yüzünden işlemsiz geçen bar: {state.skipped_stale}",
              f"Açık pozisyonlar   : " + (", ".join(f"{s} {p.quantity}" for s, p in
                                                      sim.portfolio.positions.items()) or "yok"),
-             f"Nakit              : {sim.portfolio.cash:.2f} {sim.config.quote}", ""]
+             f"Nakit              : {sim.portfolio.cash:.2f} {sim.config.quote}"]
+    parts = getattr(sim.strategy, "strategies", [sim.strategy])
+    weights = [f"{p.symbol} {p.weight * 4:.0f}/4" for p in parts if hasattr(p, "weight")]
+    if weights:
+        lines.append("Trend ağırlıkları  : " + ", ".join(weights)
+                     + " (4/4 = coin için ayrılan payın tamamı yatırımda)")
+    lines.append("")
     if sim.equity_curve:
         lines.append(format_report(sim.result()))
         decisions = [d for d in sim.decisions() if d.status != "bekliyor"]
@@ -448,7 +464,10 @@ def main(argv=None) -> None:
                        help="Kesinti sonrası en fazla kaç mum geriye bakılsın")
     p_init.add_argument("--symbols", nargs="+", default=["BTCUSDT", "ETHUSDT"])
     p_init.add_argument("--interval", default="1h", choices=sorted(INTERVALS))
-    p_init.add_argument("--strategy", choices=("sma", "al-tut"), default="sma")
+    p_init.add_argument("--strategy", choices=("sma", "al-tut", "trend"), default="sma",
+                        help="trend: günlük mumlarla 4 kurallı yavaş trend topluluğu (--interval 1d)")
+    p_init.add_argument("--rebalance", default="0.1",
+                        help="trend: hedeften sapma, payın bu oranını aşınca düzelt")
     p_init.add_argument("--fast", type=int, default=24)
     p_init.add_argument("--slow", type=int, default=96)
     p_init.add_argument("--fraction", default="0.95")
@@ -477,7 +496,7 @@ def main(argv=None) -> None:
                 "symbols", "interval", "strategy", "fast", "slow", "fraction", "vol_target",
                 "vol_window", "stop_loss_pct", "take_profit_pct", "cash", "taker_rate",
                 "slippage_bps", "max_volume_share", "rules", "max_trade_notional",
-                "max_position_notional", "min_cash_reserve", "max_lag_bars")}
+                "max_position_notional", "min_cash_reserve", "max_lag_bars", "rebalance")}
             init(args.dir, settings)
             print(status(args.dir))
         elif args.command == "run":
