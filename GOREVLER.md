@@ -85,7 +85,7 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 
 ## Görev 8 — Bedava duygu endeksi
 
-- Sorumlu: @demirfahrieren-png (ajanla). Durum: İncelemede — kod ve testler hazır; geçmiş testi sunucuda çalıştırılacak.
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: Tamamlandı — geçmiş testinde filtre trendi iyileştirmedi (test Sharpe 1,01 → 1,00); stratejiye eklenmedi, endeks yalnızca bilgi amaçlı kaydedilir.
 - Kapsam: Korku/Açgözlülük Endeksi (alternative.me), Binance fonlama ve long/short oranı; anahtarsız ve model çağrısı yok. Trend topluluğuna filtre olarak eğitim/test ayrımıyla geçmiş testi; günlük kayıt.
 - Sınır: Emir yok. Filtre, geçmiş testi ve gölge izlemeden sonra ayrı PR ile stratejiye eklenir. Ayrıntı: `docs/DUYGU-ENDEKSI.md`.
 

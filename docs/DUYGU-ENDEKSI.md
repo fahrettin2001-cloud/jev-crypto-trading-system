@@ -1,6 +1,6 @@
 # Duygu endeksi — bedava piyasa duygusu ölçümü
 
-Durum: Kod ve testler hazır (16 Kasım 2026). Geçmiş testi sunucuda çalıştırılacak; sonucuna göre filtre olarak kullanılıp kullanılmayacağına karar verilecek.
+Durum: Geçmiş testi 16 Kasım 2026'da sunucuda çalıştırıldı. **Sonuç: duygu filtresi stratejiye eklenmiyor.** Endeks yalnızca bilgi amaçlı günlük kaydediliyor.
 
 ## Neden?
 
@@ -29,13 +29,26 @@ Bu göstergeler tek başına kâr sinyali değildir. Genelde ters yönlü ve yal
 - Rapor, bütün ızgaranın test sonuçlarını da gösterir. Filtrelerin çoğu test döneminde trendi geçemiyorsa, seçilen filtrenin başarısı tesadüf sayılır.
 - Kıyas: eşit ağırlıklı al-tut ve filtresiz trend topluluğu.
 
+## Geçmiş testi sonucu — 16 Kasım 2026
+
+Veri: 2018-02 → 2026-11-15, BTCUSDT+ETHUSDT. Fonlama verisi BTC için 2019-09-10'dan, ETH için 2019-11-27'den başlıyor.
+
+| Test dönemi (2024-01 → 2026-11) | Toplam | Yıllık | En büyük düşüş | Sharpe |
+|---|---|---|---|---|
+| Al-tut | +%17,5 | +%5,8 | −%59,9 | 0,37 |
+| Trend topluluğu | +%122,5 | +%32,1 | −%31,6 | 1,01 |
+| Trend + eğitimde seçilen filtre (korku≤20 → en az %50) | +%129,3 | +%33,4 | −%33,3 | 1,00 |
+
+- Eğitimde seçilen filtre, test döneminde Sharpe'ı iyileştirmedi (1,01 → 1,00) ve düşüşü büyüttü. 19 filtrenin 10'u trendi geçti; bu yazı-tura düzeyinde, gerçek bir etki yok. Fonlama ve açgözlülük filtreleri eğitimde de trendden kötüydü.
+- **Yan bulgu:** Trend topluluğunun kuralları 2024-11 → 2026-10 verisine bakılarak seçilmişti. 2018–2023 eğitim dönemi bu kurallar için hiç görülmemiş veri sayılır ve orada Sharpe **1,10** çıktı. 2018–2026 tüm dönemde trend Sharpe 1,07 ve en büyük düşüş −%49; al-tutta bunlar 0,59 ve −%84. Bu sonuç, trend topluluğunun canlı sanal hesapta denenmesine dayanak oldu.
+
 ## Kurulum (sunucu, root)
 
 ```bash
 cd /opt/jev/app && sudo -u jev git pull && bash deploy/install-duygu.sh
 ```
 
-Betik geçmiş veriyi indirir, geçmiş testini `/var/lib/jev/duygu/gecmis_testi.md` dosyasına yazar ve günlük kaydı açar (`jev-duygu.timer`, 00:15 UTC). Yalnızca standart kütüphane kullanılır; ek paket, anahtar ya da ücret gerekmez. Sonuçlar `jev-sonuc` ile sonuç deposunun `son/duygu/` klasörüne yayınlanır.
+Bilgi amaçlı günlük kayıt içindir. Betik geçmiş veriyi indirir, geçmiş testini `/var/lib/jev/duygu/gecmis_testi.md` dosyasına yazar ve günlük kaydı açar (`jev-duygu.timer`, 00:15 UTC). Yalnızca standart kütüphane kullanılır; ek paket, anahtar ya da ücret gerekmez. Sonuçlar `jev-sonuc` ile sonuç deposunun `son/duygu/` klasörüne yayınlanır.
 
 Komutlar: `python -m jev.duygu indir | test | gunluk --dir <klasör>`.
 
