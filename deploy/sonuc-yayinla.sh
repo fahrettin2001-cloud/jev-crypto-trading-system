@@ -31,6 +31,18 @@ fi
 (cd "$APP_DIR" && "$PYTHON" -m jev.live status --dir "$STATE_DIR") > son/durum.txt 2>&1 || true
 (cd "$APP_DIR" && "$PYTHON" -m jev.live golge --dir "$STATE_DIR" --csv "$OUT_DIR/son/golge_sonuclar.csv") \
     > son/golge.txt 2>&1 || true
+
+# Ajan kurulu (TradingAgents, gölge mod) çıktıları — kuruluysa. Gizli bilgi içermez.
+AJAN_DIR=${AJAN_DIR:-/var/lib/jev/ajan}
+if [ -f "$AJAN_DIR/ajan_kararlar.jsonl" ]; then
+    mkdir -p son/ajan/raporlar
+    cp "$AJAN_DIR/ajan_kararlar.jsonl" son/ajan/
+    [ -f "$AJAN_DIR/ozet.md" ] && cp "$AJAN_DIR/ozet.md" son/ajan/
+    [ -f "$AJAN_DIR/gunluk.log" ] && tail -n 200 "$AJAN_DIR/gunluk.log" > son/ajan/gunluk-son.log
+    # Son 14 günün raporları
+    find "$AJAN_DIR/raporlar" -name '*.md' -mtime -14 -exec cp -p {} son/ajan/raporlar/ \; 2>/dev/null || true
+    find son/ajan/raporlar -name '*.md' -mtime +14 -delete 2>/dev/null || true
+fi
 {
     echo "yayin_zamani_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     echo "kod_surumu: $(git -C "$APP_DIR" rev-parse --short HEAD 2>/dev/null || echo bilinmiyor)"
@@ -53,6 +65,7 @@ https://github.com/fahrettin2001-cloud/jev-crypto-trading-system (`jev.live`).
 - `son/sunucu.txt` — yayın zamanı, kod sürümü, zamanlayıcı ve durdurma durumu
 - `son/golge.txt`, `son/golge.jsonl`, `son/golge_sonuclar.csv` — Jev gölge modu
   (işlemleri etkilemeyen olasılık tahminleri ve isabeti)
+- `son/ajan/` — TradingAgents ajan kurulu (gölge mod): `ozet.md`, kararlar, raporlar
 EOF
 fi
 

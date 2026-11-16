@@ -1,0 +1,26 @@
+[Unit]
+Description=Jev ajan kurulu (TradingAgents) - GOLGE mod, gunluk analiz, emir yok
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=jev
+Group=jev
+WorkingDirectory=/opt/jev/app
+# API anahtarlari yalnizca root okunur dosyalarda (systemd okur). Ornek: deploy/ajan.env.example
+EnvironmentFile=/etc/jev/ajan.env
+# Varsa Jev golge modunun TypeSafe anahtari: duygu analisti gonderileri Jev ile eler
+EnvironmentFile=-/etc/jev/typesafe.env
+Environment=HOME=/var/lib/jev/ajan/ev
+Environment=TRADINGAGENTS_RESULTS_DIR=/var/lib/jev/ajan/ta/sonuclar
+Environment=TRADINGAGENTS_CACHE_DIR=/var/lib/jev/ajan/ta/onbellek
+Environment=TRADINGAGENTS_MEMORY_LOG_PATH=/var/lib/jev/ajan/ta/hafiza/trading_memory.md
+ExecStart=/opt/jev/ajan-venv/bin/python -m jev.ajan_kurulu calistir --dir /var/lib/jev/ajan --symbols BTCUSDT ETHUSDT
+# Bir calisma (2 coin) LLM cagrilariyla uzun surebilir
+TimeoutStartSec=3600
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/jev/ajan

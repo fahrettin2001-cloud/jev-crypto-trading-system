@@ -12,6 +12,10 @@ Hedef, kripto piyasası verileri ve haberlerini değerlendiren; Jev, güçlü bi
 
 13 Kasım 2026: GitHub ekipçe gözden geçirilmiş kod ve notların ortak kaynağıdır. Obsidian depo kopyası proje sahibi istediğinde, yerel değişiklikler korunarak elle güncellenecek. Proje sahibi, Windows'taki 23.00 görevini devre dışı bıraktığını bildirdi; bu ajan cihazda bağımsız olarak doğrulayamadı. Manuel güncelleme SQLite için ayrı şifreli yedeğin yerini tutmaz; herkese açık depoya hassas bilgi gönderilmez. Ayrıntı: `YEDEKLEME-KURALLARI.md`.
 
+## Görev 7 — Ajan kurulu (16 Kasım 2026)
+
+TradingAgents (Tauric Research, Apache-2.0, v0.7.1) gölge modda projeye bağlandı: `jev/ajan_kurulu.py`, `deploy/jev-ajan.*`, `deploy/install-ajan.sh`, `docs/AJAN-KURULU.md`. Günlük not → BUY/HOLD/SELL karar kaydı; emir yok. 11 yeni test sahte ajanla geçti. Gerçek TradingAgents bu ortamda çalıştırılmadı (ağ ve paket kurulumu kapalı); sunucudaki ilk çalışma doğrulanmalı.
+
 ## Yeni görev — sinir ağı ve ödül araştırması
 
 Proje sahibinin isteğiyle [Görev 6 / #29](https://github.com/fahrettin2001-cloud/jev-crypto-trading-system/issues/29) açıldı. Sentetik verilerle ayrı bir küçük ağ deneyi ve risk/maliyet duyarlı ödül kaydı planlanıyor; bunlar henüz uygulanmadı. Ayrıntılar: `docs/GOREV6-SINIR-AGI-ODUL.md`. Çalışan Hostinger sanal botuna entegrasyon bu aşamada kapsam dışıdır.
