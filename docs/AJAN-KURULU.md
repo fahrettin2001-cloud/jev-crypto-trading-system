@@ -6,7 +6,7 @@ Durum: Kod ve testler hazır (16 Kasım 2026). Sunucuya kurulmadı; bir model AP
 
 [TradingAgents](https://github.com/TauricResearch/TradingAgents) (Tauric Research, Apache-2.0, sabitlenen sürüm v0.7.1 / `9fa1196`) bir yatırım şirketini taklit eden çok ajanlı bir LLM sistemidir. Her gün BTCUSDT ve ETHUSDT için şu ajanlar çalışır:
 
-1. **Analistler** (aynı anda): piyasa/teknik, duygu (Reddit, StockTwits; sunucuda Jev gölge modunun anahtarı `/etc/jev/typesafe.env` varsa gönderiler **Jev** ile elenir), haber.
+1. **Analistler** (aynı anda): piyasa/teknik ve haber. Haber analisti `FRED_API_KEY` varsa makro verileri (faiz, enflasyon) da kullanır. Duygu analisti (Reddit, StockTwits; `/etc/jev/typesafe.env` varsa gönderiler **Jev** ile elenir) varsayılan olarak kapalı, çünkü bu siteler Hostinger'ın veri merkezi IP'sinden 403 veriyor. Açmak için servis satırına `--analysts market news social` yazılır.
 2. **Boğa ve ayı araştırmacıları** tartışır; araştırma yöneticisi bir plan yazar.
 3. **Trader** öneri verir; **risk ekibi** (agresif, nötr, temkinli) tartışır.
 4. **Portföy yöneticisi** son notu verir: Buy / Overweight / Hold / Underweight / Sell.
@@ -27,7 +27,7 @@ Karar gününün kapanışından **5 gün sonraki** kapanışa bakılır. Fiyat 
 
 ## Maliyet
 
-Bir coin için tek çalışma onlarca LLM çağrısı yapar. Ekip kararıyla (16 Kasım 2026) iki katman da `claude-sonnet-5-5` (Anthropic); tartışma turu 1. Sonnet 5.5 TradingAgents v0.7.1'in model listesinde olmadığından günlükte "unknown model" uyarısı görünür, çalışmayı etkilemez. Maliyet düşürmek gerekirse hızlı katman `claude-haiku-4-5` yapılabilir. Günde 2 coin çalışır. İlk birkaç günün faturasını sağlayıcı panelinden kontrol edin ve gerekirse sağlayıcıda harcama sınırı koyun.
+Bir coin için tek çalışma onlarca LLM çağrısı yapar. İlk gece Sonnet 5.5 ile (2 coin, 3 analist) yaklaşık 1,66 USD tuttu. Bu yüzden 16 Kasım 2026'dan itibaren düşük maliyet ayarı kullanılıyor: iki katman da `claude-haiku-5-5`, tartışma turu 1, analist başına en fazla 8 veri çekme turu (`TRADINGAGENTS_MAX_TOOL_ROUNDS=8`), duygu analisti kapalı. Haiku 5.5 TradingAgents v0.7.1 listesinde olmadığı için günlükte "unknown model" uyarısı görünür, çalışmayı etkilemez. Kaliteyi artırmak için önce derin katman (yöneticiler) `claude-sonnet-5-5` yapılabilir.
 
 ## Sunucuya kurulum (root)
 
