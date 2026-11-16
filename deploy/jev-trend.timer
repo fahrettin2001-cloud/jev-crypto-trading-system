@@ -1,0 +1,11 @@
+[Unit]
+Description=Jev trend toplulugu - her gun 00:05 UTC (03:05 TR), gunluk mum kapandiktan sonra; 06:05'te yedek deneme
+
+[Timer]
+OnCalendar=*-*-* 00:05:00 UTC
+OnCalendar=*-*-* 06:05:00 UTC
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target

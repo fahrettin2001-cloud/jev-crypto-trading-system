@@ -315,3 +315,100 @@ class Combined:
         for s in self.strategies:
             out.extend(s.on_bar(bar, view) or [])
         return out
+
+
+class TrendRules:
+    """Yavaş trend topluluğunun 4 kuralı; her kapanışta 0, ¼, ½, ¾ ya da 1 ağırlık verir.
+
+    Kurallar: SMA10 > SMA40; SMA20 > SMA100 (±%1 bant); fiyat > SMA50;
+    fiyat > SMA100 (±%2 bant). Bant içinde kalınırsa önceki durum korunur.
+    SMA100 için 100 kapanış birikene kadar ağırlık 0'dır. Yalnızca o ana kadarki
+    kapanışları kullanır. `jev.duygu.trend_weights` ile aynı sonucu verir."""
+
+    def __init__(self):
+        self._prices: deque[Decimal] = deque(maxlen=100)
+        self._states = [Decimal("0")] * 4
+
+    def update(self, price: Decimal) -> Decimal:
+        self._prices.append(D(price))
+        p = list(self._prices)
+        n = len(p)
+
+        def sma(k):
+            return sum(p[-k:], Decimal("0")) / k if n >= k else None
+
+        s10, s40, s20, s100, s50 = sma(10), sma(40), sma(20), sma(100), sma(50)
+        one, zero, st = Decimal("1"), Decimal("0"), self._states
+        price = p[-1]
+        if s40 is not None:
+            st[0] = one if s10 > s40 else zero
+        if s100 is not None:
+            if s20 > s100 * Decimal("1.01"):
+                st[1] = one
+            elif s20 < s100 * Decimal("0.99"):
+                st[1] = zero
+            if price > s100 * Decimal("1.02"):
+                st[3] = one
+            elif price < s100 * Decimal("0.98"):
+                st[3] = zero
+        if s50 is not None:
+            st[2] = one if price > s50 else zero
+        return sum(st, zero) / 4 if s100 is not None else zero
+
+
+class TrendTopluluk:
+    """Günlük mumlarla yavaş trend topluluğu (16 Kasım 2026 araştırması).
+
+    Hedef: sembol için ayrılan pay (`sleeve`, toplam varlığın oranı) × kural
+    ağırlığı. Mevcut pozisyon değeri hedeften payın `rebalance` katından fazla
+    saparsa fark kadar alır ya da satar; ağırlık 0'a düşerse tamamını satar.
+    `max_quote` verilirse tek alış o tutarla sınırlanır; eksik kalan kısım sonraki
+    günlerde tamamlanır (risk limitindeki işlem başına tutarla aynı verilmeli).
+    `max_position` ve `min_cash` risk limitlerindeki coin başına azami pozisyon ve
+    nakit rezerviyle aynı verilirse hedef bunlara göre kırpılır; böylece öneriler
+    her gün reddedilmez."""
+
+    def __init__(self, symbol: str, sleeve="0.3", rebalance="0.1", max_quote=None,
+                 max_position=None, min_cash=None):
+        self.symbol = symbol
+        self.sleeve = _fraction(sleeve)
+        self.rebalance = _fraction(rebalance)
+        self.max_quote = D(max_quote) if max_quote is not None else None
+        if self.max_quote is not None and (not self.max_quote.is_finite() or self.max_quote <= 0):
+            raise ValueError("max_quote pozitif olmalı")
+        self.max_position = D(max_position) if max_position is not None else None
+        self.min_cash = D(min_cash) if min_cash is not None else Decimal("0")
+        self.rules = TrendRules()
+        self.weight = Decimal("0")
+        self.name = f"trend-topluluk({symbol},pay %{self.sleeve * 100})"
+
+    def on_bar(self, bar, view):
+        price = bar.prices.get(self.symbol)
+        if price is None:
+            return []
+        self.weight = w = self.rules.update(price)
+        held = view.quantity(self.symbol)
+        sleeve_value = view.equity * self.sleeve
+        target = sleeve_value * w
+        if self.max_position is not None:
+            target = min(target, self.max_position * Decimal("0.99"))   # fiyat oynasa da sınırda kal
+        current = held * price
+        why = f"trend ağırlığı {w * 4:.0f}/4 → hedef {target:.2f} USDT, mevcut {current:.2f}"
+        if w == 0:
+            if held > 0:
+                return [OrderIntent(self.symbol, SELL, quantity="ALL", reason=why + "; trend kapandı")]
+            return []
+        gap = target - current
+        if abs(gap) < sleeve_value * self.rebalance:
+            return []
+        if gap > 0:
+            amount = min(gap, view.cash - self.min_cash)
+            if self.max_quote is not None:
+                amount = min(amount, self.max_quote)
+            if amount <= 0:
+                return []
+            return [OrderIntent(self.symbol, BUY, quote_amount=amount, reason=why)]
+        qty = min(-gap / price, held)
+        if qty <= 0:
+            return []
+        return [OrderIntent(self.symbol, SELL, quantity=qty, reason=why)]

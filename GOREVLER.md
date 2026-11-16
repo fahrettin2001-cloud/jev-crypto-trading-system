@@ -89,6 +89,13 @@ Ekip: @fahrettin2001-cloud, @demirfahrieren-png, @babakok-prog. Aşağıdaki iş
 - Kapsam: Korku/Açgözlülük Endeksi (alternative.me), Binance fonlama ve long/short oranı; anahtarsız ve model çağrısı yok. Trend topluluğuna filtre olarak eğitim/test ayrımıyla geçmiş testi; günlük kayıt.
 - Sınır: Emir yok. Filtre, geçmiş testi ve gölge izlemeden sonra ayrı PR ile stratejiye eklenir. Ayrıntı: `docs/DUYGU-ENDEKSI.md`.
 
+## Görev 9 — Trend topluluğu: ikinci sanal hesap
+
+- Sorumlu: @demirfahrieren-png (ajanla). Durum: Tamamlandı (kod); sunucuya kurulum bekliyor.
+- Kapsam: Günlük mumlarla 4 kurallı yavaş trend topluluğu (`TrendTopluluk`); 500 USDT, temkinli limitler; mevcut SMA 24/96 bot kıyas için çalışmaya devam eder.
+- Kanıt: kurallar için hiç görülmemiş 2018–2023 döneminde Sharpe 1,10; 2018–2026 en büyük düşüş −%49 (al-tut −%84). Canlı ayarla 2024-11 → 2026-10 simülasyonu: +%25,8, düşüş −%15,2, 0 red.
+- Sınır: Sanal para, emir yok. Ayrıntı: `docs/TREND-SANAL-HESAP.md`.
+
 ## İleriki aşamalar — Henüz başlanmadı
 
 - [ ] Binance Global (seçildi, [karar kaydı](docs/kararlar/2026-11-13-binance-global.md)) için yalnızca halka açık piyasa verisi ve işlem kuralları (`exchangeInfo`).
