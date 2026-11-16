@@ -220,34 +220,61 @@ class Universe:
         if v.kind == "genislik":
             on = sum(1 for s in active if w[s] > 0) / len(active)
             return {s: (w[s] / len(active) if on >= v.breadth else 0.0) for s in active}
-        cands = [(self.momentum(s, i) or -9e9, s) for s in active if w[s] > 0]
+        cands = []
+        for s in active:
+            if w[s] > 0:
+                m = self.momentum(s, i)
+                cands.append((-9e9 if m is None else m, s))
         top = [s for _, s in sorted(cands, reverse=True)[: v.k]]
         return {s: w[s] / v.k for s in top}
 
     def simulate(self, v: Variant | None, start: date, end: date, cost: float, ann: int, *,
-                 buy_hold=False, only: tuple[str, ...] | None = None, label="") -> Result:
-        prev: dict[str, float] = {}
+                 buy_hold=False, only: tuple[str, ...] | None = None, label="",
+                 band: float = 0.1) -> Result:
+        """Ağırlıklar fiyatla birlikte kayar (bedava günlük yeniden dengeleme yok).
+        Strateji: bir varlığın kaymış ağırlığı hedeften payın `band` katından fazla
+        saparsa ya da hedef 0 ise hedefe çekilir; masraf her gerçek değişimde düşülür.
+        Al-tut: pencere başında etkin varlıklara eşit dağıtılır, sonra hiç dokunulmaz
+        (borsadan çıkarılan varlık son fiyatından nakde döner)."""
+        held: dict[str, float] = {}           # bar başındaki (kaymış) ağırlıklar
         eq, peak, mdd, rets, ctot, expo, hold = 1.0, 1.0, 0.0, [], 0.0, [], []
         cal = self.calendar
+        started = False
         for i in range(len(cal) - 1):
             if not start <= cal[i + 1] <= end:
                 continue
-            tgt = self.targets(i, v, buy_hold, only)
-            c = sum(abs(tgt.get(s, 0.0) - prev.get(s, 0.0)) for s in set(tgt) | set(prev)) * cost
-            r = 0.0
-            for s, w in tgt.items():
+            if buy_hold:
+                if not started:
+                    new = self.targets(i, None, True, only)
+                    started = bool(new)          # ilk etkin varlık olduğu gün alınır
+                else:
+                    new = {s: w for s, w in held.items() if self.ready[s][i]}
+            else:
+                tgt = self.targets(i, v, False, only)
+                n_act = max(1, len(tgt))
+                new = {}
+                for s in set(tgt) | set(held):
+                    t_, h_ = tgt.get(s, 0.0), held.get(s, 0.0)
+                    sleeve = 1.0 / n_act if v is None or v.kind != "enIyiK" else 1.0 / v.k
+                    new[s] = t_ if (t_ == 0.0 or abs(t_ - h_) > band * sleeve) else h_
+                new = {s: w for s, w in new.items() if w > 0}
+            c = sum(abs(new.get(s, 0.0) - held.get(s, 0.0)) for s in set(new) | set(held)) * cost
+            r, grown = 0.0, {}
+            for s, w in new.items():
                 a, b = self.close[s][i], self.close[s][i + 1]
-                if w and a and b:
-                    r += w * (b / a - 1)   # çıkarılan coinde son fiyat sürer → getiri 0, sonra satılır
-            prev = tgt
+                g = (b / a - 1) if (a and b) else 0.0
+                r += w * g
+                grown[s] = w * (1 + g)
             net = r - c
+            total = 1 + r
+            held = {s: x / total for s, x in grown.items()} if total > 0 else {}
             eq *= 1 + net
             peak = max(peak, eq)
             mdd = min(mdd, eq / peak - 1)
             rets.append(net)
             ctot += c
-            expo.append(sum(tgt.values()))
-            hold.append(sum(1 for x in tgt.values() if x > 0))
+            expo.append(sum(new.values()))
+            hold.append(len(new))
         n = len(rets)
         if n < 2:
             return Result(label, 0, 0, 0, 0, 0, 0, 0, n, rets)
@@ -291,11 +318,13 @@ def universe_report(directory: Path, name: str) -> tuple[str, dict[str, list[flo
     best_tr, best_v = max(train, key=lambda x: x[0].sharpe)
     te = lambda v, **kw: u.simulate(v, te_start, last, cost, ann, **kw)
     full = lambda v, **kw: u.simulate(v, tr_start, last, cost, ann, **kw)
-    bh_te = te(None, buy_hold=True, label="Al-tut (evren, eşit)")
+    bh_te = te(None, buy_hold=True, label="Al-tut (evren, eşit başlangıç)")
     base_name, base_only = ({"kripto": ("BTC+ETH trend (mevcut strateji)", ("BTCUSDT", "ETHUSDT")),
                              "etf": ("Yalnızca SPY trend", ("SPY",)),
                              "hisse": ("", None)})[name]
     rows_te = [bh_te]
+    if base_only and not all(s in u.syms for s in base_only):
+        base_only = None
     if base_only:
         rows_te.append(te(None, only=base_only, label=base_name))
         bh_one = te(None, buy_hold=True, only=base_only[:1],
@@ -312,11 +341,11 @@ def universe_report(directory: Path, name: str) -> tuple[str, dict[str, list[flo
              f"en büyük düşüş {chosen_te.max_dd * 100:.1f}%.", "",
              "### Test dönemi (eğitimde kullanılmadı)", "", HEAD] + [_row(r) for r in rows_te]
     lines += ["", "### Eğitim dönemi", "", HEAD, _row(u.simulate(None, tr_start, tr_end, cost, ann,
-                                                                   buy_hold=True, label="Al-tut (evren, eşit)"))]
+                                                                   buy_hold=True, label="Al-tut (evren, eşit başlangıç)"))]
     if base_only:
         lines.append(_row(u.simulate(None, tr_start, tr_end, cost, ann, only=base_only, label=base_name)))
     lines += [_row(r) for r, _ in train]
-    lines += ["", "### Tüm dönem (bilgi)", "", HEAD, _row(full(None, buy_hold=True, label="Al-tut (evren, eşit)")),
+    lines += ["", "### Tüm dönem (bilgi)", "", HEAD, _row(full(None, buy_hold=True, label="Al-tut (evren, eşit başlangıç)")),
               _row(full(best_v)), ""]
     series = {"secilen": u.simulate(best_v, te_start, last, cost, ann).returns}
     return "\n".join(lines), series, u
@@ -324,7 +353,8 @@ def universe_report(directory: Path, name: str) -> tuple[str, dict[str, list[flo
 
 def mixed_report(directory: Path) -> str:
     """Kripto (eşit pay) + ETF (eşit pay), %50/%50, test döneminde (2024→). Kripto
-    takvimine göre; ETF getirisi hafta sonu 0. Günlük yeniden dengeleme masrafı yok sayılır."""
+    takvimine göre; ETF getirisi hafta sonu 0. İki yarı arasında günlük yeniden
+    dengeleme masrafsız varsayılır (yaklaşık; iki yarının kendi masrafları dahil)."""
     try:
         uk, _ = load_universe(directory, "kripto")
         ue, _ = load_universe(directory, "etf")
@@ -341,6 +371,8 @@ def mixed_report(directory: Path) -> str:
 
     rk, re_ = daily(uk, "kripto"), daily(ue, "etf")
     days = sorted(rk)
+    if len(days) < 2:
+        return "## KARIŞIK\n\nAtlandı: 2024 sonrası veri yok\n"
 
     def stats(rs):
         eq, pk, mdd = 1.0, 1.0, 0.0
@@ -374,7 +406,10 @@ def full_report(directory: Path, names=("kripto", "etf", "hisse")) -> str:
             text = f"## {n.upper()}\n\nAtlandı: {exc}\n"
         parts.append(text)
     if "kripto" in names and "etf" in names:
-        parts.append(mixed_report(directory))
+        try:
+            parts.append(mixed_report(directory))
+        except (ValueError, statistics.StatisticsError) as exc:
+            parts.append(f"## KARIŞIK\n\nAtlandı: {exc}\n")
     parts.append("Veri: Binance (data.binance.vision), Yahoo Finance (yfinance).")
     return "\n".join(parts) + "\n"
 

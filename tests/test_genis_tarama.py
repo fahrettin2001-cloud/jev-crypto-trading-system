@@ -143,6 +143,35 @@ class TestUniverse(unittest.TestCase):
         for part in ("KRIPTO", "ETF", "HISSE", "Atlandı", "KARIŞIK", "Eğitimde seçilen", "BTC+ETH trend"):
             self.assertIn(part, rep)
 
+    def test_buy_hold_is_not_rebalanced(self):
+        # Denetimde bulunan hata: al-tut her gün bedava yeniden dengeleniyordu (+%56).
+        d0 = date(2020, 1, 1)
+        base = [100.0] * 120
+        a = base + [200.0, 100.0]
+        b = base + [50.0, 100.0]
+        u = G.Universe({"A": {d0 + i * DAY: a[i] for i in range(122)},
+                        "B": {d0 + i * DAY: b[i] for i in range(122)}})
+        r = u.simulate(None, d0 + 120 * DAY, d0 + 121 * DAY, 0.001, 365, buy_hold=True)
+        # gerçek al-tut: 1,25 → 1,00; tek kayıp giriş masrafı (0,001 × 0,8 kalan değer)
+        self.assertAlmostEqual(r.total, -0.0008, places=6)
+
+    def test_zero_momentum_is_not_worst(self):
+        d0 = date(2020, 1, 1)
+        n = 300
+        prices = {"P": {d0 + i * DAY: 100.0 for i in range(n)}}
+        u = G.Universe(prices)
+        u.weight["P"] = [1.0] * n                     # zorla trendde say
+        u.weight.update({})
+        self.assertEqual(u.momentum("P", 250), 0.0)
+        top = u.targets(250, G.Variant("enIyiK", k=1))
+        self.assertEqual(list(top), ["P"])
+
+    def test_mixed_report_without_test_period(self):
+        write_universe(self.root, "kripto", ["BTCUSDT", "ETHUSDT"], date(2020, 1, 1), 600)
+        write_universe(self.root, "etf", ["SPY"], date(2020, 1, 1), 600)
+        self.assertIn("Atlandı", G.mixed_report(self.root))
+        self.assertIn("KRIPTO", G.full_report(self.root))
+
     def test_module_has_no_orders(self):
         src = (Path(G.__file__)).read_text(encoding="utf-8")
         for bad in ("portfolio", "run_once", "api_key", "/order"):
